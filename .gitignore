@@ -1,0 +1,9 @@
+*.log
+*.pygtex
+*.bak
+*.out
+*.aux
+*.toc
+*.pdf_original
+*.class
+*.new
