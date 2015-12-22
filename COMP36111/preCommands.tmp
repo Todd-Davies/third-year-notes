@@ -1,0 +1,4 @@
+cd diagrams && pdflatex connected-graph.tex && cd ..
+cd diagrams && pdflatex directed-graph.tex && cd ..
+cd diagrams && pdflatex multiple-edges.tex && cd ..
+cd diagrams && pdflatex self-loops.tex && cd ..

@@ -1,0 +1,15 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\begin{document}
+\begin{tikzpicture}[->, node distance=3cm, every loop/.style={},
+                    thick,main node/.style={circle,draw,font=\sffamily\Large\bfseries}]
+
+  \node[main node] (1) {};
+  \node[main node] (2) [left of=1] {};
+  %\node[main node] (3) [below right of=2] {};
+  %\node[main node] (4) [below right of=1] {};
+
+  \path[every node/.style={font=\sffamily\small}]
+    (1) edge (2);
+\end{tikzpicture}
+\end{document}
