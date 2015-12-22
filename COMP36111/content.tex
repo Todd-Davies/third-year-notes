@@ -1,0 +1,128 @@
+% Set the author and title of the compiled pdf
+\hypersetup{
+	pdftitle = {\Title},
+	pdfauthor = {\Author}
+}
+
+\section{Algorithmic Wisdom}
+
+{\hspace{2.2em} \small Lectures 2 \& 3}
+
+The first two lectures of the course describe different types of algorithms,
+what is computable, where to optimise algorithms, asymptotics and heuristics.
+
+\subsection{Different types of algorithms}
+
+There are three types of algorithms that are mentioned:
+
+\marginpar{You should know all of this from \texttt{COMP26120}.}
+
+\begin{description}
+  \item \textbf{Divide and conquer}\\
+    These algorithms continually break a problem down into smaller parts, which
+    are easier to solve, until eventually, the problems are trivial and easily
+    solved. This is often used when the data you're operating on is in a
+    recursive datastructure such as a tree. If you're writing an algorithm to
+    find how many nodes there are in a tree, then you could use divide and
+    conquer:
+
+    \begin{lstlisting}
+      int countTreeSize(tree) {
+        int size = 1;
+        if (tree.left) size += countTreeSize(tree.left);
+        if (tree.right) size += countTreeSize(tree.right);
+        return size;
+      }
+    \end{lstlisting}
+
+    As you can see from the example, divide and conquer algorithms are usually
+    recursive.
+
+    The divide and conquer technique can be applied to graphs, but in order to
+    do this, you must keep track of which nodes you've visited with a flag on
+    each node. If we wanted to count the nodes in a graph, we could do:
+
+    \begin{lstlisting}
+      int countGraphSize(graph) {
+        if (graph.visited) return 0;
+        graph.visited = true;
+        int size = 1;
+        for (child in graph) {
+          size += countGraphSize(child);
+        }
+        return size;
+      }
+    \end{lstlisting}
+
+  \item \textbf{Mutual Recursion}\\
+    Mutual recursion describes an algorithm that operates on data where one type
+    of data can reference another, and the other can reference it. The example
+    given is that of statements and expressions in programming languages;
+    statements contain expressions, and expressions can also contain statements.
+    Parsing such a structure might involve two algorithms that recurse on each
+    other!
+
+  \item \textbf{Dynamic Programming}\\
+    Dynamic programming exploits the fact that when some problems are broken
+    down into smaller sub-problems, some of the sub-problems are identical.
+    Dynamic programming algorithms start from the very smallest sub-problems and
+    build up to the final solution, and usually cache results to sub-problems in
+    a table so that work is not done twice.
+
+\end{description}
+
+\subsection{Computability}
+% TODO: Combine this with a later topic?
+
+There are many different definitions of computability, including
+\href{https://en.wikipedia.org/wiki/Lambda_calculus}{lambda calculus},
+\href{https://en.wikipedia.org/wiki/Turing_machine}{Turing machines},
+\href{https://en.wikipedia.org/wiki/Rewriting}{rewriting rules},
+\href{https://en.wikipedia.org/wiki/Random-access_machine}{random access
+machines} and (many) more. The idea that relates all of these things, is that
+they all have the same capabilities. That is to say that if you can compute
+something using one of these ideas, then you can also compute it on all the
+others too.
+
+There are also a class of `alternate' computing mechanisms, such as quantum
+computers and neural computers. These ideas have the potential to compute things
+that a Turing machine (or its equivalents cannot), but they are significantly
+harder to build, and functional implementations do not exist yet.
+
+\subsection{Asymptotics and optimisation}
+
+When you have to get a computer to perform a task, implementing a simple
+algorithm first is a good idea, since you will at least have something to
+demonstrate to people, and you will gain a good understanding of the problem at
+hand. However, simple algorithms are often slow; how should we evolve our
+implementation to be as fast as we need it to be?
+
+Profiling can tell you where your code is spending most of its time. Sometimes
+your algorithm will be really fast, and the processor will spend most of its
+time waiting for IO to give it more data; this is often the case with GPU
+computation.
+
+Assuming you find some CPU bottleneck in your code, before you spend hours
+making it faster, consider whether it is worth the effort. If this part takes up
+10\% of your runtime, and you make it twice as fast, your program will only run
+5\% faster. This is an example of the
+\href{https://en.wikipedia.org/wiki/Diminishing_returns}{Law of Diminishing
+Returns}.
+
+As well as optimising specific parts of an algorithm, you also should consider
+its asymptotic run time. An algorithm that runs in $O(n^2)$ time is probably
+going to be better than one that runs in $O(n log(n))$ time. However, this isn't
+always the case; some algorithms (often ones with good asymptotic run times)
+take a long time to set up, usually when you have to transform the data into
+some different datastructure. If you are running your algorithm on a small
+amount of data, then an algorithm that you can run on your data \textit{as is}
+might outperform a fancier algorithm that you have to invest more overhead in.
+
+\marginpar{Sometimes a good solution is to use different algorithms depending
+on the input. If there are only a few cases that produce worst-case performance,
+you could even hard-code solutions to those!}
+
+The average case runtime of a algorithm is also important. Haskell uses a type
+checker that runs in $O(2^{n^n})$ time in the worst case, but for every program
+that isn't made specifically to mess with the compiler, runs in linear time.
+
