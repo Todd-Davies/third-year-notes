@@ -158,6 +158,7 @@ its weight. The length of a path between nodes is simply the sum of the edge
 weights connecting the nodes.
 
 \subsection{Connectivity}
+\label{connectivity}
 
 A node $a$ is \textbf{reachable} from another node $b$ if there is some sequence
 of nodes connected by edges that go from the $a$ to $b$.
@@ -223,7 +224,38 @@ We can store graphs in computer memory in two ways:
     low constant overhead.
 \end{description}
 
-\subsection{Graph algorithms}
+\subsection{Classifying Edges}
+
+During a \textit{depth first traversal} (Section~\ref{depth-first-search}) of a
+graph, we can classify each edge into one of four types. When doing the
+traversal, we process each edge from left to right (from the viewer's
+perspective), and we define an edge to be an \textit{ancestor} of another edge
+if there is a path from the ancestor edge to the descendent edge and the ancestor
+is traversed first. The four types of edges are:
+
+\begin{description}
+  \item \textbf{Tree edges}\\
+    These edges lead to a new node during a search. If you remove all the edges 
+    from the graph except tree edges, then you get a tree!
+  \item \textbf{Forward edges}\\
+    These go from ancestor edges to descendent edges, but are not tree edges
+    (i.e. the descendent node has been visited already).
+  \item \textbf{Cross edges}\\
+    These go between edges where no node is the ancestor of the other.
+  \item \textbf{Back edges}\\
+    An edge that goes from a descendant to an ancestor.
+\end{description}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{images/edge-types}
+  \caption{A
+  \href{http://courses.csail.mit.edu/6.006/spring11/rec/rec13.pdf}{pictorial
+  illustration} of the different edge types.}
+  \label{fig:connected-graph}
+\end{figure}
+
+\subsection{Graph Algorithms}
 
 You will have covered some of the algorithms featuring here in previous courses,
 or perhaps seen them in the wild. They are however interesting and useful, so
@@ -231,11 +263,16 @@ it's worth a recap even if they're not new! I've ordered these in roughly
 increasing order of mental strain.
 
 \subsubsection{Depth first search}
+\label{depth-first-search}
 
 \href{https://en.wikipedia.org/wiki/Depth-first_search}{Depth first search}
 (DFS) is an algorithm to find a node in a graph starting from another node. It
 works on both directed and undirected graphs, and runs in $O(|V| + |E|)$
 (linear) time. The psudo code looks like this:
+
+\marginpar{Note how we mark nodes as having been visited (by adding them to
+\texttt{visitedNodes}). This is so if there is a loop in the graph, the 
+algorithm doesn't run indefinitely.}
 
 \begin{lstlisting}[language=java]
   Node dfs(Node haystack, Node needle) {
@@ -278,6 +315,11 @@ time using Tarjan's algorithm, which we'll see later.
 Dijkstra's algorithm finds the undirected shortest path between two nodes in a
 graph. Here is the psudo-code:
 
+\marginpar{My best advice for learning an algorithm like this, is to get a 
+whiteboard, draw out the problem, and then run the solution manually on the 
+whiteboard. Then you have a pictorial and visual explanation of how the 
+algorithm \textit{really} works.}
+
 \begin{lstlisting}[language=java,
                   caption=Dijkstra's algorithm (from Wikipedia),
                   label=lst:dijkstra,
@@ -285,20 +327,23 @@ graph. Here is the psudo-code:
 function Dijkstra(Graph, source):
   create vertex set Q
 
-  for each vertex v in Graph:        // Initialization
-    dist[v] = INFINITY               // Unknown distance from source to v
-    prev[v] = UNDEFINED              // Previous node in optimal path from source
-    add v to Q                       // All nodes initially in Q (unvisited nodes)
+  // Initialization
+  for each vertex v in Graph:
+    dist[v] = INFINITY
+    prev[v] = UNDEFINED
+    add v to Q
 
-  dist[source] = 0                   // Distance from source to source
+  // Distance from source to source
+  dist[source] = 0
 
   while Q is not empty:
-    u = vertex in Q with min dist[u] // Source node will be selected first
+    u = vertex in Q with min dist[u]
     remove u from Q 
 
-  for each neighbour v of u:          // where v is still in Q.
+  for each neighbour v of u:
     alt = dist[u] + length(u, v)
-    if alt < dist[v]:                // A shorter path to v has been found
+    // A shorter path to v has been found
+    if alt < dist[v]:
       dist[v] = alt 
       prev[v] = u 
 
@@ -308,3 +353,158 @@ function Dijkstra(Graph, source):
 If we use a Fibonacci heap, for the priority queue, then the runtime of
 Dijkstra's algorithm is $O(|E| + |V|log(|V|)$. If we use a normal heap, then the
 runtime is $O(|E|log(|V|))$.
+
+\subsubsection{Tarjan's Algorithm}
+
+Before we delve into Tarjan's Algorithm, we need to discuss strongly connected
+components. You will remember from Section~\ref{connectivity}, that a graph is
+strongly connected if all nodes are reachable from any other node.
+
+A \textit{strongly connected component} is a subset of edges within a graph,
+where the subset is strongly connected. If a graph has only one strongly
+connected component, then it is strongly connected.
+
+The psudo code here is from
+\href{https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm}{Wikipedia}.
+If you're reading this after week 8 of the \texttt{COMP36111} course, then you
+probably have your own implementation in C.
+
+\begin{lstlisting}
+  algorithm tarjan is
+  input: graph G = (V, E)
+  output: set of strongly connected components (sets of vertices)
+
+  index := 0
+  S := empty
+  for each v in V do
+    if (v.index is undefined) then
+      strongconnect(v)
+    end if
+  end for
+
+  function strongconnect(v)
+    // Set the depth index for v to the smallest unused index
+    v.index := index
+    v.lowlink := index
+    index := index + 1
+    S.push(v)
+    v.onStack := true
+
+    // Consider successors of v
+    for each (v, w) in E do
+      if (w.index is undefined) then
+        // Successor w has not yet been visited; recurse on it
+        strongconnect(w)
+        v.lowlink  := min(v.lowlink, w.lowlink)
+      else if (w.onStack) then
+        // Successor w is in stack S and hence in the current SCC
+        v.lowlink  := min(v.lowlink, w.index)
+      end if
+    end for
+
+    // If v is a root node, pop the stack and generate an SCC
+    if (v.lowlink = v.index) then
+      start a new strongly connected component
+      repeat
+        w := S.pop()
+        w.onStack := false
+        add w to current strongly connected component
+      while (w != v)
+      output the current strongly connected component
+    end if
+  end function
+\end{lstlisting}
+
+%TODO: Expand on Tarjan's algorithm when a whiteboard is present
+
+\section{Linear Programming}
+
+Linear programming is an optimisation problem, where we want to find the `best'
+solution to a set of equations. We're going to solve it using the
+\textit{simplex} method, but before we do, I think it's a good idea to recap
+some high-school mathematics first. Feel free to skip the next subsection if
+you're feeling confident with it.
+
+\subsection{Background mathematics}
+
+An inequality relation is just like a normal equation, except the equals sign is
+replaced by either $<$, $>$, $\leq$ or $\geq$. When you solve an inequality, you
+generally want to get all of the similar terms on one side (e.g. move all the
+variable terms over to one side, and all of the constants to another side). This
+\textit{mostly} works like a normal equation; you can add and subtract from both
+sides just like normal, however, if you want to divide or multiply \textbf{by a
+negative quantity}, then you need to \textbf{reverse the equality}.
+
+\[
+  \begin{split}
+    -2x &> -2\\
+    2x &< 2\\
+    x &< 1
+  \end{split}
+\]
+
+This equality is satisfied whenever $x$ is less than $1$. If we have two terms
+in the equality (something similar to $ax + by \geq c$), it becomes slightly
+harder to solve. To solve this we can:
+
+\begin{itemize}
+  \item Plot a graph of the line $ax + by = c$.
+  \item Pick a test point $(x, y)$ not on the line, and plot it on the graph.
+  \item If the point $(x, y)$ satisfies the inequality, then shade the opposite 
+    side of the line to which the point is on, otherwise, shade the same side.
+\end{itemize}
+
+For example, given $3x + 4y \leq 6$, and choosing the point $(-2,1)$ we end up
+with what's in Figure~\ref{fig:graph-1}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics{diagrams/graph1}
+  \caption{A graph of $3x + 4y \leq 6$, with all the valid values shaded blue.}
+  \label{fig:graph-1}
+\end{figure}
+
+If we have multiple inequalities, we want to \textit{find the region where all
+of them are satisfied}. This involves plotting each line, and shading the
+regions where they're not satisfied, which means the blank bit is the bit we
+want.
+
+If we have the equations $3x + 4y \leq 6$, $2y - x \leq 2$ and $x \geq 0$, we
+will get something like in Figure~\ref{fig:graph-2}.
+
+\begin{figure}[h]
+\captionsetup{width=.4\linewidth}
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{diagrams/graph2}
+  \captionof{figure}{A graph plotting $3x + 4y \leq 6$, $2y - x \leq 2$ and
+  $x \geq 0$, where the points not satisfying the inequalities are shaded in 
+  blue, green and red respectively. The clear region satisfies all points.}
+  \label{fig:graph-2}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\textwidth]{diagrams/graph3}
+  \captionof{figure}{The valid region in the three inequalities from
+  Figure~\ref{fig:graph-2}. The corner points are $(2,0),(-2,0)$ and
+  $(\frac{2}{5},\frac{6}{5})$.}
+  \label{fig:graph-3}
+\end{minipage}
+\end{figure}
+
+
+The corner points are especially important to us, since that's often where the
+useful numbers are (we'll see more of this later). In order to find the corner
+points, we solve the two lines that form them. Solving the following equations
+gives the points in Figure~\ref{fig:graph-3}.
+
+\begin{mymulticols}
+  \begin{itemize}
+    \item $x = 0, 3x + 4y = 6$
+    \item $x = 0, 2y - x = 2$
+    \item $2y - x = 2, 3x + 4y = 6$
+  \end{itemize}
+\end{mymulticols}
+
+% Up to 4.4 in the Linear Equalities booklet.

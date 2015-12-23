@@ -1,0 +1,25 @@
+\documentclass{standalone}
+
+\usepackage{pgfplots}
+
+\begin{document}
+\begin{tikzpicture} 
+
+    \begin{axis}[
+      enlargelimits=0.1,
+      axis lines=middle,
+      xmin=-4, xmax=4,
+      ymin=-1.5, ymax=4.5]
+    \addplot [domain=-4:4,thick,color=blue,mark=o,]coordinates {(2, 0)};
+    \addplot [domain=-4:4,thick,color=blue,mark=o,]coordinates {(-2, 0)};
+    \addplot [domain=-4:4,thick,color=blue,mark=o,]coordinates {(2/5, 6/5)};
+    \addplot [color=white,fill=orange, 
+              fill opacity=0.4]coordinates {
+              (2,0)
+              (-2,0)
+              (2/5,6/5)};
+     % Re-paint the x axis
+    \addplot [] {0};
+    \end{axis}
+\end{tikzpicture}  
+\end{document}
