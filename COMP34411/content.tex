@@ -266,3 +266,172 @@ One thing that is important to note, is that we can process words from left to
 right, and don't have to back-track. This means that processing is in linear
 time, which is fantastic (though we need a big dictionary of words, which is
 rather less fantastic).
+
+\subsection{Unknown words}
+
+Now we can read in a sentence, parse each word and extract the relations between
+the words to produce a meaningful parse tree, great! But\dots what if we
+don't have a word in the input sentence in our dictionary? We won't be able to
+fit it into our parse tree since it won't have any meaning to us. Looking at the
+morphemes doesn't tell us too much; having `ing' at the end means that a word is
+probably a verb and is in the present tense, but doesn't tell us what's actually
+going on.
+
+There are two different classes of classes of words \textit{open} and
+\textit{closed}. Open classes are verbs, adjectives, nouns etc where there are
+lots of them and you can easily add more (new nouns are created all the time).
+Closed classes are things like prepositions (`in', `on'), and auxiliaries (`be',
+`have', `would') where you rarely if ever get new words being added.
+
+So, if we cannot recognise a word using the morphological rules we used before,
+then we should \textbf{back off} to using a more robust but less accurate
+strategy. Lets define exactly what robust and accurate mean:
+
+\begin{description}
+  \item \textbf{Robust}\\
+    This is when a system always gives an answer, even if the answer might be 
+    wrong. It's sometimes a good idea have a robust system, since then you can 
+    always take \textit{some} action.
+  \item \textbf{Accurate}\\
+    An accurate system always gets the answer `right' when asked a question.
+\end{description}
+
+A common strategy in Natural Language Processing is to use a system that is
+highly accurate but less robust, but fall back on a less accurate but more
+robust system when the first doesn't give an answer.
+
+So, we need to build a robust word recogniser for unknown words. To do this, we
+need to know what word it is, and what part of speech tag it has (noun, verb
+etc).
+
+\subsubsection{Stemming}
+
+If you were to come across the word `blodge', you probably wouldn't know what it
+means (althought there are, as always a number of definitions in the
+\href{http://www.urbandictionary.com/define.php?term=blodge}{Urban Dictionary}).
+If a word like `blodge' were to appear in the middle of a sentence, you could
+probably still extract some information from it:
+
+\begin{itemize}
+  \item I went to blodge $\rightarrow$ Blodge is a place.
+  \item I went to blodged it $\rightarrow$ Blodging is a thing you can do.
+    The blodging happened in the past.
+  \item The car was blodge $\rightarrow$ You can describe something as having 
+    the property/quality `blodge'.
+\end{itemize}
+
+The \textbf{Porter Stemmer} is a set of rules that tell you what bits of a word
+you can remove to get the stem of the word that is common to all forms of the
+word. If we run the porter stemmer on `blodge', `blodging' and `blodged', then
+we get the stem as `blodg'. Now we can at least identify all instances of
+`blodg*' as the same word.
+
+\subsubsection{Part of speech tagging}
+
+When we look up a word in a dictionary, we get something like this:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.75\textwidth]{images/revision-definition}
+  \caption{A dictionary definition of the word `revision'.}
+  \label{fig:revision-definition}
+\end{figure}
+
+Not only does a dictionary give us the definition of a word, but it also give us
+its part of speech tag. In the case of Figure~\ref{fig:revision-definition} it
+is a noun. We need the POS tag in order to work out how words are related to
+each other, so we can put them in their proper place in a parse tree.
+
+There are a number of ways to do part of speech tagging (this is what I'm doing
+for my third year project, and it's a rabbit hole that you don't want to go down
+if you're trying to revise for exams). Here are the ones you need to know for
+this course:
+
+\begin{description}
+
+  \marginpar{One thing to be aware of with using corpuses, is that they are 
+  often ordered. If you use the first $N$ million words for training and the 
+  next $M$ million for testing, then you could end up with disasterous results, 
+  because different areas of the corpus will be about different genres, and 
+  will contain different words.}
+
+  \item \textbf{Dictionary look up}\\
+  The easiest way to do POS tagging (but also the worst), is to get a big
+  massive dictionary, and find the part of speech tag for each word. Then, when
+  you need to tag a word, then you just look it up in your big list.
+
+  However, you need lots and lots and lots of words to do this, and getting the
+  tags for all of the words is a big task. Furthermore, if we're trying to
+  handle unknown words, then by definition, we've not seen them before and they
+  won't be in our dictionary.
+
+  Obviously, the bigger your list of words, the fewer words you'll need to
+  handle. The British National Corpus has 100 million words in, which is in the
+  right ballpark, but it is poorly tagged (the error rate is above 1\% in
+  parts). Other corpuses are available, but are either smaller, or you have to
+  pay for them. In order to use the BNC (or any corpus) as a dictionary, you
+  count how many times each word is tagged with each part of speech tag, and
+  then assign the most common tag.
+
+  There are two main advantages to this method; first of all, it's really
+  simple, and computationally easy. Using a sensible hash table, lookup is
+  $O(1)$ and training is $O(n)$. It's so fast that the bottleneck is usually the
+  IO operations of reading (and decoding) the corpus. The second advantage, is
+  that you get alternative tags for words. A word might be in the corpus 50
+  times as a verb, but 20 times as a noun, and you can use this information in
+  your processing.
+
+  As a \textbf{backoff} technique, you can also keep track of the POS
+  probabilities for the last $n$ letters of the word, so if the word isn't in
+  your dictionary, you can use the last $n$ letters of it to determine what tag
+  to assign.
+
+  %TODO: Sefine precision and recall somewhere
+
+  \item \textbf{Transition probabilities and HMM's}\\
+
+  HMM's use probabilities and context to determine what tag a word should get.
+  To train a HMM, we collect statistics on what part of speech tags
+  \textit{follow and precede} other ones. For example, the probability of a noun
+  being followed by another noun might be quite high, because of names (e.g.
+  Todd Davies), and adjectives usually lead onto nouns, or other adjectives
+  (e.g. hungry bored Todd).
+
+  These are called \textbf{bigram} probabilities (because you have information
+  about following and preceding tags). A HMM based POS tagger works as follows:
+
+  \begin{itemize}
+    \item For each word, use a corpus to calculate how likely it is to belong 
+    to each class (just like we did for the dictionary look up approach). These 
+    are the emission probabilities.
+    \item For each tag that we have found that might correspond to a specific 
+    word, look at the tag we assigned to the previous (and possibly next) word(
+    s) and use the transition probabilities to choose the most likely tag.
+  \end{itemize}
+
+  We want to find the most likely sequence of tags for the whole sentence, which
+  is why the hidden markov model works well. However, training can be slow and
+  its hard to make use of the backward transition probabilities.
+
+  \marginpar{I think this is more important for the POS tagging part of the
+  course than HMM's are.}
+
+  Alternately, you can use no HMM at all, by using a function to evaluate the
+  best next tag:
+
+  \[
+    \begin{split}
+    F(&dict(Word, tag_i),\\
+      &\sum_k(P(tag(prevWord) = tag_k) \times P(tag_k \rightarrow tag_i)),\\
+      &\sum_k(dict(nextWord, tag_k) \times P(tag_i \leftarrow tag_k)))
+    \end{split}
+  \]
+
+  You can define $F$ to be anything, but in the course notes:
+
+  \[
+    F(dictProbability, forward, backward) = \sqrt{dictProbability} \times 
+      (forward + backward)
+  \]
+
+\end{description}
