@@ -434,4 +434,86 @@ this course:
       (forward + backward)
   \]
 
+  \item \textbf{Transformation Based Learning}\\
+
+  \marginpar{This is the subject of my third year project, when I've finished 
+  it, I might remember to update these notes with a link to the code/my 
+  dissertation.}
+
+  Doing statistical tagging is pretty tedious, and requires a lot of text. Is
+  there another way of doing POS tagging? Maybe one that could require less
+  data?
+
+  This is very possible, as was demonstated in
+  \href{http://dl.acm.org/citation.cfm?doid=974499.974526}{Eric Brill's PhD
+  thesis} in 1995. The idea is to have a \textit{base tagger}, which is your 
+  first guess at what the tag is (this is any POS tagger, like the ones above 
+  for example), and then have rules that can correct mistakes in the output.
+
+  This presents its own problems though. For example, how do you generate 
+  rules? The solution is this:
+
+  \begin{enumerate}
+    \item Tag a small part of a corpus by hand, so the tags are 100\% (or very 
+    close to it) accurate.
+    \item Then you get come up with a set of rule \textit{templates}. Templates 
+    (in this course) are of the form
+    \texttt{\#name(entity1, entity2, entity3): oldTag > newTag if condition;} A 
+    set of templates looks something like this:
+    \begin{itemize}
+      \item \texttt{\#t0(T1,T2): T1 > T2 if tag[0] = T1}\\
+        Change tag T1 to tag T2 in every instance.
+      \item \texttt{\#t1(T1,T2,T3): T1 > T2 if tag[-1] = T3}\\
+        Change tag T1 to tag T2 if the previous tag was T3.
+      \item \texttt{\#w0(T1,T2,W1): T1 > T2 if word[0] = W1}\\
+        Change tag T1 to tag T2 if the current word is equal to W1.
+    \end{itemize}
+    \item Tag the corpus with the base tagger (something like a dictionary 
+    lookup tagger, or transition probability tagger) plus any rules you've 
+    generated so far, and then find the errors that it made. For every error,
+    \textbf{instansiate a rule based on the context of the error}.
+    \item Now you have lots of rules, you score each one by how many times it 
+    would have made a good change, and how many times it would have made a bad 
+    edit if you ran it on the whole corpus.
+    \item Select the top rule, and run steps 3-4 again until you have enough 
+    rules.
+  \end{enumerate}
+
+  I'm not sure if I like the format of the rule templates here, since they
+  require you to specify that you're turning one specific tag into another. An
+  example of an instansiated rule is:
+
+  \texttt{\#t0(UN,NN,UN): UN > NN if tag[0]=UN;}
+
+  This says turn every `UN' into a `NN'. What if we wanted to turn any tag into
+  a `NN' if it was preceded by a `UN' though? We couldn't do this with this
+  specific rule set, unless you had wildcards or something, e.g.:
+
+  \texttt{\#t1(*,NN,UN): * > NN if tag[-1]=UN;}
+
+  When you're assigning a score to each rule, you should give a gross score and
+  a net score. The gross score is how many problems the rule would fix, but the
+  net score is how many problems it would fix minus the number of correct
+  taggings it wrongly breaks. You might end up with something like this:
+
+  \begin{center}
+    \begin{tabular} {|c|c|c|}
+      \hline
+      Rule ranking & Gross & Net\\ \hline
+      1 & 500 & 300\\ \hline
+      2 & 450 & 240\\ \hline
+      3 & 412 & 234\\ \hline
+      4 & 375 & 121\\ \hline
+      5 & 297 & 100\\ \hline
+      $\vdots$ & $\vdots$ & $\vdots$\\ 
+    \end{tabular}
+  \end{center}
+
+  A brill tagger isn't really a part of speech tagger on its own, but it does go
+  a long way to making existing POS taggers better. Depending on the
+  characteristics of the base tagger, you can get anywhere from half a
+  percentage extra accuracy, to a full ten percent extra. Remember though, if
+  the base tagger is already 98\% accurate, half a percent is a big improvement!
 \end{description}
+
+% Talk about confusion matrix (slide 161)
