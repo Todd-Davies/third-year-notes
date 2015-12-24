@@ -507,4 +507,53 @@ gives the points in Figure~\ref{fig:graph-3}.
   \end{itemize}
 \end{mymulticols}
 
-% Up to 4.4 in the Linear Equalities booklet.
+So, now we know how to solve these types of problems, lets look at how to
+decompose a problem statement into a set of equations.
+
+\begin{quote}
+
+  You can buy wood in 11 meter lengths, or 6 meter lengths. A 11 meter piece of
+  wood can be cut into two lengths of 5 meters, and one length of 1 meter. A 6
+  meter piece of wood is cut into one length of 5 meter, and one length of 1
+  meter.
+
+  If we want twenty 1 meter pieces and thirty 5 meter pieces, how many 11, and
+  how many 6 meter lengths should we buy?
+
+\end{quote}
+
+To answer this, we can make a table to describe it:
+
+\begin{center}
+  \begin{tabular} {|p{3cm}|p{2cm}|p{2cm}|}
+    \hline
+    \multirow{2}{*}{Bought Length} & \multicolumn{2}{c|}{Required length}\\
+    \cline{2-3}
+    & 5 meter & 1 meter\\ \hline
+    11 meter\newline 6 meter & 2 per board\newline 1 per board & 1 per
+    board\newline 1 per board\\ \hline
+    Amount needed & 30 & 20\\ \hline
+  \end{tabular}
+\end{center}
+
+This decomposes into the following equations:
+
+\begin{itemize}
+  \item $2x + y \geq 30$
+  \item $x + y \geq 20$
+  \item $x \geq 0$, $y \geq 0$
+\end{itemize}
+
+Plotting this on a graph gives us what's in Figure~\ref{fig:graph-4}, where we
+can see a feasible region between $(0, 20), (10, 10), (15, 0)$ and  $(0,0)$. The
+three corner points are all of the non-zero points (zero eleven meter and zero
+six meter pieces is an invalid solution), and anywhere on the outer edge of the
+region is a solution.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics{diagrams/graph4}
+  \caption{A graph of $2x + y = 30$, $x + y = 20$, $x > 0$, $y > 0$.}
+  \label{fig:graph-4}
+\end{figure}
+
