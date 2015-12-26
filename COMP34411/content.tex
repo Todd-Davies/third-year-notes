@@ -326,7 +326,7 @@ word. If we run the porter stemmer on `blodge', `blodging' and `blodged', then
 we get the stem as `blodg'. Now we can at least identify all instances of
 `blodg*' as the same word.
 
-\subsubsection{Part of speech tagging}
+\subsection{Part of speech tagging}
 
 When we look up a word in a dictionary, we get something like this:
 
@@ -564,3 +564,114 @@ whatever system is using our tags further down the NLP pipeline. As a solution,
 we could define some special cases (the word `that' is hard to tag, for
 example), and if we're not sure about a tag, make the tag equal to the word.
 This technique is called \textbf{underspecification}.
+
+\subsection{Regular expressions}
+
+Now we can find the part of speech tag for any word (or at least give a good
+guess for it), we can start to assign structure to the sentence. Given the words
+of a sentence and their part of speech tags, using a grammar to parse sentences
+can be done in $O(n^3)$ time \textbf{so long as lecixal ambiguity and out- of-
+place words are ignored}. The trouble with this, is that both these things
+really matter, and an algorithms that doesn't work, isn't very much use at all.
+
+So, when our grammar does break down in those cases, we need to be able to
+\textit{back off} to another more robust technique. This could be regular
+expressions. Say a noun phrase is made of an optional determiner, zero or more
+adjectives and then a noun:
+
+\begin{verbatim}
+  NP = DET? ADJ* NOUN
+\end{verbatim}
+
+A verb phrase is made of a verb and either one or two noun phrases, while a
+sentence is made of a noun phrase and a verb phrase:
+
+\begin{verbatim}
+  VP = (VERB PREP? NP) | (VERB PREP? NP NP)
+  s = NP VP
+\end{verbatim}
+
+Given a string that was tagged (correctly), you could apply the regular
+expression to the string to get the sentences:
+
+\begin{center}
+  % Tabular centering hack #2
+  \begin{tabular}{c}
+    \begin{lstlisting}
+      The reader wishes for    a   long break.
+      --- ------ ------ ---    -   ---- -----
+      DET NOUN   VERB   PREP  DET  ADJ  NOUN
+      ----------              --------------  
+        NP                        NP
+                 --------------------
+                         VP
+       ---------------------
+                 s
+    \end{lstlisting}
+  \end{tabular}
+\end{center}
+
+If we tag a sentence from the BNC, and run it through a simple regex, then we
+can efficiently and effectively parse the sentence. First we need to go from the
+BNC tags (they have different types of nouns, adjectives ete, looking like `NN4'
+for a type 4 noun) to more sensible tags:
+
+\begin{verbatim}
+  'noun': 'NN.'
+  'adj': 'AJ.'
+  'det0': '(AT|D.).'
+  ...
+\end{verbatim}
+
+Then we need to recognise phrases:
+
+\begin{verbatim}
+  'nmod': 'adj|noun'
+  'np0': '((det0? nmod* noun)|name|pron)'
+  ...
+\end{verbatim}
+
+Then you end up with something like:
+
+\begin{center}
+  % Tabular centering hack #2
+  \begin{tabular}{c}
+    \begin{lstlisting}
+      <NP><DET>The</DET><NOUN>reader</NOUN></NP><VP><VERB>wishes</VERB>
+      <PREP>for</PREP><NP><DET>a</DET><ADJ>long</ADJ><NOUN>break</NOUN>
+      <NP></VP><PUN>.</PUN>
+    \end{lstlisting}
+  \end{tabular}
+\end{center}
+
+\marginpar{Regexes also don't give you alternate options for parsing. They give 
+you one answer (i.e. `the string you gave matches this structure'), or no answers 
+at all.}
+
+This is good, and reasonable fast when your regex is small, but unfortunately,
+the regex has to get quite large for the output to be a correct parsing of the
+sentence, and then the regex parsing is quite slow. Furthermore, the output
+looks horrible, and since regex matching is an opaque thing, you can't debug it
+very well!
+
+Ultimately, you can recognise a sentence and its structure using regexes, but
+it's hard to make them parse a sentence just how you like it. Regexes aren't the
+exactly easy to come up with, and in order to properly define a sentence
+structure we need recursion (a noun phrase may contains another noun phrase).
+Unfortunately, regexes don't know about recursion, so we need to cascade them:
+
+\begin{verbatim}
+  'a': 'c b'
+  'b': 'a d'
+  ...
+\end{verbatim}
+
+\subsection{Supertagging}
+
+%TODO: WTF is supertagging
+
+Make me a pull request to fill in this section, do it now!
+
+\url{http://github.com/Todd-Davies/third-year-notes}{}
+
+%TODO: Page 193 onwards
