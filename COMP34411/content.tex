@@ -516,4 +516,51 @@ this course:
   the base tagger is already 98\% accurate, half a percent is a big improvement!
 \end{description}
 
-% Talk about confusion matrix (slide 161)
+\paragraph{Confisuion matrices}
+
+No matter how good our POS tagging algorithms are, they're always going to get
+\textit{something} wrong. Confusion matrices are a way to spot common errors
+that our taggers make. It is a table showing the correct tags along one side,
+and the tags the POS tagger came up with along the other. Something like in
+Table~\ref{table:conf-matrix}.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|c|c|c|c|c|}
+    \hline
+        & NN  & VB  & PUN & $\dots$\\ \hline
+    NN  & 80  & 4   & 0   & $\dots$\\ \hline
+    VB  & 12  & 74  & 1   & $\dots$\\ \hline
+    PUN & 0   & 0   & 12  & $\dots$\\ \hline
+    $\vdots$ & $\vdots$ & $\vdots$ & $\vdots$ & $\ddots$\\ \hline
+  \end{tabular}
+  \caption{A sample confusion matrix. Along the top is the number of `correct' 
+  tags, along the side is the number of tags we predicted.}
+  \label{table:conf-matrix}
+\end{table}
+
+Apart from using them to gloat about your awesome POS taggger to your natural
+language systems friends, confusion matrices are useful for improving the
+accuracy of your tagger. If you have multiple taggers, each with a different
+confusion matrix, then you can use the values in the matrix to determine which
+one tagger to believe on any word.
+
+If Tagger A says a word is a noun, but Tagger B another says its a determiner,
+then what do you do? You can look at the confusion matrix, and see that $93\%$
+of the time, the Tagger A gets nouns right, but $98\%$ of the time Tagger B gets
+determiners right, then you should go with Tagger B. It's kind of like if you
+hearded a load of lecturers into a room and started asking them CS questions. If
+you asked a question about complexity theory, you're more likely to get a good
+answer from somebody who teaches an advanced algorithms course than you are from
+somebody who teaches a UX course.
+
+\marginpar{NLP stands for Natural Language Processing, not Neuro-Linguistic
+Programming...}
+
+\paragraph{Special cases} Sometimes, a POS tag is very ambigous; the kind of
+thing that would have linguists arguing for ages trying to determine which was
+right. In these cases, we don't want to assign the wrong tag and mis-lead
+whatever system is using our tags further down the NLP pipeline. As a solution,
+we could define some special cases (the word `that' is hard to tag, for
+example), and if we're not sure about a tag, make the tag equal to the word.
+This technique is called \textbf{underspecification}.
