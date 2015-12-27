@@ -517,8 +517,9 @@ decompose a problem statement into a set of equations.
   meter piece of wood is cut into one length of 5 meter, and one length of 1
   meter.
 
-  If we want twenty 1 meter pieces and thirty 5 meter pieces, how many 11, and
-  how many 6 meter lengths should we buy?
+  If we have room for twenty 1 meter pieces and thirty 5 meter pieces, how many
+  11, and how many 6 meter lengths should we buy? We cannot go over that amount
+  of pieces, but we can settle for less than that amount.
 
 \end{quote}
 
@@ -539,10 +540,12 @@ To answer this, we can make a table to describe it:
 This decomposes into the following equations:
 
 \begin{itemize}
-  \item $2x + y \geq 30$
-  \item $x + y \geq 20$
+  \item $2x + y \leq 30$
+  \item $x + y \leq 20$
   \item $x \geq 0$, $y \geq 0$
 \end{itemize}
+
+\marginpar{Notice how our shapes always have a convex hull...}
 
 Plotting this on a graph gives us what's in Figure~\ref{fig:graph-4}, where we
 can see a feasible region between $(0, 20), (10, 10), (15, 0)$ and  $(0,0)$. The
@@ -557,3 +560,61 @@ region is a solution.
   \label{fig:graph-4}
 \end{figure}
 
+\subsection{The maximum problem}
+
+Sometimes, we want to maximise some particular variable. For example, companies
+want to maximise their profit. If this is the case, then we can come up with a
+function for the profit, something like:
+
+\[
+  P = 7x + 3y
+\]
+
+Where $x$ is the number of $5$ meter boards, and $y$ is the number of $1$ meter
+boards. We can factor this equation into our solution, to find the most
+profitable wood to buy.
+
+If you think about it, the further from the origin we get, the more profit we
+get. At $(0,0)$ we have no profit, since we have done nothing, but at $(5,0)$ we
+have $35$ profit since we have bought five, $5$ meter length boards. Since our
+lines always intersect to produce a region with a convex shape, the points
+furthest from the origin are the corner points. To figure out how much profit we
+can make, we just need to find the maximum of these points:
+
+\begin{center}
+  \begin{tabular}{c | c | c | c}
+    \textbf{Corner point} & \textbf{5 meter boards} & \textbf{1 meter boards}
+      & \textbf{Profit}\\  \hline
+    $(0,20)$  & 20 & 20 & 200\\ \hline
+    $(10,10)$ & 30 & 20 & 270\\ \hline
+    $(15,0)$  & 30 & 15 & 255\\
+  \end{tabular}
+\end{center}
+
+Therefore the most profitable choice is to buy $10$ 11 meter length boards and
+$10$ 6 meter length boards.
+
+\subsection{The minimum problem}
+
+This is similar to the maximum problem, except instead of maximising profit,
+you'll be minimising cost, while still fulfilling some criteria. You plot a
+graph, find the corner points of the feasible region and see which one minimises
+the cost.
+
+%TODO: Expand on this when you have a quiet and comfortable place to work...
+
+\subsection{The Simplex Method}
+
+The simplex method automates finding the optimium value of variables. This is
+how it works:
+
+\begin{itemize}
+  \item Select a corner of the feasible region of the graph
+  \item Choose an edge that is connected to this point that will increase the
+  objective function.
+  \item Go to the next corner on that edge
+  \item Keep doing steps 2 and 3 until you find an optimal solution.
+\end{itemize}
+
+% TODO: Carry on later with this (when you have a whiteboard to practice the
+% tableau)
