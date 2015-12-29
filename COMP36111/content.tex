@@ -605,7 +605,7 @@ the cost.
 
 \subsection{The Simplex Method}
 
-The simplex method automates finding the optimium value of variables. This is
+The simplex method automates finding the optimum value of variables. This is
 how it works:
 
 \begin{itemize}
@@ -618,3 +618,251 @@ how it works:
 
 % TODO: Carry on later with this (when you have a whiteboard to practice the
 % tableau)
+
+\section{Turing machines and complexity measures}
+
+A Turing machine is a theoretical device that implements a model of computation.
+It operates on a tape of infinite length, which is divided into cells, and can
+read and write symbols from/to each cell when the \textit{head} of the machine
+is positioned over the cell. The Turing machine also has internal state, which
+is finite and determines what actions it takes (reading, writing, moving the
+tape etc).
+
+In this course, we will be thinking about multi-tape Turing machines. Here, the
+there are many tapes, numbered $1 \dots K$. Tape $1$ is the input tape and tape
+$K$ is the output tape. The tapes inbetween the input and output tapes are the
+work tapes. Any algorithm can be expressed as a multi-tape Turing machine
+
+\subsection{Formally defining a Turing Machine}
+
+A TM (Turing Machine) can be define as a quintuple, as shown in
+Figure~\ref{fig:tm-definition}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{equations/tm-definition}
+  \caption{Part of a multi-tape Turing machine definition. We must also define
+  the word \textit{symbol}, which is a mark occupying one cell on the tape. The
+  alphabet that a symbol can be from is $\Sigma \cup \{
+  \textrm{\textvisiblespace}, \vartriangleright\}$, where \textvisiblespace~is a
+  blank cell, and $\vartriangleright$ is the start symbol (signifying the left
+  edge of the tape).}
+  \label{fig:tm-definition}
+\end{figure}
+
+Up to now, we've defined a TM that is perfectly formed\dots but does nothing. We
+need to define how it moves between states in $Q$. To do that, we define a
+transition, as in Figure~\ref{fig:tm-transition}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{equations/tm-transition}
+  \caption{A transition of a Turing Machine}
+  \label{fig:tm-transition}
+\end{figure}
+
+Informally, this transition applies only if the current state is $p$, and the
+squares on the tapes confirm to $\bar{s}$, then set the new state to $q$ and
+write the symbols from $\bar{t}$ to the tapes and move the heads as directed by
+$\bar{d}$ (Left, Right or Stay).
+
+Now we've nearly finished defining a multi-tape TM, the final points are:
+
+\begin{itemize}
+  \item Since the TM is deterministic, there can be \textit{at most} one 
+    transition for every $(state,~\bar{current~symbols})$ tuple.
+  \item The tape never moves left $\vartriangleright$.
+  \item Tape 1 is read only and tape $K$ is write only.
+\end{itemize}
+
+\subsubsection{Acceptance, computability and decidability}
+
+We say that a TM $M$ \textit{accepts} an input $x$ if it halts on $x$. The
+language \textit{recognised} my $M$ is the set of strings that is accepted by
+$M$.
+
+\marginpar{Remember, when we say `Turing Machine', we could mean either a 
+deterministic TM or a non-deterministic one (unless we explicitly said which one
+we meant of course!).}
+
+If a language is recognised by a Turing Machine $M$, then there is also a 
+deterministic Turing Machine $M'$ that will recognise the same language. 
+
+A language is \textit{computable} (aka decidable), if there is a (deterministic)
+TM that will accept every string in the language, and reject every string not in
+the language.
+
+Up to now, our definitions of recognisable and computable are pretty similar (if
+not the same). The difference is, that if an input string \textbf{isn't} in a
+computable language, then the TM will halt (and output `no'), whereas if the
+input string isn't in a recognisable language, then the TM \textit{may} halt and
+output `no', or it could just carry on computing for ever. All a Turing Machine
+does with a recognisable language, is recognise if a string is in the language,
+it makes no guarantees about string not in the language!
+
+\subsubsection{The Universal Machine}
+
+If you're that way inclined, you can find lots of cool things about Turing
+Machines. Another such cool thing, is that every TM is a finite thing (it's just
+a quintuple as shown in Figure~\ref{fig:tm-definition}), which means we can come
+up with a way of encoding any Turing Machine into a string over the alphabet
+$\Sigma$ and use it as input to another Turing Machine!
+
+If we can do this, then we can construct a \textbf{Universal Machine} $U$. This
+machine takes two `arguments', another TM $M$ (encoded of course) and some
+arbitrary input $x$. If $M \downarrow x$, then $U$ finishes with $y$ on its
+output tape. If $M \uparrow x$, then $U$ will never terminate. The input is
+coded as $M;x$, where `;' is a separator between the Turing Machine we're
+`simulating' and the input we'll give it.
+
+\subsubsection{Nailing that TM definition}
+
+If you want your Turing Machines better defined than Arnie's Biceps, then this
+how you do it (alternately, read Chapter 3 of Sipser).
+
+%TODO: Not sure about a configuration on slide 8 of lecture 7b. I emailed Ian.
+
+A run of a TM is terminating if it is finite. If the input to a deterministic TM
+$M$ is $x$, and the run is finite, we write $M \downarrow x$ otherwise, if the
+run is infinite, we write $M \uparrow x$.
+
+Let $M$ be a deterministic TM that knows the alphabet $\Sigma$, and its input be
+$x \in \Sigma*$ (i.e. the input is zero or more symbols from the alphabet). If
+$M \downarrow x$ then the output tape of $M$ will contain some string $y \in
+\Sigma*$ once M has finished computing. The cool thing, is that we can treat $M$
+like a function, lets call it $f_M$, that operates over $\Sigma* \rightarrow
+\Sigma*$:
+
+\[
+  f_M(x) = \begin{cases}
+       y & if M \downarrow x\\
+       \text{undefined} & if M \uparrow x\\
+     \end{cases}
+\]
+
+In this case, $M$ computes the function $f_M$.
+
+\subsubsection{Enumerators}
+
+Enumerators aren't in the course slides, but they do appear in the reading. Skip
+this section if you're doing last minute cramming.
+
+An Enumerator is a Turing Machine with an attached printer. Now, I know what
+you're thinking; \textit{I'm a computer scientist, I hate printers. Why would
+anybody combine a complicated enough idea like a TM with a printer?!}
+Enumerators have an important theoretical use though, and don't require us to
+install drivers like we do for printers, and they certainly don't need to work
+over WiFi (so this section should be a piece of cake really).
+
+The TM inside an enumerator is able to send a string to the printer whenever it
+wants to print out a string. If the TM does not halt, then the printer may print
+an infinate list of strings. The language that is \textit{enumerated} by the
+enumerator, is the collection of strings that it eventually prints out. Since
+there are no rules about repetitions or ordering in the output list of the
+printer, you might want to think about the enumerated language as a set.
+
+So, as I said before, enumerators \textit{are} useful. Namely a language is
+Turing recognisable if and only if, there is some enumerator that enumerates it.
+
+Its easy to show that a TM can recognise a language that is enumerated by an
+enumerator, just build a TM that does this:
+
+\begin{enumerate}
+  \item We have an input word $w$
+  \item Run the enumerator $E$:
+  \begin{enumerate}
+    \item Every time $E$ outputs a new string, compare it to the word $w$
+    \item If they are equal, then accept the word.
+  \end{enumerate}
+\end{enumerate}
+
+Note that there is the potential for this TM to run for an infinate length of
+time, if the enumerator generates an infinate list, and $w$ is not in the
+language it enumerates.
+
+We can also make an enumerator enumerate any language that is recognised by a
+Turing Machine $M$:
+
+\begin{enumerate}
+  \item Ignore any input
+  \item For $i = 1$ to $i = \infty$
+  \begin{enumerate}
+    \item Run the TM $M$ for $i$ steps for all possible strings of length $i$ in
+      the language ($\Sigma^i$)
+    \item If any computations accept, then print out the corresponding string.
+  \end{enumerate}
+\end{enumerate}
+
+This enumerator will never halt (since it loops infinately many times over an
+infinately large set of input strings), but eventually, it will print out all of
+the words in the language (even though there will be \textit{a lot} of
+duplicates!).
+
+\subsection{The Halting problem}
+
+The Halting problem asks:
+
+\begin{quote}
+  Given a Turing Machine $M$ and a string for its input $x$, return:
+  \begin{itemize}
+    \item[] \textbf{Yes} if $M \downarrow x$ ($M$ decides $x$)
+    \item[] \textbf{No} otherwise, where $M$ would compute forever
+  \end{itemize}
+\end{quote}
+
+Turing managed to prove that there is no Turing Machine that will decide the
+Halting problem. The proof is fairly simple, but it takes a while to get your
+head around it when its written in a mathematical form. Luckily, I found a poem,
+written in the style of \href{https://en.wikipedia.org/wiki/Dr._Seuss}{Dr.
+Seuss}, that provides a better textual explanation than I ever could; see
+Figure~\ref{fig:halting-poem}.
+
+\begin{figure}[h]
+\begin{minipage}{\textwidth}
+  \newgeometry{top=2cm,bottom=2cm,left=1cm,right=3cm}
+  \begin{mymulticols}
+  \input{poem.tex}
+  \end{mymulticols}
+  \restoregeometry
+\end{minipage}
+\caption{A poetic explanation of the Halting Problem.}
+\label{fig:halting-poem}
+\end{figure}
+
+As nice as it is, I think it's unlikely that the poem would be accepted as an
+answer in an exam, so we'd better learn the formal definition of the Halting
+problem too.
+
+Suppose we have a TM $P$ that can determine if another TM can halt. We're going
+to make another TM $Q$ that is defined so:
+
+\begin{enumerate}
+  \item Duplicate the input $x$ TM we're given.
+  \item Run $P$ on the duplicated input ($x;x$).
+  \begin{itemize}
+    \item[] $P(x;x) = Y$, then Loop 
+    \item[] $P(x;x) = N$, then Halt
+  \end{itemize}
+\end{enumerate}
+
+Now, if we give $Q$ the input $Q$, then the embedded $P$ will receive $(Q,Q)$,
+meaning that if:
+
+\begin{description}
+  \item $Q \downarrow Q \implies Q \uparrow Q$
+  \item $Q \uparrow Q \implies Q \downarrow Q$
+\end{description}
+
+% TODO: Find another explination of the halting problem
+
+\subsection{Complexity}
+
+You already know that there are two types of Turing Machine; deterministic and
+non-determinitic TM's, but now its time to think about the resources that Turing
+Machines consume. We don't think of TM resources as commodities such as metal,
+electricity etc, since TM's are abstract, theoretical devices. Instead the two
+commodities we're interested in with Turing Machines are \textbf{time} and
+\textbf{space}.
+
+%TODO: Read chapter 4 of Sipser, carry of from slide 18 of 
+% http://studentnet.cs.manchester.ac.uk/ugt/2015/COMP36111/lecture7b.pdf

@@ -1,11 +1,9 @@
 % Tell me about my LaTeX bad practices
 \usepackage[l2tabu, orthodox]{nag}
-% For \hypersetup
-\usepackage{hyperref}
-% For line brakes in tables
-\usepackage{tabularx}
 % For the split environment
 \usepackage{amsmath}
+% For more symbols in math mode
+\usepackage{amssymb}
 % For tabs in verbatim
 \usepackage{moreverb}
 % Images
@@ -13,6 +11,8 @@
 % For fancier figures
 \usepackage{caption}
 \usepackage{subcaption}
+% For float placement
+\usepackage{float}
 % Better tables
 \usepackage{booktabs}
 \usepackage{multirow}
@@ -31,10 +31,26 @@
 \else
   \BODY
 \fi}
+% For poems
+\let\orignewcommand\newcommand  % store the original \newcommand
+\let\newcommand\providecommand  % make \newcommand behave like \providecommand
+\RequirePackage{verse}
+\let\newcommand\orignewcommand  % use the original `\newcommand` in future
+\makeatletter
+% Use the original definition from verse.sty
+\renewcommand*{\theHpoemline}{\arabic{verse@envctr}.\arabic{poemline}}
+\makeatother
+\newcommand{\attrib}[1]{%
+\nopagebreak{\raggedleft\footnotesize #1\par}}
+\renewcommand{\poemtitlefont}{\normalfont\large\itshape\centering}
 % Listings
 \usepackage{listings}
 % Means you don't have to put \\ to start a new line.
 \usepackage[parfill]{parskip}
+% For \hypersetup
+\usepackage{hyperref}
+% For line brakes in tables
+\usepackage{tabularx}
 % Make LaTeX pretty with better kerning etc
 \usepackage{microtype}
 

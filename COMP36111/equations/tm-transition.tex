@@ -1,0 +1,47 @@
+\documentclass{standalone}
+\usepackage{tikz}
+
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+
+\begin{document}
+
+% \langle p, \bar{s}, q, \bar{t}, \bar{d}\rangle
+% Where:
+% p \in Q
+% q \in Q
+% \bar{s} is a k-tuple representing the current state
+% \bar{t} is a k-tuple representing the next state
+% \bar{d} is a k-tuple saying what to do for each tape (L,R,S)
+
+\tikz[baseline]{
+    \node (start) {$\langle$};
+    \node[draw=red,rounded corners,right = 0.1cm of start] (m1) {$p,$};
+    \node[text width = 3cm,align=center, above left = 0.1cm of m1] (l1) {
+      $p \in Q$\\(current state)};
+    \draw[-,red] ($(l1) + (1.2,-0.4)$) -- (m1);
+    %
+    \node[draw=red,rounded corners,right = 0.2cm of m1] (m2) {$q,$};
+    \node[text width = 3cm,align=center,below = 1cm of m2] (l2) {
+      $q \in Q$\\(next state)};
+    \draw[-,red] (l2) -- (m2);
+    %
+    \node[draw=red,rounded corners,right = 0.2cm of m2] (m3) {$\bar{s},$};
+    \node[above = 1cm of m3] (l3) {a k-tuple representing the current symbol
+      on each tape\hspace{3cm}~};
+    \draw[-,red] ($(l3) + (-1,-0.2)$) -- (m3);
+    %
+    \node[draw=red,rounded corners,right = 0.2cm of m3] (m4) {$\bar{t},$};
+    \node[above of=m4] (l4) {\hspace{7cm}a k-tuple representing the next symbol
+      on each tape};
+    \draw[-,red] ($(l4)+(1,-0.2)$) -- (m4);
+    %
+    \node[draw=red,rounded corners,right = 0.2cm of m4] (m5) {$\bar{d}$};
+    \node[below of=m5] (l5) {\hspace{4cm}a k-tuple saying what to do for each tape
+      (L,R,S)};
+    \draw[-,red] (l5) -- (m5);
+    %
+    \node[right = 0.1cm of m5] (end) {$\rangle$};
+}
+
+\end{document}
