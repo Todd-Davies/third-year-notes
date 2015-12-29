@@ -307,7 +307,7 @@ etc).
 \subsubsection{Stemming}
 
 If you were to come across the word `blodge', you probably wouldn't know what it
-means (althought there are, as always a number of definitions in the
+means (although there are, as always a number of definitions in the
 \href{http://www.urbandictionary.com/define.php?term=blodge}{Urban Dictionary}).
 If a word like `blodge' were to appear in the middle of a sentence, you could
 probably still extract some information from it:
@@ -347,14 +347,13 @@ for my third year project, and it's a rabbit hole that you don't want to go down
 if you're trying to revise for exams). Here are the ones you need to know for
 this course:
 
+\marginpar{One thing to be aware of with using corpuses, is that they are 
+often ordered. If you use the first $N$ million words for training and the 
+next $M$ million for testing, then you could end up with disastrous results, 
+because different areas of the corpus will be about different genres, and 
+will contain different words.}
+
 \begin{description}
-
-  \marginpar{One thing to be aware of with using corpuses, is that they are 
-  often ordered. If you use the first $N$ million words for training and the 
-  next $M$ million for testing, then you could end up with disasterous results, 
-  because different areas of the corpus will be about different genres, and 
-  will contain different words.}
-
   \item \textbf{Dictionary look up}\\
   The easiest way to do POS tagging (but also the worst), is to get a big
   massive dictionary, and find the part of speech tag for each word. Then, when
@@ -444,7 +443,7 @@ this course:
   there another way of doing POS tagging? Maybe one that could require less
   data?
 
-  This is very possible, as was demonstated in
+  This is very possible, as was demonstrated in
   \href{http://dl.acm.org/citation.cfm?doid=974499.974526}{Eric Brill's PhD
   thesis} in 1995. The idea is to have a \textit{base tagger}, which is your 
   first guess at what the tag is (this is any POS tagger, like the ones above 
@@ -471,7 +470,7 @@ this course:
     \item Tag the corpus with the base tagger (something like a dictionary 
     lookup tagger, or transition probability tagger) plus any rules you've 
     generated so far, and then find the errors that it made. For every error,
-    \textbf{instansiate a rule based on the context of the error}.
+    \textbf{instantiate a rule based on the context of the error}.
     \item Now you have lots of rules, you score each one by how many times it 
     would have made a good change, and how many times it would have made a bad 
     edit if you ran it on the whole corpus.
@@ -481,7 +480,7 @@ this course:
 
   I'm not sure if I like the format of the rule templates here, since they
   require you to specify that you're turning one specific tag into another. An
-  example of an instansiated rule is:
+  example of an instantiated rule is:
 
   \texttt{\#t0(UN,NN,UN): UN > NN if tag[0]=UN;}
 
@@ -516,7 +515,7 @@ this course:
   the base tagger is already 98\% accurate, half a percent is a big improvement!
 \end{description}
 
-\paragraph{Confisuion matrices}
+\paragraph{Confusion matrices}
 
 No matter how good our POS tagging algorithms are, they're always going to get
 \textit{something} wrong. Confusion matrices are a way to spot common errors
@@ -539,7 +538,7 @@ Table~\ref{table:conf-matrix}.
   \label{table:conf-matrix}
 \end{table}
 
-Apart from using them to gloat about your awesome POS taggger to your natural
+Apart from using them to gloat about your awesome POS tagger to your natural
 language systems friends, confusion matrices are useful for improving the
 accuracy of your tagger. If you have multiple taggers, each with a different
 confusion matrix, then you can use the values in the matrix to determine which
@@ -549,7 +548,7 @@ If Tagger A says a word is a noun, but Tagger B another says its a determiner,
 then what do you do? You can look at the confusion matrix, and see that $93\%$
 of the time, the Tagger A gets nouns right, but $98\%$ of the time Tagger B gets
 determiners right, then you should go with Tagger B. It's kind of like if you
-hearded a load of lecturers into a room and started asking them CS questions. If
+herded a load of lecturers into a room and started asking them CS questions. If
 you asked a question about complexity theory, you're more likely to get a good
 answer from somebody who teaches an advanced algorithms course than you are from
 somebody who teaches a UX course.
@@ -557,7 +556,7 @@ somebody who teaches a UX course.
 \marginpar{NLP stands for Natural Language Processing, not Neuro-Linguistic
 Programming...}
 
-\paragraph{Special cases} Sometimes, a POS tag is very ambigous; the kind of
+\paragraph{Special cases} Sometimes, a POS tag is very ambiguous; the kind of
 thing that would have linguists arguing for ages trying to determine which was
 right. In these cases, we don't want to assign the wrong tag and mis-lead
 whatever system is using our tags further down the NLP pipeline. As a solution,
@@ -613,7 +612,7 @@ expression to the string to get the sentences:
 
 If we tag a sentence from the BNC, and run it through a simple regex, then we
 can efficiently and effectively parse the sentence. First we need to go from the
-BNC tags (they have different types of nouns, adjectives ete, looking like `NN4'
+BNC tags (they have different types of nouns, adjectives etc, looking like `NN4'
 for a type 4 noun) to more sensible tags:
 
 \begin{verbatim}
@@ -675,3 +674,102 @@ Make me a pull request to fill in this section, do it now!
 \url{http://github.com/Todd-Davies/third-year-notes}{}
 
 %TODO: Page 193 onwards
+
+\subsection{Deterministic dependency parsing}
+
+Using a regex to parse the structure of a sentence isn't widely done. In
+practice, the way that gets the best results is to use a non-deterministic
+algorithm. However, (as you may know all to well from \texttt{COMP36111}) non-
+deterministic algorithms don't run very quickly at all on deterministic
+computing machines, and will often exhibit an exponential runtime.
+
+We therefore want to find a deterministic algorithm to extract a sentence
+structure. When we're thinking about this, we want to optimise for three things:
+
+\begin{itemize}
+  \item Accuracy - get the correct answer
+  \item Robustness - at least \textit{give} an answer
+  \item Speed - try to have a polynomial time complexity
+\end{itemize}
+
+A good approach is to try and make a system that has a good accuracy, then
+compromise until the other two criteria are satisfied too.
+
+To parse a sentence into a structure, we can recognise the following points:
+
+\begin{itemize}
+  \item Each word has exactly one parent (except the root word)
+  \item You can draw arrows between words in a sentence, and none of the arrows 
+  will cross (see Figure~\ref{fig:dependency-relations} for an explanation).
+\end{itemize}
+
+\begin{figure}[h]
+  \centering
+    \begin{subfigure}[b]{0.55\textwidth}
+    \includegraphics[width=\textwidth]{diagrams/dependency-tree}
+    \caption{}
+    \label{fig:dependency-tree}
+  \end{subfigure}
+
+  \begin{subfigure}[b]{0.55\textwidth}
+    \includegraphics[width=\textwidth]{diagrams/dependency-relations}
+    \caption{}
+    \label{fig:dependency-relations}
+  \end{subfigure}
+
+  \caption[Two dependency representations]{(a)A dependency tree for the sentence 
+  `This time around they're moving even faster'. (b) An alternative 
+  representation of the dependency tree. Note how none of the lines cross.}
+\end{figure}
+
+\subsubsection{MALT}
+
+\let\thefootnote\relax\footnotetext{I can't find what MALT stands for, but it
+seems to have a webpage: \url{http://maltparser.org/}}
+
+We can come up with a linear time algorithm for comping up with dependency
+relations (i.e. the arrows on Figure~\ref{fig:dependency-relations}). It uses
+three data structures:
+
+\begin{description}
+  \item A \textbf{list} of the input words (we treat it like a queue).
+  \item A \textbf{stack} of words that we've looked at, but haven't yet assigned
+    a parent
+  \item A \textbf{set} of dependency relations for the output.
+\end{description}
+
+The algorithm can do three things:
+
+\begin{description}
+  \item \textbf{Shift}: Moves the word onto the stack
+  \item \textbf{Left arc}: Sets the top item on the stack as a dependent of the
+    head of the input list, and removes it from the stack. This item is now
+    gone.
+  \item \textbf{Right arc}: Sets the head of the input list as a dependent of
+    the top item on the stack, throw away that item, but then move the top item
+    from the stack to the head of the input list.
+\end{description}
+
+Since \textit{shift} removes an item from the input list, the \textit{arc}
+operations both remove an item from consideration altogether and at most one
+dependency is produced at every step, we can see that the algorithm runs in both
+linear time and space.
+
+So, we have a mechanism for producing dependencies, but we don't actually have
+any logic to drive it yet; we need some rules to determine what actions we
+should take for each input item.
+
+There are some rules that constitute `low hanging fruit' here. First of all, we
+always need to perform exactly one operation on each iteration of the algorithm
+(since otherwise the state doesn't change). Secondly, sometimes there's only one
+thing we \textit{can} do. For example, if there's nothing on the stack, then you
+can only do a \textit{shift}.
+
+In fact, for any (valid) sequence of operations we perform on the input, we will
+\textit{always} end up with a dependency tree, so our algorithm is
+\textbf{robust}. The accuracy of our algorithm depends on the rules we give it;
+though we only have a choice of three operations at each iteration of the
+algorithm, if we do something wrong, then that error will propogate through the
+tree and we might end up getting it very wrong.
+
+% Look at example on p207

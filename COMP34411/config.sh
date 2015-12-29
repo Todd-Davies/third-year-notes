@@ -15,7 +15,7 @@ authorName="Todd Davies"
 # ==============================================================================
 # What directories to compile .tex files in. Seperate by spaces e.g:
 # directories=(diagrams automata)
-directories=();
+directories=(diagrams);
 
 # Use parallel compilation (true/false)
 parallelCompile=1

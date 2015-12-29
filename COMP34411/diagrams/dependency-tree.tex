@@ -1,0 +1,28 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\begin{document}
+\begin{tikzpicture}[->, node distance=3cm, every loop/.style={},
+                    thick,main node/.style={circle,draw,font=\sffamily\Large\bfseries}]
+
+  \node[main node]   (moving) [] {moving};
+
+  \node[main node]   (even)   [below right = 2cm of moving] {even};
+  \node[main node]   (they're)[left of = even] {they're};
+
+  \node[main node]   (time)   [left of= they're] {time};
+
+  \node[main node]   (this)   [below left of=time] {this};
+  \node[main node]   (around) [below right of=time] {around};
+
+  \node[main node]   (faster) [right of=even] {faster};
+
+  \path[] (moving) [bend right] edge (they're);
+  \path[] (moving) [bend left] edge (even);
+  \path[] (moving) [bend left=50] edge (faster);
+
+  \path[] (moving) [bend right=50] edge (time);
+  \path[] (time) [bend left] edge (around);
+  \path[] (time) [bend right] edge (this);
+\end{tikzpicture}
+\end{document}
