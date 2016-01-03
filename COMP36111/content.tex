@@ -605,19 +605,174 @@ the cost.
 
 \subsection{The Simplex Method}
 
-The simplex method automates finding the optimum value of variables. This is
-how it works:
+If we have more than two variables, then all of a sudden, working out the
+optimum on a graph becomes rather hard. I don't know about you, but I'm not
+great at drawing 3d graphs, and visualising n-dimensional graphs quickly becomes
+infeasible.
+
+The simplex method automates finding the optimum value of any number of
+variables. This is how it works:
 
 \begin{itemize}
-  \item Select a corner of the feasible region of the graph
+  \item Draw the feasible region in $n$ dimensional space
+  \item Select a corner of the feasible region
   \item Choose an edge that is connected to this point that will increase the
   objective function.
   \item Go to the next corner on that edge
   \item Keep doing steps 2 and 3 until you find an optimal solution.
 \end{itemize}
 
-% TODO: Carry on later with this (when you have a whiteboard to practice the
-% tableau)
+That's pretty far removed from how we see the simplex algorithm working, since
+we find the optimum by using a tableaux. I've broken down the algorithm into
+multiple steps with a running example here:
+
+\begin{itemize}
+  \item[\textbf{Step 0}] The zero'th step, is to examine the input data we're 
+  given. This will consist of a function $f$ to be maximised and a set of 
+  inequalities that constrain the values we can give to $f$.
+
+  \[\begin{split}
+    f &= x + 2y + 3z\\
+    4 &\geq x + y + z\\
+    -1&\geq 2y -3z\\
+    0 &\geq 2x -z
+  \end{split}\]
+
+  N.b. if the inequalities aren't of the form $CONST \geq EXPR$, then rearrange 
+  them so that they are.
+
+  \item[\textbf{Step 1}] Now we turn each inequality we were given into an 
+  equation (replace the inequality sign with an equals basically), and introduce 
+  a new variable for each (called a \textit{slack variable}). Also, rearrange
+  $f$ so its equal to zero:
+
+  \begin{alignat*}{12}
+    4 &=~ &x~ &+~&y ~&+~&z ~&+~&m_1&~ &~  &~ &~  &~&~\\
+    -1&=~ &~~ &+~&2y~&-~&3z~&~~&~  &+~&m_2&~ &~  &~&~\\
+    0 &=~ &2x~&~~&~~ &-~&z ~&~~&~  &~ &~  &+~&m_3&~&~\\
+    0 &=~ &-x~&-~&2y~&-~&3z~&~ &~  &~ &~  &~ &~  &+&f
+  \end{alignat*}
+  \item[\textbf{Step 2}] Now our problem is in the correct form, we can whack it 
+  into a tableaux:
+
+  \begin{center}
+    \begin{tabular}{>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|
+      >{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}}
+          & x & y & z & m_1 & m_2 & m_3 & f & \text{constants}\\ \hline
+      m_1 & 1 & 1 & 1 & 1   & 0   & 0   & 0   & 4\\ \hline
+      m_2 & 0 & 2 &-3 & 0   & 1   & 0   & 0   &-1\\ \hline
+      m_3 & 2 & 0 &-1 & 0   & 0   & 1   & 0   & 0\\ \hline
+      f   &-1 &-2 &-3 & 0   & 0   & 0   & 1   & 0\\
+    \end{tabular}
+  \end{center}
+
+  It should be quite obvious how we go from the equations in step 1 to
+  the tableaux in step 2. The only stuff you need to \textit{remember} about
+  formatting the tableaux, is that the slack variables go along the left side,
+  $f$ is the bottom row, and to put the constants in the last column.
+
+  The values in the bottom row are called \textbf{indicators}.
+
+  \item[\textbf{Step 3}] We need to find the \textbf{pivot cell} in the table. 
+  The pivot column is easy to find, its the one with the most negative 
+  indicator (in our case, the third row, since the indicator is $-3$). 
+  Finding the row is a bit harder, you need to divide the constant column by 
+  the pivot column and pick the one with the lowest value:
+
+  \definecolor{highlight}{gray}{0.7}
+  \definecolor{dhighlight}{gray}{0.5}
+
+  \begin{center}
+    \begin{tabular}{>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|
+      >{$}>{\columncolor{highlight}}c<{$}|>{$}c<{$}|
+      >{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|c}
+          & x & y & z & m_1 & m_2 & m_3 & f & \text{constants}
+            & \text{ratio}\\ \hline
+      m_1 & 1 & 1 & 1                      &1&0& 0   & 0   & 4 & 4/1 \\ \hline
+      \rowcolor{highlight}
+      m_2 & 0 & 2 &\cellcolor{dhighlight}-3&0&1& 0   & 0   &-1 & -1/2\\ \hline
+      m_3 & 2 & 0 &-1                      &0&0& 1   & 0   & 0 & 0/0 \\ \hline
+      f   &-1 &-2 &-3                      &0&0& 0   & 1   & 0 & 0/3 \\
+    \end{tabular}
+  \end{center}
+
+  \item[\textbf{Step 4}] Now we do the pivot about the pivot cell:
+
+    \begin{itemize}
+      \item[\textbf{Step 4a}] Divide each cell in the pivot's row by the pivot
+      (which makes the pivot equal to $1$!).
+
+      \renewcommand{\arraystretch}{1.4}
+      \begin{center}
+        \begin{tabular}{>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|
+          >{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}}
+              & x & y & z & m_1 & m_2 & m_3 & f & \text{constants}\\ \hline
+          m_1 & 1 & 1           & 1&1&0            &0&0& 4\\ \hline
+          m_2 & 0 & \frac{-2}{3}&\cellcolor{dhighlight}1&0&\frac{-1}{3}&0&0&\frac{1}{3}\\ \hline
+          m_3 & 2 & 0           &-1&0&0            &1&0& 0\\ \hline
+          f   &-1 &-2           &-3&0&0            &0&1& 0\\
+        \end{tabular}
+      \end{center}
+
+      \item[\textbf{Step 4b}] Subtract the pivot row from each other row
+      so that the whole pivot column becomes $0$. For example here, we need to
+      $R3 = R3 + R2$, $R4 = R4 + 3(R2)$ and $R1 = R1 - R2$ to make the cell 
+      below the pivot $0$.
+
+      \renewcommand{\arraystretch}{1.4}
+      \begin{center}
+        \begin{tabular}{>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|
+          >{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}}
+              & x & y & z & m_1 & m_2 & m_3 & f & \text{constants}\\ \hline
+          m_1 & 1 & \frac{5}{3} & 0&0&\frac{1}{3} &0&0&\frac{11}{3}\\ \hline
+          m_2 & 0 & \frac{-2}{3}& 1&0&\frac{-1}{3}&0&0&\frac{1}{3}\\ \hline
+          m_3 & 2 & \frac{-2}{3}& 0&0&\frac{-1}{3}&1&0&\frac{1}{3}\\ \hline
+          f   &-1 &\frac{-12}{3}& 0&0&-1           &0&1& 1\\
+        \end{tabular}
+      \end{center}
+
+      \item[\textbf{Step 4c}] Replace the letter on the pivot row with the 
+      letter on the pivot column:
+
+      \renewcommand{\arraystretch}{1.4}
+      \begin{center}
+        \begin{tabular}{>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}|
+          >{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}}
+              & x & y & z & m_1 & m_2 & m_3 & f & \text{constants}\\ \hline
+          m_1 & 1 & \frac{5}{3} & 1&0&\frac{1}{3} &0&0&\frac{11}{3}\\ \hline
+          z   & 0 & \frac{-2}{3}& 1&0&\frac{-1}{3}&0&0&\frac{1}{3}\\ \hline
+          m_3 & 2 & \frac{-2}{3}& 0&0&\frac{-1}{3}&1&0&\frac{1}{3}\\ \hline
+          f   &-1 &\frac{-12}{3}& 0&0&-1           &0&1& 1\\
+        \end{tabular}
+      \end{center}
+    \end{itemize}
+
+    \item[\textbf{Step 5}] Now we have found another solution, to see what it 
+    is, read off the letters on the far left and correspond them to the 
+    constants on the far right:
+
+    \[
+      m_1 = \frac{11}{3}, z = \frac{1}{3}, m_3 = \frac{1}{3}, f = 1
+    \]
+
+    If we sub that in, then we can see that if satisfies the formulae from step
+    1:
+
+    \begin{alignat*}{12}
+      4 &=~ &0~ &+~&0~&+~&\frac{1}{3} ~&+~&\frac{11}{3}&~ &~&~ &~&~&~\\
+      -1&=~ &~~ &+~&0~&-~&3\frac{1}{3}~&~~&~           &+~&0&~ &~&~&~\\
+      0 &=~ &0~&~~&~~ &-~&\frac{1}{3} ~&~~&~           &~ &~&+~&0&~&~\\
+      0 &=~ &-0~&-~&0~&-~&3\frac{1}{3}~&~ &~  &~ &~  &~ &~  &+&1
+    \end{alignat*}
+
+    {\color{red}Except for the third one, where I must have made a mistake...}
+
+  \item[\textbf{Step 6}] If there are no negative indicators in the table
+  (bottom row of the tableaux), then we've finished, and our solution is the 
+  optimal one. If there are, then we need to go back to step 3 and repeat until 
+  there aren't any negative indicators.
+
+\end{itemize}
 
 \section{Turing machines and complexity measures}
 
@@ -756,7 +911,7 @@ over WiFi (so this section should be a piece of cake really).
 
 The TM inside an enumerator is able to send a string to the printer whenever it
 wants to print out a string. If the TM does not halt, then the printer may print
-an infinate list of strings. The language that is \textit{enumerated} by the
+an infinite list of strings. The language that is \textit{enumerated} by the
 enumerator, is the collection of strings that it eventually prints out. Since
 there are no rules about repetitions or ordering in the output list of the
 printer, you might want to think about the enumerated language as a set.
@@ -776,8 +931,8 @@ enumerator, just build a TM that does this:
   \end{enumerate}
 \end{enumerate}
 
-Note that there is the potential for this TM to run for an infinate length of
-time, if the enumerator generates an infinate list, and $w$ is not in the
+Note that there is the potential for this TM to run for an infinite length of
+time, if the enumerator generates an infinite list, and $w$ is not in the
 language it enumerates.
 
 We can also make an enumerator enumerate any language that is recognised by a
@@ -793,8 +948,8 @@ Turing Machine $M$:
   \end{enumerate}
 \end{enumerate}
 
-This enumerator will never halt (since it loops infinately many times over an
-infinately large set of input strings), but eventually, it will print out all of
+This enumerator will never halt (since it loops infinitely many times over an
+infinitely large set of input strings), but eventually, it will print out all of
 the words in the language (even though there will be \textit{a lot} of
 duplicates!).
 
@@ -858,7 +1013,7 @@ meaning that if:
 \subsection{Complexity}
 
 You already know that there are two types of Turing Machine; deterministic and
-non-determinitic TM's, but now its time to think about the resources that Turing
+non-deterministic TM's, but now its time to think about the resources that Turing
 Machines consume. We don't think of TM resources as commodities such as metal,
 electricity etc, since TM's are abstract, theoretical devices. Instead the two
 commodities we're interested in with Turing Machines are \textbf{time} and
