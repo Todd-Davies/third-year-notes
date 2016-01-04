@@ -66,7 +66,9 @@ each.
 \marginpar{Tries are very handy datastructures for technical interviews, you
 should read up on them an implement one!}
 
-In order to examine the syntactic and semantic properties of the words, we need to represent them in the computer. A common way to do this is with a \textit{trie}:
+In order to examine the syntactic and semantic properties of the words, we need
+to represent them in the computer. A common way to do this is with a
+\textit{trie}:
 
 \begin{wrapfigure}{r}{0.25\textwidth}
   \begin{center}
@@ -434,6 +436,7 @@ will contain different words.}
   \]
 
   \item \textbf{Transformation Based Learning}\\
+  \label{brill-rules}
 
   \marginpar{This is the subject of my third year project, when I've finished 
   it, I might remember to update these notes with a link to the code/my 
@@ -746,8 +749,7 @@ The algorithm can do three things:
     head of the input list, and removes it from the stack. This item is now
     gone.
   \item \textbf{Right arc}: Sets the head of the input list as a dependent of
-    the top item on the stack, throw away that item, but then move the top item
-    from the stack to the head of the input list.
+    the top item on the stack, move the head of the input list onto the stack.
 \end{description}
 
 Since \textit{shift} removes an item from the input list, the \textit{arc}
@@ -765,11 +767,304 @@ always need to perform exactly one operation on each iteration of the algorithm
 thing we \textit{can} do. For example, if there's nothing on the stack, then you
 can only do a \textit{shift}.
 
+Two rules that do this are:
+
+\begin{verbatim}
+  // Always left arc with the dependency 'mod' if we don't know what else to do
+  // And the stack isn't empty
+  { input: [?,...], stack: [?,...] } ==> leftArc(mod)
+  // Always shift if there is nothing on the stack
+  { input: [?,...], stack: [] } ==> shift(mod)
+\end{verbatim}
+
 In fact, for any (valid) sequence of operations we perform on the input, we will
 \textit{always} end up with a dependency tree, so our algorithm is
 \textbf{robust}. The accuracy of our algorithm depends on the rules we give it;
 though we only have a choice of three operations at each iteration of the
-algorithm, if we do something wrong, then that error will propogate through the
-tree and we might end up getting it very wrong.
+algorithm, if we do something wrong, then that error will propagate through the
+tree and we might end up getting it very wrong. We should make it so that the
+rules are applied in order (going down a list) and put the two rules shown above
+at the bottom (since they're the ones that will always apply and make our
+algorithm robust). We need to come up with good rules to put before them
+though...
 
-% Look at example on p207
+\marginpar{In order to handle special cases, we could make left shift arc look 
+anywhere in the stack, and right arc look anywhere in the queue. This defeats 
+the object of the queue and stack (since they're FIFO and LIFO datastructures 
+respectively), but never mind.}
+
+Of course, we could employ a linguist to come up with rules, or (as lazy and
+stingy computer scientists) we could try and learn a good set of rules. Of
+course, if we have some example sentences that we have the correct dependency
+relation trees for, we can see what MALT operations would have worked to get the
+sentence into the form given in the tree. To turn this information into rules,
+we can literally just encode it in the rule syntax:
+
+\begin{verbatim}
+  {input: [old, man, ate, it], stack; [the], relations:[]} ==> shift
+\end{verbatim}
+
+Obviously, this is very, very specific to our training sentence (`the old man
+ate it'), and we've overfitted our Machine Learning algorithm to our training
+data. However, we can generalise the rule, by replacing all the words with their
+part of speech tags:
+
+\begin{verbatim}
+  {input: [ADJ, NOUN, VERB, PRONOUN], stack; [DET], relations:[]} ==> shift
+\end{verbatim}
+
+Which is obviously less general; it would match a sentence like `the small fish
+swam off'. However, we could generalise further by only looking at part of the
+input list and stack:
+
+\begin{verbatim}
+  {input: [ADJ, NOUN, ...], stack; [DET, ...], relations:[]} ==> shift
+\end{verbatim}
+
+Having more general rules means that we will probably have fewer rules, and we
+will have to fall back on our two `dumb' robust rules less often, which are
+likely to make a mistake. However, if we make rules too general then we're
+probably not looking at enough information and are likely to make bad decisions
+(its analogous to how stereotyping people can make you misinformed/make bad
+decisions). We need to find the sweet spot for generality though; as we saw, if
+we have very specific rules, then we need lots of them to cover all the cases!
+
+\subsection{Pesky formats}
+
+Up to now, I've been taking it for granted that we have examples of parse trees,
+lists of tagged words etc all ready to use. If you've ever tried to write some
+software that does natural language processing, you might have realised that
+this is a very naive assumption.
+
+Getting hold of corpora is a non-trivial task lots of the time. Not only do you
+have to pay for some of them (i.e. Penn Treebank, where you get 10\% free and
+you have to stump up for the rest), but its very rare that they exist in the
+format you want.
+
+For my third year project, I'm using the British National Corpus. Its encoded in
+XML, and I've often found parsing the XML to be the largest bottleneck in my
+project (performance wise).
+
+Unfortunately, its not always as easy as `parse this XML'. For example, the Penn
+Treebank derives its name partly from the \textit{headed phrase structure trees}
+that it contains. These are basically parse trees in a slightly different format
+than how we want them. An example headed phrase structure tree is given in
+Figure~\ref{fig:headed-phrase-struct-tree}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{images/headed-phrase-struct}
+  \caption{A headed phrase structure tree}
+  \label{fig:headed-phrase-struct-tree}
+\end{figure}
+
+In order to convert headed phrase structure trees into dependency trees, we can
+use the following algorithm:
+
+\begin{enumerate}
+  \item Pick the most important child of each node
+  \begin{itemize}
+    \item[-] If it's a word, return a leaf node containing the word.
+    \item[-] Else, recurse and convert it to a dependency tree
+  \end{itemize}
+  \item Recurse on all the other children, and make them subtrees of the 
+  important child we handled first.
+\end{enumerate}
+
+This produces dependency trees that look like what's in
+Figure~\ref{fig:converted-dep-tree}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.4\textwidth]{images/converted-dep-tree}
+  \caption{The dependency tree that was derived from the headed phrase structure 
+  tree in Figure~\ref{fig:headed-phrase-struct-tree}.}
+  \label{fig:converted-dep-tree}
+\end{figure}
+
+The last thing we need to think about, is how to pick the most important child
+of each node (step 1 of the algorithm). The way to do this is by using a
+\textbf{Head Percolation Table (HPT)}. This lists each type of node (`S', `VP'
+etc) and lists the order of importance whereby each child node should be ranked.
+See Table~\ref{tbl:HPT} for an example.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|l|l|l|l|}
+    \hline
+    Root type & Most important & Second most important & \dots \\ \hline
+    S & VP & S & \dots\\ \hline
+    NP & NN & NNP & \dots\\ \hline
+    $\vdots$ & $\vdots$ & $\vdots$ & $\ddots$\\ \hline
+  \end{tabular}
+  \caption{A sample Head Percolation Table. Its important that the HPC be as 
+  accurate as possible, since otherwise the resulting dependency tree will be 
+  silly, and it'll make any MALT rules we learn from them silly.}
+  \label{tbl:HPT}
+\end{table}
+
+\subsection{N-Fold Cross Validation}
+
+N-Fold Cross Validation is a method used to prevent overfitting of Machine
+Learning models. Essentially, you split your data into $N$ parts, and train your
+model $N$ times. Then, you do $N$ iterations of the training (training on $N-1$
+parts each time), and then test on the remaining part. You can then average the
+results and thus obtain a reasonable accurate estimate for the error rate of
+your model. Figure~\ref{fig:cross-validation} explains this.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.7\textwidth]{images/cross-validation}
+  \caption{A visual explanation of N-Fold Cross Validation.}
+  \label{fig:cross-validation}
+\end{figure}
+
+\section{Semantics and Inference}
+
+Given any (normal) piece of text, a reasonably well informed and intelligent
+human can figure out, with a variable degree of certainty what the text means.
+This section is about confering that skill to computers.
+
+If you had to say what the blanked out word in the following sentence was; ``The
+******* saluted crisply to the general as he walked past, his uniform buttons
+gleaming'', you'd probably guess `soldier'. But why? Well, we can infer from the
+context that it's probably a soldier, since not many other things salute to a
+general, or have gleaming buttons. Futhermore, you might have unconciously
+realised that it's a noun that fits in the gap (well, it's definately not
+something like an adjective), and gotten clues from the length of the missing
+word by how many stars there are.
+
+How could we get a computer to solve this problem? Well, one way might be to see
+how many of the words in the sentence are associated with soldier; I bet
+`general, `salute, `uniform and possibly `crisply'`are all commonly used
+whenever `soldier' is used.
+
+To get information about which words commonly occur with which other words, we
+can simply go through every word in our dictionary and do the following:
+
+\begin{enumerate}
+  \item Use a search engine to find documents about our word.
+  \item For each document, remove all instances of our search term.
+  \marginpar{This is from an example script I wrote to pull content from the 
+  Wikipedia and extract a vector space model. It's on
+  \href{https://github.com/Todd-Davies/third-year-notes}{Github} if you want a 
+  look... Why don't you submit a pull request while your at it!}
+  \item Count the number of occurances of each word, to make a \textbf{Vector 
+    Space Model}, something like this:
+    \begin{verbatim}
+      {'the': 20, 'or': 17, 'of': 16, 'to': 13, 'in': 9, 'are': 8,
+       'soldiers': 7, 'from': 7, 'as': 7, 'a': 7, 'Army': 6, 'military': 5,
+       'an': 5, 'word': 5, 'and': 5, 'is': 5, 'In': 5, 'term': 4, 'referred': 4,
+       'US': 4, 'their': 4, 'Marine': 4, 'other': 4, 'meaning': 4, 'officer': 3,
+       'United': 3, 'called': 3, 'service': 3, 'such': 3, 'The': 3, 'States': 3,
+       'years': 2, 'soudeour': 2, 'personnel': 2, 'countries': 2, 'because': 2,
+       'often': 2, 'employment': 2, 'Latin': 2, 'combat': 2, 'warfighter': 2,
+       'by': 2, 'Infantry': 2, 'warfighters': 2, 'occupations': 2, 'French': 2,
+       'one': 2, 'armed': 2, 'use': 2, 'type': 2, 'artillery': 2, 'serve': 2...}
+    \end{verbatim}
+\end{enumerate}
+
+It's also a good idea to stem the words before continuing. For example,
+`soldier' and `soldiers' are for all intents and purposes, the same word here.
+
+This information still isn't very useful; we would like a way to compare the
+similarity of two vector spaces (i.e. a candidate word, and a document we're
+trying to classify).
+
+If you took \texttt{COMP24111}, and you're not half asleep from boredom, then
+you might remember a certain method of classification called \textit{nearest
+neighbour}. Given a set of n-dimensional vectors and an n-dimensional vector you
+want to classify, nearest neighbour will find the distances between all the
+vectors in the set, and your other vector, and try to assign it a class based on
+the classes of `near' vectors.
+
+This \textit{isn't} what we're going to do here, but it's pretty similar. For
+each vector, we can find the cosine of the angle between them:
+
+\[
+  \frac{\sum (d_1 \times \dots \times d_n)}
+       {\sqrt{\sum (d_0^2) \times \dots \times \sum (d_n^2)}}
+\]
+
+The cosine of two vectors is a rough approximation of their similarity. However,
+there is an issue; a large document (e.g. an explanation of the Church-Turing
+thesis) will have higher values in its vector space than the text off the back
+of a chocolate bar, since the former has far more words.
+
+\subsection{TF-IDF}
+
+We don't want document size to affect our similarity measures much, since you
+would want a sign posting the way to Manchester to have a high similarity score
+to a book about Manchester, but not a high similarity score with a leaflet about
+an environmental protest. 
+
+To normalise the vector spaces, we can divide each number in the vector by:
+
+\[
+  \sqrt{\sum_{i=1}^ns_i^2}
+\]
+
+Where (I think, please correct me if I'm wrong), $s_i$ is the value associated
+with the $i$th word in the vector space. This reduces the values in the vector
+space proportional to the size of the vector space.
+
+Another thing that makes vector spaces less effective, is the large amount of
+noise we get from common words such as `and', `the' and `a'. We want these words
+to have less weighting when it comes to determining whether documents are
+similar, and possibly give a higher word to more uncommon words such as `marine'
+or `howitzer'.
+
+For each word in our dictionary, we could see how many documents it is included
+in; this is the \textbf{document frequency}. We could also see how often it
+occurs in a single document; the \textbf{term frequency}. We can use these two
+values to determine how much we care about each dimension in the vector space,
+specifically, we can multiply the vector space value by the term frequency and
+then the inverse of the document frequency:
+
+\[
+  \text{vector space value} =
+    \text{vector space value} \times
+    \text{term frequency} \times
+    \frac{1}{\text{document frequency}}
+\]
+
+This is called the \textbf{TF-IDF} (term frequency - inverse document frequency)
+score.
+
+\subsection{Clustering}
+
+Doing the above (document $\rightarrow$ vector space $\rightarrow$ TD-IDF) gets
+pretty good results. In the course notes, an example is given where five bacon
+themed websites are correctly marked as being more similar than four cricket
+themed ones.
+
+The example doesn't get perfect results; it could be improved. To do so, we need
+to think back to the Machine Learning course again, and remember \textbf{K-means
+clustering}. This is where, given the vector spaces, we try and group documents
+into $n$ similar clusters. This is what you do:
+
+\begin{enumerate}
+  \item This is where you find the $n$ least similar documents ($n$ = the
+    amount of clusters you want to find), and set them as seeds. The logic is
+    that these are not similar, and therefore won't be in the same clusters.
+  \item For each document, put it in the cluster that has the seed most similar 
+    to it.
+  \item For each group, find take the weighted average of them all, and make 
+    that the new seed. This seed is now called the \textbf{centroid}.
+  \item If some documents switched clusters, then go back to step 2 and repeat.
+\end{enumerate}
+
+This gets better results than TF-IDF on its own, but still isn't perfect. This
+is probably because it only looks at words in isolation. However, as we know
+from our Part of Speech tagging exploits, the same word can have different
+meanings depending on the \textbf{context} that it appears in. For example,
+homonyms can mess up our analysis; we'd like to differentiate between `lead' as
+a metal as a verb (``he lead her outside'') and as a noun (``fetch the dog's
+lead'').
+
+To do this, we might want to look at the words surrounding a target word, or
+possibly think about \textit{syntactically related} words; if two verbs take the
+same set of objects, then they're probably similar (e.g. `she kissed him'
+$\approx$ `she snogged him').
+
+%p268...
