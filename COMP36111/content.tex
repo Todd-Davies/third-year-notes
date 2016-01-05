@@ -797,6 +797,113 @@ So:
 You can use this tool to check solutions to simplex problems:
 \url{http://www.zweigmedia.com/RealWorld/simplex.html}.
 
+\subsubsection{Duality}
+
+Simplex is great if we're trying to maximise a function, but what if we want to
+minimise it? Duality does this. Basically, you give it a function and
+inequalities, it mutates them so they'll fit into simplex, and then you run
+simplex as normal. So, to apply the duality theorem, you need:
+
+\begin{itemize}
+  \item A function you want to minimize; $f = ax + by + \dots$
+  \item A set of inequalities of the form `$EXPR \geq CONST$'
+\end{itemize}
+
+Since simplex tries to maximise $f$, which is the opposite of what we want to
+do, and our inequalities are the wrong way around, we need to the duality bit
+now:
+
+First, like the first part of simplex, we put the coefficients in a table.
+However, this table has a special name; the \textit{coefficient matrix}. It's
+called a matrix, not a table because we're going to do a transposition on it
+(and mathematicians transpose matrices, not tables!). 
+
+The input:
+
+\[
+  \begin{split}
+    g = 3r + 4s + t\\
+    r + 2s + t \geq 4\\
+    r + 2s - t \geq -2\\
+    r + s \geq -1\\
+    r \geq 0,~s \geq 0,~t \geq 0
+  \end{split}
+\]
+
+Would result in a matrix like this:
+
+\begin{center}
+  \begin{tabular}{>{$}r<{$}|>{$}c<{$} >{$}c<{$} >{$}c<{$} >{$}l<{$}}
+        & r & s & t & \text{constants}\\ \hline
+        & 1 & 2 & 1 &4\\ 
+        & 1 & 2 &-1 &-2\\ 
+        & 1 & 1 & 0 &-1\\ 
+      g & 3 & 4 & 1 &  \\ 
+  \end{tabular}
+\end{center}
+
+So, we put the inequalities in first, then put the minimising function in the
+last column. Now what we do, is to flip the matrix along its top-left to bottom-
+right diagonal:
+
+\begin{center}
+  \begin{tabular}{>{$}r<{$}|>{$}c<{$} >{$}c<{$} >{$}c<{$} >{$}l<{$}}
+        & x & y & z & \text{constants}\\ \hline
+        & 1 & 1 & 1 & 3\\ 
+        & 2 & 2 & 1 & 4\\ 
+        & 1 &-1 & 0 & 1\\ 
+      f & 4 &-2 &-1 &  \\ 
+  \end{tabular}
+\end{center}
+
+After we've done that, we get the following equation and inequalities:
+
+\[
+  \begin{split}
+    f = 4x - 2y - z\\
+    x + y + z \leq 3\\
+    2x + 2y + z \leq 4\\
+    x + y \geq 1\\
+    x \geq 0, y \geq 0,~z \geq 0
+  \end{split}
+\]
+
+If you do simplex on them (you should try it for practice!), you get:
+
+\begin{center}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{>{$}c<{$}|>{$}c<{$}|
+    >{$}c<{$}|>{$}c<{$}|>{$}c<{$}|
+    >{$}c<{$}|>{$}c<{$}|>{$}c<{$}|>{$}c<{$}l}
+        & x & y & z & m_1 & m_2 & m_3 & f & \text{constants}\\
+    \cline{1-9}
+    w_1& 0 & 0 &\frac{1}{2}& 1 &\frac{-1}{2}&0&0&1&\\
+    \cline{1-9}
+    y & 0 & 1 &\frac{1}{4}&0&\frac{1}{4} &\frac{-1}{2}&0&\frac{1}{2}&\\
+    \cline{1-9}
+    x & 1 & 0 &\frac{1}{4}&0&\frac{1}{4}&\frac{1}{2}&0&\frac{3}{2}&\\
+    \cline{1-9}
+    f & 0 & 0 &\frac{3}{2} & 0 & \frac{1}{2}   &3&1&5&g\\
+    \multicolumn{4}{c}{~}&\multicolumn{1}{c}{r}&\multicolumn{1}{c}{s}&
+    \multicolumn{1}{c}{t}&\multicolumn{2}{c}{~}
+  \end{tabular}
+\end{center}
+
+Therefore the minimum value of $g$ is $5$, with the inputs as $r=0$,
+$s=\frac{1}{2}$, $t=3$.
+
+The course reading, sums up the duality theorem like so (in your head, replace
+`dual problem' with `simplex problem'):
+
+\begin{quote}
+  The minimum value of the objective function $g = ar + bs + ct$ in a primal
+  minimization problem is the maximum value of the objective function $f = ax +
+  by + cz$ in the dual problem. Values of $r,~s$ and $t$ that minimize $g$
+  appear in the lat row of the terminal tableau of the dual problem under the
+  slack variables $w_1,~w_2$ and $w_3$.
+\end{quote}
+
+
 \section{Turing machines and complexity measures}
 
 A Turing machine is a theoretical device that implements a model of computation.
