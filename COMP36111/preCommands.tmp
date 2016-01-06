@@ -1,0 +1,11 @@
+cd diagrams && pdflatex connected-graph.tex && cd ..
+cd diagrams && pdflatex directed-graph.tex && cd ..
+cd diagrams && pdflatex graph1.tex && cd ..
+cd diagrams && pdflatex graph2.tex && cd ..
+cd diagrams && pdflatex graph3.tex && cd ..
+cd diagrams && pdflatex graph4.tex && cd ..
+cd diagrams && pdflatex graph5.tex && cd ..
+cd diagrams && pdflatex multiple-edges.tex && cd ..
+cd diagrams && pdflatex self-loops.tex && cd ..
+cd equations && pdflatex tm-definition.tex && cd ..
+cd equations && pdflatex tm-transition.tex && cd ..

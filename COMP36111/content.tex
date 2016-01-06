@@ -594,15 +594,6 @@ can make, we just need to find the maximum of these points:
 Therefore the most profitable choice is to buy $10$ 11 meter length boards and
 $10$ 6 meter length boards.
 
-\subsection{The minimum problem}
-
-This is similar to the maximum problem, except instead of maximising profit,
-you'll be minimising cost, while still fulfilling some criteria. You plot a
-graph, find the corner points of the feasible region and see which one minimises
-the cost.
-
-%TODO: Expand on this when you have a quiet and comfortable place to work...
-
 \subsection{The Simplex Method}
 
 If we have more than two variables, then all of a sudden, working out the
@@ -903,8 +894,86 @@ The course reading, sums up the duality theorem like so (in your head, replace
   slack variables $w_1,~w_2$ and $w_3$.
 \end{quote}
 
+\subsubsection{Complexity}
 
-\section{Turing machines and complexity measures}
+The Simplex algorithm has an exponential complexity, since in the worst case,
+adding a new inequality results in having twice as many vertices to traverse as
+before.
+
+An interesting aspect of the Simplex algorithm, is that although there are
+polynomial alternatives, in practice it beats all the other algorithms! Is this
+because we only ever run it on the inputs which are solvable in polynomial time?
+
+\section{Integer Programming}
+
+Integer programming is just like linear programming, except we are only allowed
+solutions inside $\mathbb{N}$ (the integers) instead of $\mathbb{R}$ (real
+numbers). Even though we've narrowed our search space, the new problem turns out
+to be harder (remember, even though our solutions will be finite and countable,
+there are still a lot (very exponential) of them)!
+
+We define \textit{mixed integer programming} to be linear programming, where
+some variables are integers, but some are real numbers. Likewise, \textit{pure
+integer programming} is when all the variables are integers.
+
+At first, I thought integer programming was a bit pointless; couldn't you just
+find the linear programming solution, and then round it down to the nearest
+integer? Well, yes, but there are two issues; firstly, it might not be the best
+solution, and secondly, you can do cool stuff with integer programming.
+
+For example, what if we wanted to implement multiple choice? Say I want to buy
+either car A, B, or C, and they all have safety ratings, prices, etc. I
+obviously can't buy 0.375A, 0.005B and 0.62C; I have to make a decision.
+
+We can encapsulate this in integer programming by having a constraint like this:
+
+\[
+  A + B + C \leq 1
+\]
+
+Furthermore, we can restrict variables to be binary too, which, if all our
+variables are binary, actually turns out to be our old friend the knapsack
+problem!
+
+In fact, any pure integer programming problem can be expressed as a 0-1 problem,
+since we can express any decimal number as a binary number.
+
+\marginpar{We can also turn scheduling problems such as timetabling or the 
+travelling salesman problem into integer programming problems.}
+
+You may have worked out by this (if you remember the lectures from the second
+half of this course, or if you have read later sections of this document), that
+if we can turn the 0-1 knapsack problem into an integer programming problem,
+then integer programming must be in the same complexity class as the knapsack
+problem; meaning that integer programming is NP hard!
+
+\subsection{Solving Integer Programming Problems}
+
+It turns out, that \textit{Branch and Bound} is a good way to solve these kinds
+of problems. If you remember the second year algorithms course, then you might
+be having a quiet little groan right now. However, I have good news! There's a
+really good explanation of B\&B in the course reading (The Chapter 9 handout you
+should have picked up in the lecture).
+
+Though it's good, and thorough, it's also a bit boring and dense. Here's my
+shorter version, broken up into steps:
+
+\begin{enumerate}
+  \item So, we have an optimisation problem just like normal. We can graph it, 
+  and it'll look something like this:
+
+  \begin{figure}[h]
+    \centering
+    \includegraphics{diagrams/graph5}
+    \caption{}
+    \label{fig:graph-5}
+  \end{figure}
+
+  % TODO: Continue from P297 from Chapter 9. Start by fixing the graph above :)
+
+\end{enumerate}
+
+\section{Turing Machines and Complexity Measures}
 
 A Turing machine is a theoretical device that implements a model of computation.
 It operates on a tape of infinite length, which is divided into cells, and can
