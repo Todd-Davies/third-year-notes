@@ -1062,9 +1062,177 @@ homonyms can mess up our analysis; we'd like to differentiate between `lead' as
 a metal as a verb (``he lead her outside'') and as a noun (``fetch the dog's
 lead'').
 
+\marginpar{What if we could cluster the vector space of a word. If there are 
+lots of different clusters, then it's probably an ambigous word...}
+
 To do this, we might want to look at the words surrounding a target word, or
 possibly think about \textit{syntactically related} words; if two verbs take the
 same set of objects, then they're probably similar (e.g. `she kissed him'
 $\approx$ `she snogged him').
 
-%p268...
+We can extract information from verb phrase-noun phrase interactions
+automatically using regular expressions. For example, the regex \texttt{noun
+(MV:verb) det? adj? (OBJ:noun)} will match ``he kissed the beautiful lady'', and
+assign \texttt{MV} to `kissed' and \texttt{OBJ} to `lady'.
+
+Since regex matching is fast, we can extract these relationships quickly from
+the input corpus.
+
+To see how similar different verbs are, we can do the above for both verbs, and
+then intersect what words they are related to. The larger the intersection, the
+more related the verbs are. The course notes does this for `read' and `write'.
+There are lots of nouns including `book', `letter', `newspaper', `paper',
+`music' etc that are related to both words.
+
+However, while obviously `read' and `write' are related, they're (in a sense)
+antonyms too. See, we are able to cluster words this way, but we can't tell
+\textit{how} the words are related. Are they synonyms (kiss/snog), antonyms
+(eat/regurgitate) etc?
+
+Furthermore, the analysis is quite dumb, and is easily confused by sentences
+that aren't `simple' or require a context to understand properly. Again, the
+course notes give a good example; you might devour a book, and an intergalactic
+monster might devour a world, which presents issues if you're trying to cluster
+`devour' with `eat', which is obviously related.
+
+\subsubsection{Choosing cluster poiints}
+
+So, although we've decided that our measures for detecting whether words are
+similar are rather dumb, we know they do work. So, how do we start using them to
+cluster similar words together? As mentioned above, to do K-means clustering, we
+need to both decide on how many seeds to create (which will give us the same
+number of clusters) and which elements to set as the initial seeds.
+
+We're going to cheat regarding the number of seeds we'll create, since it's hard
+to do automatically. For choosing the seeds though, there is a nice way of doing
+things:
+
+\begin{enumerate}
+  \item For 0 to $n$
+  \begin{enumerate}
+    \item Pick $m$ random seeds 
+    \item Calculate their \textit{density}, which is the sum of their pairwise 
+      cosines.
+  \end{enumerate}
+  \item Choose the set of seeds that had the lowest density.
+\end{enumerate}
+
+This works because if the sum of pairwise cosines is low, that means the items
+were dissimilar, which is likely to give us seeds that properly represent the
+clusters that they will go on to form.
+
+In practice, the choice of seeds is important, but not vital; it is possible for
+the initial seed to move out of the cluster it initially created. Obviously
+better seeds will make the algorithm converge faster and make it less likely
+that silly clusters will result.
+
+A good idea is to run the algorithm many times with steadily increasing seed
+sizes, and select the number of seeds that gives the maimum average density in
+the clusters (except from when the number of clusters is close to the number of
+words, since then the average density will be 1!).
+
+\subsection{Hand Coded Relations}
+
+The trouble we're having now is that we know when concepts are related, but not
+how they're related. For example, we can tell that two sentences are related
+(e.g. `I drove the car' and `I drove a fiat'), but not how they're related; is
+driving a fiat the opposite of driving a car, is it better than driving a car?
+
+In order to solve this problem, we're going to need to create (or obtain some
+data that our algorithms can use to help distinguish between words. WordBanks
+have \textbf{Synsets}, which are collecitons of the different senses of words.
+This lets us get a list of potential meanings for a word in a sentence, like
+this (but in a different format obviously):
+
+\begin{description}
+  \item \textbf{Run:}
+  \begin{mymulticols}
+    \begin{itemize}
+      \item On the run
+      \item Run across a friend
+      \item Run around in the field
+      \item Run for president
+      \item Many more...
+    \end{itemize}
+  \end{mymulticols}
+\end{description}
+
+Synset relationships (superset and opposite relations) are also given. This is
+most useful to us, since we can see what items other items are linked to.
+Obviously the relations aren't always good; sometimes you get ones that seem
+completely arbitrary, but you can use synset relations so do things like:
+
+\[
+  \text{I melted the ice} \rightarrow \text{The ice is no longer frozen}
+\] 
+
+\subsection{Word Sense Disambugation}
+
+We can use the \textbf{Page Rank} algorithm to decide on what interpretation of
+each word is correct. Page Rank is (was, I expect that its evolved quite a bit
+now) the algorithm that powers Google search. The idea is that we can think of
+synsets just like webpages. Synsets relate one word to a collection of related
+words, and web pages are related to other web pages via links.
+
+\subsubsection{Page Rank}
+
+Page rank works by using the \textit{random surfer model}, which is the
+assumption that a web surfer will click random links on a web page to get to
+other web pages (each link has a $\frac{1}{n}$ chance of being clicked).
+
+We can use a markov model to represent this; where the probability of the user
+being on web page $x$ at time $t + 1$ is equal to the sum of the probability of
+them being on a web page with a link to $x$ at time $t$ multiplied by the
+probability of them clicking the link to $x$:
+
+\[
+  prob(\text{Web Page}_x^{t + 1}) =
+    \sum (prob(\text{Web Page}_i^t) + prob(S_i \rightarrow S_x))
+\]
+
+If you construct a weighted graph representing the web pages and their
+connections, and simulate the time increasing, then eventually, you will find a
+convergence, so long as the following criteria hold:
+
+\begin{itemize}
+  \item All web pages must have at least one working link (i.e. no inescapable
+    webpages).
+  \item No inescapable loops.
+\end{itemize}
+
+If one of these criteria is not met, then the model will converge to zero. This
+is an issue, since we can't always guarentee that our input web pages will
+conform to these rules. See the course notes (p309-314) for an example of the
+convergance.
+
+We can also supply a damping parameter for some page, which is the chance that a
+surfer will visit it. Then, the chance of visiting other pages linked by a page
+is $\frac{1 - damping}{n}$.
+
+You can `personalise' results by reserving some probability at each stage,
+dividing it by the pages you're biased towards (e.g. web pages of bands you
+like). This has \textit{the effect of making those pages more important, as well
+as making the pages linked too by those pages more important too}.
+
+\subsubsection{Application of Page Rank to Synsets}
+
+As you might have guessed, the reason we looked at Page Rank, is that you can
+apply it to synsets just like you can between web pages. It works for
+synset/superset links and between synsets and the synsets of words that appear
+inside it.
+
+Given a word we want to find more about, we can get its definition, and then get
+the synsets of the open class words in the definition. For example, if `run' was
+defined as `moving faster than a walk', we could get the synsets for `move',
+`fast' and `walk' (this is called a \textit{gloss}). If we ran Page Rank on a
+graph consisting of those words (+ `run'), then we'd get the most prominent
+synsets for `run'. If we personalise the Page Rank by making the synsets that
+appear in whatever text you're analysing more weighty, then we'll get better
+results.
+
+Two big advantages of using synsets and page rank, is that they disambugate all
+the words in a phrase in one pass, so they're not too slow. Furthermore, since
+we have relatively good word banks, somebody doesn't have to spend ages coming
+up with and inputting lots of different senses of different words.
+
+% p343
