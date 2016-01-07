@@ -19,10 +19,15 @@
   \addplot[domain=-1:7,fill=gray!50] {(45 - (5*x)) / 9};
   \addplot [color=transparent,fill=blue, 
             fill opacity=0.15]coordinates {
+            (0,4)
+            (9/5,4)
+            (0,5)};
+  \addplot [color=transparent,fill=blue, 
+            fill opacity=0.15]coordinates {
             (0,0)
             (6,0)
-            (9/4,15/4)
-            (0,5)};
+            (3,3)
+            (0,3)};
     \draw[red] (axis cs:9/4,15/4) circle[radius=2pt];
     \end{axis}
 \end{tikzpicture}  
