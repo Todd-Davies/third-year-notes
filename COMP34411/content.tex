@@ -923,14 +923,14 @@ your model. Figure~\ref{fig:cross-validation} explains this.
 
 Given any (normal) piece of text, a reasonably well informed and intelligent
 human can figure out, with a variable degree of certainty what the text means.
-This section is about confering that skill to computers.
+This section is about conferring that skill to computers.
 
 If you had to say what the blanked out word in the following sentence was; ``The
 ******* saluted crisply to the general as he walked past, his uniform buttons
 gleaming'', you'd probably guess `soldier'. But why? Well, we can infer from the
 context that it's probably a soldier, since not many other things salute to a
-general, or have gleaming buttons. Futhermore, you might have unconciously
-realised that it's a noun that fits in the gap (well, it's definately not
+general, or have gleaming buttons. Furthermore, you might have unconsciously
+realised that it's a noun that fits in the gap (well, it's definitely not
 something like an adjective), and gotten clues from the length of the missing
 word by how many stars there are.
 
@@ -949,7 +949,7 @@ can simply go through every word in our dictionary and do the following:
   Wikipedia and extract a vector space model. It's on
   \href{https://github.com/Todd-Davies/third-year-notes}{Github} if you want a 
   look... Why don't you submit a pull request while your at it!}
-  \item Count the number of occurances of each word, to make a \textbf{Vector 
+  \item Count the number of occurrences of each word, to make a \textbf{Vector 
     Space Model}, something like this:
     \begin{verbatim}
       {'the': 20, 'or': 17, 'of': 16, 'to': 13, 'in': 9, 'are': 8,
@@ -1063,7 +1063,7 @@ a metal as a verb (``he lead her outside'') and as a noun (``fetch the dog's
 lead'').
 
 \marginpar{What if we could cluster the vector space of a word. If there are 
-lots of different clusters, then it's probably an ambigous word...}
+lots of different clusters, then it's probably an ambiguous word...}
 
 To do this, we might want to look at the words surrounding a target word, or
 possibly think about \textit{syntactically related} words; if two verbs take the
@@ -1095,7 +1095,7 @@ course notes give a good example; you might devour a book, and an intergalactic
 monster might devour a world, which presents issues if you're trying to cluster
 `devour' with `eat', which is obviously related.
 
-\subsubsection{Choosing cluster poiints}
+\subsubsection{Choosing cluster points}
 
 So, although we've decided that our measures for detecting whether words are
 similar are rather dumb, we know they do work. So, how do we start using them to
@@ -1127,7 +1127,7 @@ better seeds will make the algorithm converge faster and make it less likely
 that silly clusters will result.
 
 A good idea is to run the algorithm many times with steadily increasing seed
-sizes, and select the number of seeds that gives the maimum average density in
+sizes, and select the number of seeds that gives the maximum average density in
 the clusters (except from when the number of clusters is close to the number of
 words, since then the average density will be 1!).
 
@@ -1140,7 +1140,7 @@ driving a fiat the opposite of driving a car, is it better than driving a car?
 
 In order to solve this problem, we're going to need to create (or obtain some
 data that our algorithms can use to help distinguish between words. WordBanks
-have \textbf{Synsets}, which are collecitons of the different senses of words.
+have \textbf{Synsets}, which are collections of the different senses of words.
 This lets us get a list of potential meanings for a word in a sentence, like
 this (but in a different format obviously):
 
@@ -1166,7 +1166,7 @@ completely arbitrary, but you can use synset relations so do things like:
   \text{I melted the ice} \rightarrow \text{The ice is no longer frozen}
 \] 
 
-\subsection{Word Sense Disambugation}
+\subsection{Word Sense Disambiguation}
 
 We can use the \textbf{Page Rank} algorithm to decide on what interpretation of
 each word is correct. Page Rank is (was, I expect that its evolved quite a bit
@@ -1201,9 +1201,9 @@ convergence, so long as the following criteria hold:
 \end{itemize}
 
 If one of these criteria is not met, then the model will converge to zero. This
-is an issue, since we can't always guarentee that our input web pages will
+is an issue, since we can't always guarantee that our input web pages will
 conform to these rules. See the course notes (p309-314) for an example of the
-convergance.
+convergence.
 
 We can also supply a damping parameter for some page, which is the chance that a
 surfer will visit it. Then, the chance of visiting other pages linked by a page
@@ -1230,9 +1230,89 @@ synsets for `run'. If we personalise the Page Rank by making the synsets that
 appear in whatever text you're analysing more weighty, then we'll get better
 results.
 
-Two big advantages of using synsets and page rank, is that they disambugate all
+Two big advantages of using synsets and page rank, is that they disambiguate all
 the words in a phrase in one pass, so they're not too slow. Furthermore, since
 we have relatively good word banks, somebody doesn't have to spend ages coming
 up with and inputting lots of different senses of different words.
 
-% p343
+\subsubsection{Textual entailment}
+
+Though we can now extract simple lexical relations, we want to determine the
+consequences that arise from actions. Given the statement `I ironed my clothes
+yesterday', we should be able to answer the question `Did I iron my clothes
+yesterday'. We can use logic to determine these consequence relations.
+
+One way to do this, is to make a system that takes in statements, turns them
+into logic and adds them into a database. There are examples in the course
+notes, but the syntax is a bit painful, so I won't include them here. The idea is
+that as you build up more statements in your database, you will be able to
+answer more queries using the database. You can use a theorem prover to try and
+answer questions formatted as logical propositions. There are some problems with
+this approach though; namely:
+
+\begin{itemize}
+  \item It's hard to go from question to logic, and statement to logic. If you get it 
+    wrong, then you might carry your errors forward later.
+  \item It's hard to prove the theorems.
+  \item Collecting the background knowledge is very hard and takes lots of time.
+\end{itemize}
+
+\subsubsection{Bag of words model}
+
+There are some simple rules for extracting consequences from sentences. For
+example, if you saw a fighter jet over Manchester, then you also saw a plane.
+Here are some rules regarding this:
+
+\begin{description}
+  \item \textbf{Okay}\\
+    Sentence $S$ entails $S'$ if every word in $S'$ is in $S$.\\
+    E.g. I ate a banana yesterday $\rightarrow$ I ate a banana.
+  \item \textbf{Better}\\
+    Sentence $S$ entails $S'$ if every word in $S'$ is subsumed by a word in
+    $S$.\\
+    E.g. I threw a ball $\rightarrow$ I threw an object.
+  \item \textbf{Halfway-decent}\\
+    Sentence $S$ entails $S'$ if every word in $S'$ is subsumed by a word in
+    $S$, where the subsumption respects the order of the sentences.\\
+    E.g. I threw a ball $\rightarrow$ I threw an object.\\
+    Bob said hi to Betty $\neq$ Betty said hi to Bob.
+\end{description}
+
+We could also determine whether sentences are related by working out what it
+would take to transform $S$ into $S'$. 
+
+\subsection{String edit distance and dynamic time warping}
+
+Finding the number of operations that transform one string into another is
+called the \textit{string-edit distance}, and algorithms that do this can be
+applied to lots of things, from spell correction to DNA sequencing!
+
+We're going to do this by using an algorithm called \textbf{Dynamic Time
+Warping}. This entails:
+
+\begin{enumerate}
+  \item Make a grid of size $n \times m$, where $n$ and $m $ are the lengths of
+    your strings plus 1, and initialise it so that all cells are $-1$. The cell
+    $(0,0)$ is set to $0$.
+  \item Make a score for each operation you can perform from \textit{exchange},
+    \textit{add} and \textit{delete}.
+  \item Go through the grid cell by cell. For each cell that is adjacent from
+    the cell you're currently in, give the cell a score equal to the current
+    cell score added to the cost of the transformation required to get there.
+\end{enumerate}
+
+This isn't easy to explain in bullet points, so here's an example. Lets go from
+`the' to `that', when exchanging costs $3$, and adding/deleting costs $2$ (this
+is because we want an exchange to be better than an addition then a deletion):
+
+\begin{center}
+  \begin{tabular}{c|c c c c c}
+      & X & T & H & A & T\\ \hline
+    X & 0 & 2 & 4 & 6 & 8\\ 
+    T & 2 & 0 & 2 & 4 & 6\\
+    H & 4 & 2 & 0 & 2 & 4\\
+    E & 6 & 4 & 2 & 3 & 5
+  \end{tabular}
+\end{center}
+
+% p404
