@@ -1,0 +1,29 @@
+\documentclass{standalone}
+\usepackage{tikz}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usetikzlibrary{positioning}
+
+\begin{document}
+
+% flow network = \lbracket V, E, s, t, c\rbracket
+% Where V, E is a directed graph with no back loops
+%       s \in V
+%       t \in V and s \notequal t
+%       c : E \rightarrow \mathbb{N}
+%       
+
+\tikz[baseline]{
+    \node (start) {flow network $ = ($};
+    \node[rounded corners,right = 0cm of start] (m1) {$V,E,s,t,c,$};
+    \node[draw=red,rounded corners,right = 0.0cm of m1] (m5) {$\gamma$};
+    \node[below of=m5] (l5) {The price per unit flow of each edge
+      ($\gamma: E \rightarrow \mathbb{N}$)};
+    \draw[-,red] (l5) -- (m5);
+    %
+    \node[right = 0.1cm of m5] (end) {$)$};
+}
+
+\end{document}

@@ -1,0 +1,40 @@
+\documentclass{standalone}
+\usepackage{tikz}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usetikzlibrary{positioning}
+
+\begin{document}
+
+% flow network = \lbracket V, E, s, t, c\rbracket
+% Where V, E is a directed graph with no back loops
+%       s \in V
+%       t \in V and s \notequal t
+%       c : E \rightarrow \mathbb{N}
+%       
+
+\tikz[baseline]{
+    \node (start) {flow network $ = ($};
+    \node[draw=red,rounded corners,right = 0cm of start] (m1) {$V,E,$};
+    \node[above = 0.8cm of m1] (l1) {A directed graph with no back-loops};
+    \draw[-,red] (l1) -- (m1);
+    %
+    \node[draw=red,rounded corners,right = 0.2cm of m1] (m2) {$s,$};
+    \node[below left of=m2] (l2) {The start node ($s \in V$)};
+    \draw[-,red] (l2) -- (m2);
+    %
+    \node[draw=red,rounded corners,right = 0.2cm of m2] (m3) {$t,$};
+    \node[above right of=m3] (l3) {The end node ($t \in V$, $t \neq s$)};
+    \draw[-,red] (l3) -- (m3);
+    %
+    \node[draw=red,rounded corners,right = 0.2cm of m3] (m4) {$c$};
+    \node[below = 0.8cm of m4] (l4) {The weight of each edge
+      ($c : E \rightarrow \mathbb{N}$)};
+    \draw[-,red] (l4) -- (m4);
+    %
+    \node[right = 0.1cm of m4] (end) {$)$};
+}
+
+\end{document}
