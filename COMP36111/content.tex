@@ -1251,7 +1251,7 @@ We can calculate the total cost of the flow to be:
   \sum_{e \in E} f(e) \times \gamma(e)
 \]
 
-What if we want to find the maximum flow with the minimium cost? In fact, it is
+What if we want to find the maximum flow with the minimum cost? In fact, it is
 possible to use the above \texttt{maximumFlow} algorithm to solve this, with
 just a few small modifications; simply have the weight function $c$ take into
 account $\gamma$:
@@ -1266,9 +1266,59 @@ account $\gamma$:
     \end{cases}
 \]
 
-% Lecture 7, slide 28
+The only change we need to make on our flow finding algorithm is to find the
+path from the start node to the end node using a minimal length:
 
+\begin{lstlisting}[numbers=left,language=Java]
+  Map<Edge, Integer> maximumFlow(List<Node> nodes, List<Edge> edges,
+      Node start, Node end, Map<Edge, Integer> weight,
+      Map<Edge, Integer> cost) {
+    // Init the flow to all zeros
+    Map<Edge, Integer> maxFlow = new HashMap<>();
+    for (Edge e : edges) maxFlow.put(e, 0);
+    // Iterate until we have a maximum flow
+    while (true) {
+      // Create the aux graph
+      List<Edge> auxFlow = createAuxFlow(nodes, edges, flow, start, end);
+      // Find the (possibly empty) path from the start to the end that has the
+      // smallest cost
+      List<Edge> path = getPath(auxFlow, start, end, cost);
+      // If there is no path, then we're finished
+      if (path.isEmpty()) break;
+      else {
+        for (Edge e : path) {
+          // Increment each edge in the flow
+          if (edges.contains(e)) maxFlow.increment(e);
+          // If the edge isn't in the flow, decrement the edge going
+          // the opposite way
+          else maxFlow.decrement(e.reverse());
+        }
+      }
+    }
+    return maxFlow;
+  }
+\end{lstlisting}
 
+This is the \textit{Busacker-Gowen algorithm}.
+
+\subsection{Stable matching as a flow matching algorithm}
+
+We can transform a matching problem into a flow matching problem as shown in
+Figure~\ref{fig:matching-flow}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{diagrams/matching-flow}
+  \caption{Here, a stable marriage problem (on the left, an edge indicates that
+    both the boy and girl like each other) is mapped to a flow matching problem
+    on the right.}
+  \label{fig:matching-flow}
+\end{figure}
+
+We assume all the edge weights are $1$, and a perfect matching will be found iff
+there is a flow from source to sink (the leftmost node to the rightmost node)
+with a value $n$, where $n$ is the number of boys or girls. This runs on
+$O(n(n+m))$ time!
 
 \section{Turing Machines and Complexity Measures}
 
@@ -1509,11 +1559,24 @@ meaning that if:
 \subsection{Complexity}
 
 You already know that there are two types of Turing Machine; deterministic and
-non-deterministic TM's, but now its time to think about the resources that Turing
-Machines consume. We don't think of TM resources as commodities such as metal,
-electricity etc, since TM's are abstract, theoretical devices. Instead the two
-commodities we're interested in with Turing Machines are \textbf{time} and
-\textbf{space}.
+non-deterministic TM's, but now its time to think about the resources that
+Turing Machines consume. We don't think of TM resources as commodities such as
+metal, electricity etc, since TM's are abstract, theoretical devices. Instead
+the two commodities we're interested in with Turing Machines are \textbf{time}
+and \textbf{space}.
 
-%TODO: Read chapter 4 of Sipser, carry of from slide 18 of 
-% http://studentnet.cs.manchester.ac.uk/ugt/2015/COMP36111/lecture7b.pdf
+If we have a TM $M$, and let $g : \mathbb{N} \rightarrow \mathbb{N}$. $M$ runs
+in time $g$ if for any finite input $x$, $M$ takes at most $g(|x|)$ steps. We
+say that $M$ runs in space $g$ if for any finite $x$, $M$ takes at most $g(|x|)$
+squares on its tapes.
+
+If you think about it, this is nearly a formal way of defining the Big-Oh
+notation. One of the main problems with this, is that TM's might execute at
+different speeds (maybe one has faster motors for its tape etc). This means that
+the algorithms we're designing will have certain runtimes on certain machines.
+In order to mitigate this, we like to define sets of functions for the Big-Oh
+notation; $M$ runs in time $G$ if for some $g \in G$, $M$ runs in time $g$.
+
+This means that the Big-Oh notation can ignore things like constants, and lets
+us abstract away the details of turing machines (like exactly how many
+operations it takes to multiply two numbers).

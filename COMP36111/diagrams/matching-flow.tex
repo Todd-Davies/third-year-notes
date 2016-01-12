@@ -1,0 +1,67 @@
+\documentclass{standalone} 
+\PassOptionsToPackage{usenames,dvipsnames,svgnames}{xcolor}  
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning,automata}
+
+\begin{document}
+\begin{tikzpicture}[>=stealth',shorten >=1pt,node distance=3cm,on grid,initial/.style    ={}]
+  \node[state]          (0)                        {};
+  \node[state]          (1) [right of=0]           {};
+  \node[state]          (2) [below of=0]           {};
+  \node[state]          (3) [right of=2]           {};
+  \node[state]          (4) [below of=2]           {};
+  \node[state]          (5) [right of=4]           {};
+  \node[state]          (6) [below of=4]           {};
+  \node[state]          (7) [right of=6]           {};
+  \node[state]          (8) [below of=6]           {};
+  \node[state]          (9) [right of=8]           {};
+
+  \node[state]          (a) [right of=5]           {};
+  \node[state]          (f) [right of=a]           {};
+  \node[state]          (d) [above of=f]           {};
+  \node[state]          (e) [right of=d]           {};
+  \node[state]          (b) [above of=d]           {};
+  \node[state]          (c) [right of=b]           {};
+  \node[state]          (h) [below of=f]           {};
+  \node[state]          (i) [right of=h]           {};
+  \node[state]          (j) [below of=h]           {};
+  \node[state]          (k) [right of=j]           {};
+  \node[state]          (g) [right of=f]           {};
+
+  \node[state]          (l) [right of=g]           {};
+
+  \path (5) edge [->, thick, dotted] node {} (a);
+
+  \path (0)     edge   node   {} (1);
+  \path (0)     edge   node   {} (3);
+  \path (2)     edge   node   {} (3);
+  \path (2)     edge   node   {} (5);
+  \path (4)     edge   node   {} (5);
+  \path (4)     edge   node   {} (7);
+  \path (4)     edge   node   {} (9);
+  \path (6)     edge   node   {} (5);
+  \path (8)     edge   node   {} (1);
+
+  \path (b)     edge   node   {} (c);
+  \path (b)     edge   node   {} (e);
+  \path (d)     edge   node   {} (e);
+  \path (d)     edge   node   {} (g);
+  \path (f)     edge   node   {} (g);
+  \path (f)     edge   node   {} (i);
+  \path (f)     edge   node   {} (k);
+  \path (h)     edge   node   {} (g);
+  \path (j)     edge   node   {} (c);
+
+  \path (a)     edge   node   {} (b);
+  \path (a)     edge   node   {} (d);  
+  \path (a)     edge   node   {} (f);  
+  \path (a)     edge   node   {} (h);
+  \path (a)     edge   node   {} (j);
+
+  \path (c)     edge   node   {} (l);
+  \path (e)     edge   node   {} (l);  
+  \path (g)     edge   node   {} (l);  
+  \path (i)     edge   node   {} (l);
+  \path (k)     edge   node   {} (l);  
+\end{tikzpicture}
+\end{document}
