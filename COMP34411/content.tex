@@ -1272,6 +1272,8 @@ Here are some rules regarding this:
     $S$.\\
     E.g. I threw a ball $\rightarrow$ I threw an object.
   \item \textbf{Halfway-decent}\\
+    \marginpar{\textit{Subsumption, noun:} incorporating something under a more 
+    general category}
     Sentence $S$ entails $S'$ if every word in $S'$ is subsumed by a word in
     $S$, where the subsumption respects the order of the sentences.\\
     E.g. I threw a ball $\rightarrow$ I threw an object.\\
@@ -1301,6 +1303,8 @@ Warping}. This entails:
     cell score added to the cost of the transformation required to get there.
 \end{enumerate}
 
+\marginpar{This is dynamic programming, yay!}
+
 This isn't easy to explain in bullet points, so here's an example. Lets go from
 `the' to `that', when exchanging costs $3$, and adding/deleting costs $2$ (this
 is because we want an exchange to be better than an addition then a deletion):
@@ -1315,4 +1319,74 @@ is because we want an exchange to be better than an addition then a deletion):
   \end{tabular}
 \end{center}
 
-% p404
+When explaining how dynamic time warping works, I've shown an example where you
+time-warp two words. However, we're going to use it for sentences to see how
+similar they are.
+
+We can change the costs for the exchange/add/delete depending on the  situation.
+For example, if we're finding the distance between sentences, and if  one word
+is a subsumed by another, then maybe they could be exchanged for a  score of
+$0$. We could make deletion free for certain unimportant words, take part of
+speech tags into account (and make exchange cost less if they're the same).
+Doing this might let our algorithm give `\textit{I ate a juicy salmon}' and
+`\textit{I ate a fish}' a score of zero, which is good, since they're pretty
+similar!
+
+You can also make a machine learning algorithm learn what weights to assign to
+each operation, and maybe supply a function that scores how similar two elements
+(words, letters part of speech tags etc) are, and incorporates that into the
+cost given for each step.
+
+\subsection{Subsumption on parse trees}
+
+We can make some logical rules that operate directly on parse trees. These will
+derive more parse trees based on the ones we have now. A simple example is that
+if a sentence is of the form:
+
+\begin{verbatim}
+  X used to Y
+\end{verbatim}
+
+Then:
+
+\begin{verbatim}
+  X does not Y
+\end{verbatim}
+
+We can incorporate words and their opposites into this too; if `Tom Cruise and
+Nicole Kidman broke up' then `Tom Cruise and Nicole Kidman are not going out'.
+
+So, we want to match two parse trees, and derive parse trees from other parse
+trees. \textit{Apparently}, a technique called \textbf{continuation programming}
+is a good way to solve this problem. This involves:
+
+\marginpar{Through I've never tried this, I view this use of exceptions as 
+badly thought out at the least, but sacrilegious, irreverent and heretic at 
+worst. An \textit{Either} type might work better?}
+
+\begin{itemize}
+  \item Making every function taking an extra argument (usually a function 
+    pointer, called the continuation), which is what should be called if 
+    everything goes well.
+  \item If the function doesn't work properly, then it returns.
+  \item If the continuation gets called, then once it is finished, then it   
+    should throw an exception to bypass the stacked up return calls.
+\end{itemize}
+
+This is a simple (if messy) way of handling backtracking search, since you use
+the normal call/return stack to keep track of state (which is efficient, since
+function calls are generally quite efficient). Exceptions are only used when you
+find the right answer (which is good, since exceptions are usually comparatively
+slow).
+
+If we apply continuation programming to our subsumption methods, then we can do
+pretty well. However, edge cases, particularly the polarity of certain
+words/phrases (e.g. didn't, haven't etc) can mess us up and cause the opposite
+of what is right to be returned.
+
+A solution to this, is to keep the polarity of each node in the parse tree and
+have a table of words that switch or set the polarity.
+
+\subsection{Deriving rules from a corpus}
+
+% slide 433
