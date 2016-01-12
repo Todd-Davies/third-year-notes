@@ -1578,5 +1578,75 @@ In order to mitigate this, we like to define sets of functions for the Big-Oh
 notation; $M$ runs in time $G$ if for some $g \in G$, $M$ runs in time $g$.
 
 This means that the Big-Oh notation can ignore things like constants, and lets
-us abstract away the details of turing machines (like exactly how many
+us abstract away the details of Turing machines (like exactly how many
 operations it takes to multiply two numbers).
+
+In fact, possibly the simplest definition of complexity is to let $L$ be a
+language, and $G$ be a set of functions from $\mathbb{N}$ to $\mathbb{N}$. $L$
+is in \texttt{TIME/SPACE(G)} if there exists a deterministic TM that recognises
+$L$ in time/space G.
+
+Similarly, if we can find a non-deterministic TM to recognise $L$, then we say
+that $L$ is in \texttt{NTIME/NSPACE{G}}.
+
+\subsubsection{Complexity classes}
+
+As you probably know, there are several different complexity classes, as shown
+in Table~\ref{tbl:complex-classes}.
+
+\marginpar{Note, you can't have $Time(log(n))$ since reading the input takes
+$n$ time.}
+
+\begin{table}[h]
+  \begin{tabular}{l >{$}l<{$} l >{$}l<{$}}
+    & & LogSpace & Space(log(n))\\
+    PTime & Time(n) & PSpace & Space(n)\\
+    ExpTime & Time(2^{n}) & ExpSpace & Space(2^{n})\\
+    k-ExpTime & Time(2^{2^{\dots^2\}^{n} \leftarrow k~times}}) & 
+      k-ExpSpace & Space(2^{2^{\dots^2\}^{n} \leftarrow k~times}})\\
+  \end{tabular}
+  \caption{The deterministic complexity classes}
+  \label{tbl:complex-classes}
+\end{table}
+
+To get their non-deterministic counterparts, just stick an `N' on the front of
+everything, as in Table~\ref{tbl:complex-classes-nondet}.
+
+\begin{table}[h]
+  \begin{tabular}{l >{$}l<{$} l >{$}l<{$}}
+    & & NLogSpace & NSpace(log(n))\\
+    NPTime & NTime(n) & NPSpace & NSpace(n)\\
+    NExpTime & NTime(2^{n}) & NExpSpace & NSpace(2^{n})\\
+    Nk-ExpTime & NTime(2^{2^{\dots^2\}^{n} \leftarrow k~times}}) & 
+      Nk-ExpSpace & NSpace(2^{2^{\dots^2\}^{n} \leftarrow k~times}})\\
+  \end{tabular}
+  \caption{The deterministic complexity classes}
+  \label{tbl:complex-classes-nondet}
+\end{table}
+
+Obviously, some complexity classes can fit inside each other. Here are some
+examples:
+
+\[
+  PTime \subseteq ExpTime \subseteq 2-ExpTime \subseteq \dots
+\]
+
+\[
+  LogSpace \subseteq PSpace \subseteq ExpSpace \subseteq \dots
+\]
+
+\[
+  NPTime \subseteq NExpTime \subseteq N2-ExpTime \subseteq \dots
+\]
+
+We can also interleave the non-deterministic classes:
+
+\[
+  PTime \subseteq NPTime \subseteq ExpTime \subseteq NExpTime \subseteq \dots
+\]
+
+Finally, the $Co^*$ complexity classes are the ones that describe the
+complementary languages to those described by the others. For example, if we can
+decide a language $L$ over $\Sigma^*$ in \texttt{NPTime}, then we can decide
+$\Sigma^* - L$ in \texttt{Co-NPTime}. We know that \texttt{Time(G) =
+Co-Time(G)}, and the same for space, but not if \texttt{NPTime(G) = Co-NPTime}.
