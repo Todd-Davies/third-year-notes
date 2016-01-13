@@ -1,0 +1,30 @@
+\documentclass{standalone}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{automata,arrows,positioning,calc}
+
+\begin{document}
+
+\begin{tikzpicture}[->, >=stealth', auto, semithick, node distance=6cm]
+\tikzstyle{every state}=[fill=white,draw=black,thick,text=black,scale=1,minimum size=3cm]
+
+\node[state]    (A)                     {Warm up};
+\node[state]    (B)[below right of=A]   {Squats};
+\node[state]    (C)[below left of=A]   {Bench press};
+\node[state]    (D)[below right of=B]   {Deadlift};
+\node[state]    (E)[below       of=B]   {Calf raises};
+\node[state]    (F)[below left  of=C]   {Dumbbell flys};
+\node[state]    (G)[below       of=C]   {Tricep extensions};
+
+\path (A) edge [->]     node {0.45}         (B);
+\path (A) edge [->]     node {0.55}         (C);
+
+\path (B) edge [->]     node {0.7}         (D);
+\path (B) edge [->]     node {0.4}         (E);
+
+\path (C) edge [->]     node {0.4}         (F);
+\path (C) edge [->]     node {0.6}         (G);
+
+\end{tikzpicture}
+
+\end{document}

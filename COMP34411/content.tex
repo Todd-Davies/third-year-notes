@@ -1488,4 +1488,104 @@ This is helpful, but its ultimately not that useful; besides being messy, we
 often need the surrounding context to interpret what a sound is (going from
 sound `a' to sound `b' will be different than going from `c' to `b').
 
-%p471
+\subsection{Using Hidden Markov Models to recognise sound}
+
+A \textbf{Markov Model} is a probabilistic model of what's going to happen given
+the current state of affairs now.
+
+\begin{figure}[h]
+  \includegraphics[width=\textwidth]{diagrams/markov-model}
+  \caption{A Markov Model of what I'm likely to do when I go to the gym.}
+  \label{fig:gym-model}
+\end{figure}
+
+So according to Figure~\ref{fig:gym-model}, if you see me warming up in the gym,
+then there's a $0.55 \times 0.6 = 0.33$ chance that I'll do tricep extensions.
+You could also work out how likely a chain set of events is, simply by
+multiplying the probabilities of the events in the tree.
+
+\marginpar{This is a hidden markov model now, as opposed to a markov model.}
+
+Suppose you're a Jedi; you can use the force to sense weights moving around, but
+you lost your eyesight in an epic battle years earlier. You want to work out
+what I'm doing in the gym from how the weights I'm pushing affect the force. You
+can come up with something like this table:
+
+\begin{center}
+  \begin{tabular}{l|c|c|c}
+    \multirow{2}{*}{Activity} &
+    \multicolumn{3}{c}{Probability if X weights sensed}\\ \cline{2-4}
+                              & Light & Medium & Heavy\\ \hline
+    Warm up & 0.9 & 0.1 & 0.0\\ \hline
+    Bench press & 0.2 & 0.5 & 0.3\\ \hline
+    Dumbbell flys & 0.8 & 0.15 & 0.05\\ \hline
+    Tricep extensions & 0.7 & 0.25 & 0.05\\ \hline
+    Squats & 0.2 & 0.4 & 0.4\\ \hline
+    Calf raises & 0.2 & 0.5 & 0.3\\ \hline
+    Deadlift & 0.1 & 0.3 & 0.6\\ \hline
+  \end{tabular}
+\end{center}
+
+So even now you can't actually see what's going on, you might be able to get a
+pretty good idea. If you made a series of observations about what weights are
+moving, you could make an educated guess about where I am in the markov model!
+
+Suppose you sense that I'm pushing light weights, then medium weights, and
+finally you sense that I'm pushing heavy weights. With this sequence of weights,
+its fairly likely that I warmed up, then did squats and then went on to
+deadlift. It's far more likely that I did that than if I did warming up, then
+bench press, then tricep extensions!
+
+\subsubsection{The Viterbi Algorithm}
+
+The Viterbi Algorithm tries to find the most likely route through a HMM given
+whatever events you think you have. You annotate the HMM with \textbf{emission
+probabilities}; `I'm now at state X, how likely is it that I'm going to be
+moving to state Y given that Z happened' and \textbf{transition probabilities};
+`How likely is it that I'm going to stay in this state, or move to state X?'
+
+Lets continue with the Jedi-gym example (this doesn't have self-loops like most
+HMM's do, but it doesn't matter too much). Given that I'm in the warm up state,
+and you're sensing me pushing medium weights, what's the probability of me
+moving to the other states?
+
+\[
+  \begin{split}
+  \mathbb{P}(\text{Bench press}) &=
+        \mathbb{P}(\text{Bench press} | \text{medium})  \times
+        \mathbb{P}(\text{Warm up}) \times
+        \mathbb{P}(\text{Warm up} \rightarrow \text{Bench press})\\
+      &= 0.5 \times 1 \times 0.55\\
+      &= 0.275
+  \end{split}
+\]
+
+\[
+  \begin{split}
+  \mathbb{P}(\text{Squats}) &=
+        \mathbb{P}(\text{Squats} | \text{medium})  \times
+        \mathbb{P}(\text{Warm up}) \times
+        \mathbb{P}(\text{Warm up} \rightarrow \text{Squats})\\
+      &= 0.4 \times 1 \times 0.45\\
+      &= 0.18\dots
+  \end{split}
+\]
+
+In general, the probability of being in State X is:
+
+\[
+  \mathbb{P}(\text{X}) =
+      \mathbb{P}(\text{X} | \text{Observations})  \times
+      \mathbb{P}(\text{Current state}) \times
+      \mathbb{P}(\text{Current state} \rightarrow \text{next state})\\
+\]
+
+Note that (not being a Jedi), I picked some very arbitrary probabilities for the
+observations. In real life, you want better ones; maybe if you're doing part of
+speech tagging, you could use frequency counts or something to determine them
+automatically.
+
+So, back to the Viterbi Algorithm; you just compute the probability of being at
+each node all along the HMM, and then pick the most likely path along it.
+
+% Page 496

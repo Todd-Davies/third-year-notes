@@ -1,2 +1,3 @@
 cd diagrams && pdflatex dependency-relations.tex && cd ..
 cd diagrams && pdflatex dependency-tree.tex && cd ..
+cd diagrams && pdflatex markov-model.tex && cd ..
