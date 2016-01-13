@@ -1168,13 +1168,19 @@ completely arbitrary, but you can use synset relations so do things like:
 
 \subsection{Word Sense Disambiguation}
 
+These are lots of different strategies for working out what the words in a
+sentence mean, as we'll see in the following subsections. However, note that
+they all have different strengths and weaknesses.
+
+Most strategies are coarse (bag of words, string edit distance etc), having a high recall but poor precision.
+
+\subsubsection{Page Rank}
+
 We can use the \textbf{Page Rank} algorithm to decide on what interpretation of
 each word is correct. Page Rank is (was, I expect that its evolved quite a bit
 now) the algorithm that powers Google search. The idea is that we can think of
 synsets just like webpages. Synsets relate one word to a collection of related
 words, and web pages are related to other web pages via links.
-
-\subsubsection{Page Rank}
 
 Page rank works by using the \textit{random surfer model}, which is the
 assumption that a web surfer will click random links on a web page to get to
@@ -1283,7 +1289,7 @@ Here are some rules regarding this:
 We could also determine whether sentences are related by working out what it
 would take to transform $S$ into $S'$. 
 
-\subsection{String edit distance and dynamic time warping}
+\subsubsection{String edit distance and dynamic time warping}
 
 Finding the number of operations that transform one string into another is
 called the \textit{string-edit distance}, and algorithms that do this can be
@@ -1337,7 +1343,7 @@ each operation, and maybe supply a function that scores how similar two elements
 (words, letters part of speech tags etc) are, and incorporates that into the
 cost given for each step.
 
-\subsection{Subsumption on parse trees}
+\subsubsection{Subsumption on parse trees}
 
 We can make some logical rules that operate directly on parse trees. These will
 derive more parse trees based on the ones we have now. A simple example is that
@@ -1387,6 +1393,99 @@ of what is right to be returned.
 A solution to this, is to keep the polarity of each node in the parse tree and
 have a table of words that switch or set the polarity.
 
-\subsection{Deriving rules from a corpus}
+\subsubsection{Deriving rules from a corpus}
 
-% slide 433
+We can get rules to do tree transformations from a large enough corpus. If you
+know that two sentences are the same, then you can derive a rule to transform
+one into the other. If its generic enough, then you can use the rule in other
+situations in the future.
+
+News websites are a good way to do this; lots of different website have the same
+content, just written in a different way. The chance that there will be
+sentences with identical meaning, but differing words is quite high. To work out
+what sentences mean the same thing, we can use our TF-IDF scoring system.
+
+This will often get very technical rules, and will not get easy ones such as `if
+X is good for Y, then Y should do X'. These rules are pretty simple, and you can
+probably put them in yourself.
+
+\section{Speech}
+
+We want to do both \textit{speech synthesis}, and \textit{speech recognition}.
+Collectively, this is speech processing. Synthesis is not trivial, but its
+doable, while recognition is \textit{hard}.
+
+\textit{Vowels} are the sounds made when you blow air over your vocal chords,
+and let them resonate. Both different resonation frequencies, and the shape of
+your vocal tract and mouth impact on what chord is produced, which is part of
+what makes a vowel sound like, a vowel. Consonants involve no vocal chord
+resonance.
+
+Some sounds are \textit{nasal}, (`mmm' and `nnn'), and require you to expel air
+predominantly from your nose.
+
+If a sound requires you to close your mouth, and obstruct the air flow, then
+it's an \textit{obstruent} sound. When you open your mouth again, the pressure
+will have built up, the air will come out quickly, and you'll be able to hear
+the turbulence.
+
+Other sounds are made by nearly closing the mouth, so air is forced through a
+small gap. This often produces a hissing noise.
+
+Doing all this takes a lot of practice; there are a lot of muscles to move into
+very precise configurations! Some transitions between sounds are easier than
+other ones; going from `nnn' to `ppp' is much harder than going from `mmm' to
+`ppp', especially in the middle of a word. This affects how we speak.
+
+If you're trying to understand sound from a computer's point of view, all you
+get is some waveform. You might be able to tell that two recordings of the same
+sound/phrase are similar, but not derive what was being said just from looking
+at a diagram of the waveform.
+
+\subsection{Analysis of waveforms using FFT}
+
+\marginpar{There's more on FFT in my \texttt{COMP28512} notes I think.}
+
+We can use the Fast Fourier Transform to find out what frequencies make up a
+waveform (the inverse FFT can also create a wave from the frequencies).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{images/fft}
+  \caption{Here is the output from the FFT function (top) and the input wave (
+  bottom). You can see that the frequencies that make up the wave have been 
+  extracted. Note that the top graph is a mirror image, this is always the
+  case.}
+  \label{fig:fft}
+\end{figure}
+
+If we plot a graph of the waveform once its been through FFT, then we can start
+to see distinct differences between recordings of different sounds. In
+particular, they will have different ratios between the main frequencies (called
+\textit{formants}), which will allow us to distinguish between different sounds.
+
+It is important to look at the ratios, since then pitch is less relevant.
+
+However, even when we've extracted the frequencies, we need to look at how they
+change over time. By looking at the rate of change of the frequencies and their
+intensity (the \textit{deltas}), we can better see how a sound is formed.
+
+\subsection{MFCC quantisation}
+
+One problem with using deltas to identify sounds is at what resolution do we
+look at the deltas? If we pick the wrong boundaries or make them too big, then
+because of the \textit{sampling theorem} (look it up), then we could miss all
+the important information.
+
+Furthermore, a small change in pitch at low frequencies is more significant than
+one at high frequencies.
+
+Mel Frequency Cepstral Coefficients is a way to solve this. It splits the
+frequency range into overlapping segments, so that all possible frequencies will
+be in two segments. See slides \texttt{466-468} for an example of this.
+
+This is helpful, but its ultimately not that useful; besides being messy, we
+often need the surrounding context to interpret what a sound is (going from
+sound `a' to sound `b' will be different than going from `c' to `b').
+
+%p471
