@@ -1588,4 +1588,39 @@ automatically.
 So, back to the Viterbi Algorithm; you just compute the probability of being at
 each node all along the HMM, and then pick the most likely path along it.
 
-% Page 496
+Unfortunately for us, this isn't that applicable to transcribing speech just
+yet; having a HMM where the nodes are equivalent to words doesn't work very
+well. Instead, phonemes or parts of phonemes are more commonly used (though
+words might be used occasionally). Going from words to phonemes is fairly easy;
+you can just use a phonetic dictionary like the British English Pronouncing
+Dictionary (BEEP).
+
+\subsubsection{Features of sounds}
+
+Before, we said that in order to construct a HMM, we need to work out transition
+probabilities and emission probabilities for each sound.
+
+\marginpar{Maybe consult the \texttt{COMP28512} notes if you're struggling to 
+understand some terminology here. Unfortunately, I don't have time to provide a 
+more detailed explination.}
+
+When we're sampling the sound, it's a good idea to quantise (put it into bins)
+into around 12 values. In terms of the sampling frequency, $44kHz$ is a
+good value to work with; it encapsulates everything that the human ear can hear,
+so going higher is pointless.
+
+We can split each phoneme into three parts; a start, middle and end. Since
+phonemes are said in a sequence, the start and end parts tend to be fairly
+distorted by the previous/next phonemes, but the middle part is usually quite
+characteristic of what sound is intended to be said.
+
+Since phonemes are of a variable length (people speak at different speeds,
+change the tempo of speech to give emphasis, etc), we need to have self-loops in
+the HMM to account for this, so a phoneme in the HMM can transition to itself if
+the sound is long.
+
+What happens in reality, is that a HMM is created for each different phoneme,
+and when sound is being recognised, they are concatenated together for form the
+expected phrases (e.g. `c,a,t' or `c,a,r').
+
+% p 536
