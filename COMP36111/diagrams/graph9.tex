@@ -1,0 +1,17 @@
+\documentclass{standalone} 
+\PassOptionsToPackage{usenames,dvipsnames,svgnames}{xcolor}  
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning,automata}
+
+\begin{document}
+\begin{tikzpicture}[>=stealth',shorten >=1pt,node distance=3cm,on grid,initial/.style    ={}]
+  \node[state]          (x)                         {$x$};
+  \node[state]          (nx) [right = of x]    {$\neg x$};
+  \node[state]          (y)  [below = of x]    {$y$};
+  \node[state]          (ny) [right = of y]    {$\neg y$};
+  \node[state]          (z)  [below = of y]    {$z$};
+  \node[state]          (nz) [right = of z]    {$\neg z$};
+
+%\path (P)     edge [mystyle]   node   {$5$} (B);;
+\end{tikzpicture}
+\end{document}

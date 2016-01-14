@@ -1650,3 +1650,246 @@ complementary languages to those described by the others. For example, if we can
 decide a language $L$ over $\Sigma^*$ in \texttt{NPTime}, then we can decide
 $\Sigma^* - L$ in \texttt{Co-NPTime}. We know that \texttt{Time(G) =
 Co-Time(G)}, and the same for space, but not if \texttt{NPTime(G) = Co-NPTime}.
+
+\section{Propositional logic}
+
+I'm going to assume that you're comfortable with basic propositional logic from
+other courses. If you did \texttt{COMP21111} then you're probably going to find
+this easy!
+
+Just to jog your memory, here are some PL things you should know:
+
+\begin{itemize}
+  \item A formula is \textit{satisfiable} if there exists an assignment such 
+  that the formula evaluates to \texttt{T}. E.g. $p \vee q$ is \texttt{T} when $
+  p = 1, q = 0$, and therefore is satisfiable. $p \wedge \neg p$ is obviously 
+  not satisfiable.
+
+  \item We can define the problem \texttt{Propositional Sat} which will 
+  determine whether a given formula is satisfiable or not. Since it is possible 
+  to turn any PL formula into one of the `normal forms', we need only consider 
+  formula made completely from negations and disjunctions, since all other 
+  formulae can be converted into something like them.
+
+  \item Since converting a formula into normal form gives us a set of clauses, 
+  we need to define the problem \texttt{SAT} which when given a set of clauses, 
+  will determine whether the whole set of clauses is satisfiable (they must all 
+  be satisfiable with the same truth assignment).
+
+  \item Similarly, \texttt{k-SAT} is the problem where each clause has at most
+  $k$ literals.
+
+  \item Horn clauses are clauses where there is only 0 or one non-negative 
+  literals. In other words, all but at most one literals are negative, e.g.
+  $\neg x \vee \neg y \vee \neg z$ or $\neg x \vee y \vee \neg z$
+
+  \item Krom clauses have at most two literals, e.g. $x \vee y$.
+\end{itemize}
+
+\subsection{DPLL}
+
+The Davis-Putnam-Logemann-Loveland algorithm solves \texttt{SAT}. Here it is:
+
+\begin{verbatim}
+  begin DPLL(clauses)
+    if clauses is empty then return Yes
+    if clauses contains the empty clause then return No
+    while clauses contains any unit clause l
+      remove l from clauses
+      clauses = resolve(Γ, l)
+      if clauses is empty then return Yes
+      if clauses contains the empty clause then return No
+    let l be the first literal of the first clause of clauses
+    if DPLL(clauses + l} then return Yes
+    if DPLL(clauses + l} then return Yes
+    return No
+
+  begin resolve(clauses, l)
+    for each x in clauses
+      if x contains l, remove x from Γ
+      if x contains not l, remove not l from x
+\end{verbatim}
+
+DPLL tries all the different combinations of truth assignments, and as a result,
+runs in exponential time. This is close to the best way of solving \texttt{SAT}
+in practice, but in practice, we don't have non-deterministic Turing machines...
+
+\subsection{NPTime SAT}
+
+We've shown that \texttt{SAT} is in \texttt{ExpTime} by giving an algorithm for
+it, but we can also make a non-deterministic algorithm to solve it:
+
+\begin{verbatim}
+  begin NdSatTest(clauses)
+    If clauses contains FALSE, then return No
+    While clauses is not empty:
+      Select a literal in clauses, p
+      Either:
+        Delete every clause containing p
+        Delete not p from all the other clauses
+      Or:
+        Delete every clause containing not p
+        Delete p from all the other clauses
+      If clauses contains FALSE, then return No
+    return Yes
+\end{verbatim}
+
+This is obviously in \texttt{NPTime}.
+
+\subsection{Horn SAT}
+
+If we have a set of Horn clauses, how does that affect \texttt{SAT}? Well, we
+can in fact solve it in $O(n^2)$ time:
+
+\begin{verbatim}
+  begin Horn-DPLL(clauses)
+    if clauses contains the empty clause then return No
+    while clauses contains any unit clause l
+      remove l from clauses
+      clauses = resolve(clauses, l)
+      if clauses contains the empty clause then return No
+    return Yes
+
+  begin resolve(clauses, l)
+    for each x in clauses
+      if x contains l, remove x from Γ
+      if x contains not l, remove not l from x
+\end{verbatim}
+
+\subsection{2-SAT}
+
+If we're given Krom clauses, we can also solve that in $O(n^2)$. To do this, you
+create a graph with $2n$ nodes, one for each literal and one for its negation.
+For the clauses $(x \vee y), (\neg x \vee z), (y \vee \neg z)$, we create a
+graph like this:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.2\textwidth]{diagrams/graph9}
+  \caption{Initial graph for $x, \neg x, y, \neg y, z, \neg z$}
+  \label{fig:graph-9}
+\end{figure}
+
+For each clause, we insert two edges. If the clause is $(a \vee b)$, we insert
+$\neg a \rightarrow b$ and $\neg b \rightarrow a$:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.35\textwidth]{diagrams/graph10}
+  \caption{Graph of $x, \neg x, y, \neg y, z, \neg z$, with the appropriate
+  edges.}
+  \label{fig:graph-10}
+\end{figure}
+
+Then, for each node in the graph, see if there is a path to its inverse. If
+there is, then the clause is \textit{unsatisfiable}. This runs in $O(n^2)$ time,
+since finding a path takes $O(n)$ time, and we have to do it for each clause, so
+we have to do it $n$ times.
+
+\section{Reducibility}
+
+You many already know that we can map some problems onto other problems. In
+fact, we did this in the previous example with \texttt{2-SAT}, where we mapped
+it onto a graph pathfinding problem.
+
+It turns out that mapping problems onto other problems can be well defined
+theoretically. if one problem $P_1$ can be mapped onto $P_2$, then we say that
+$P_1$ is reducible to $P_2$.
+
+Formally, let $P_1$ be over the alphabet $\Sigma_a$, and $P_2$ be over the
+alphabet $\Sigma_b$. $P_1$ is reducible to $P_2$ if there exists a function $f :
+\Sigma^*_a \rightarrow \Sigma^*_b$ that is in \texttt{SPACE(log n)}, such that
+$x \in \Sigma^*_a,~x \in P_1~\text{iff}~f(x)\in P_2$.
+
+In English, this is saying that a problem is reducible to another problem if we
+can make a function that runs in $log(n)$ space, that converts all instances of
+the first problem into an equivalent instance of the second problem.
+
+The notation for reducibility is:
+
+% TODO: What's m?
+
+\marginpar{This is also called a many-one logspace reduction.}
+
+\[
+  P_1 \leq^log_m P_2
+\]
+
+Reducibility is helpful for a number of reasons:
+
+\begin{itemize}
+  \item If $P_1 \leq^log_m P_2$, then $P_2$ is at least as hard as $P_1$.
+  \item Similarly, $P_1$ is no harder than $P_2$.
+  \item If anybody comes up with a way of solving $P_2$ fast, then we can use 
+    the same way to solve $P_1$.
+  \marginpar{This only works for some (most) complexity classes, e.g.
+    \texttt{LogSpace}, \texttt{NLogSpace}, \texttt{PTime}, \texttt{NPTime}.
+    Not \texttt{Time(n)} or \texttt{Time(}$n^2$\texttt{)}.}
+  \item \textbf{We can use reducibility to show that a problem is inside a 
+    complexity class by reducing it to one that you know is in the desired
+    class.}
+\end{itemize}
+
+Reducibility is transitive, so if $P_1 \leq^log_m P_2$ and $P_2 \leq^log_m P_3$, then $P_1 \leq^log_m P_3$. The reason why, is that if:
+
+\[
+  f_1 : \Sigma^*_{P_1} \rightarrow \Sigma^*_{P_2}
+\]
+\[
+  f_2 : \Sigma^*_{P_2} \rightarrow \Sigma^*_{P_3}
+\]
+
+We have a Turing Machine $M$ that can compute a function $f_3 = f_2 \cdot f_1$,
+which essentially is:
+
+\[
+  f_3 : \Sigma^*_{P_1} \rightarrow \Sigma^*_{P_3}
+\]
+
+Lets define $M$:
+
+\begin{lstlisting}[numbers=left,mathescape]
+  Calculate the first bit of $f_1(x)$
+  Keep a counter to say what bit we've calculated ($1$ at first)
+  Start a simulation of $f_2(f_1(x))$, where the argument is the calculated bit
+  If $f_2$ asks to move the read head right:
+    Calculate the next bit of $f_1(x)$
+    Write it on top of the current bit
+    Update the output bit counter
+  Else, if $f_2$ asks to move the read head left:
+    Restart the calculation of $f_1(x)$
+    Continue calculating until we have the desired output bit
+    Write it on top of the current bit
+    Update the bit counter
+\end{lstlisting}
+
+Although $M$ horrifies my programmer-mind at how inefficient it is, I conclude
+that it does in fact run in logarithmic space (it seems to run in constant space
+at first, but then you realise that the counter requires $log_2(n)$ bits).
+
+A \textit{many-one polytime} reduction is a weaker notion of reducibility where
+instead of a function that runs in log space to convert the strings of one
+problem into the strings of another, we have one that is in \texttt{TIME{P}}
+instead. If this is the case, then the reducibility is mathematically written
+as:
+
+\[
+  P_1 \leq_m^P P_2
+\]
+
+\marginpar{Many-one polynomial reducibility is transitive because any 
+polynomial multiplied by any other polynomial is still a polynomial.}
+
+However, \textit{many-one logspace} reducibility trumps its polynomial cousin,
+since while they're both transitive, the former is theoretically a bit more
+useful, and many polytime reduciblities are in fact logspace ones.
+
+\subsection{Hard and Complete Problems}
+
+A problem $P \in X$ is said to be \textit{X}-complete, when $X$ is a complexity
+class, when for all problem $Q \in X$, $Q \leq_m^{log} P$. This means that $P$
+is at least as hard as all problems $X$.
+
+If $P \notin X$, then $P$ is not \textit{X}-complete, but is \textit{X}-hard.
+
+% Slide 16, lecture 8
