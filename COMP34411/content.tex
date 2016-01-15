@@ -1666,34 +1666,36 @@ descriptions of the word.
 Human speech is made up of chords (vowels) and hissing (consonants). We can
 generate waves of specific frequencies (chords) and white noise pretty easily,
 so if we can work out what noises need to be produced for different phonemes,
-then we're good. However, these `\textit{formany synthesisers}' don't work well
+then we're good. However, these `\textit{formant synthesizers}' don't work well
 in practice.
 
-There are lots of different ways of synthesising:
+There are lots of different ways of synthesising that work better:
 
 \begin{description}
-  \item Alternately, we could record lots of words, and then say them one after 
-  the other. This is certainly listenable, but you can really hear the 
-  boundaries between words. Furthermore, to make a useful grammar, you might 
-  need to record tens of thousands of words, and many different forms of the 
-  same words! Ohh, and remember that all the words need to be of the same pitch, 
-  speed, intensity etc. This is used a lot in railways and airports etc where 
-  the vocab is limited.
+  \item \textbf{Whole word recording}\\
+  We could record lots of words, and then say them one after  the other. This is
+  certainly listenable, but you can really hear the  boundaries between words.
+  Furthermore, to make a useful grammar, you might  need to record tens of
+  thousands of words, and many different forms of the  same words! Ohh, and
+  remember that all the words need to be of the same pitch,  speed, intensity
+  etc. This is used a lot in railways and airports etc where  the vocab is
+  limited.
 
-  \item Instead of recording whole words, we could just record phonemes. Since 
-  there are only a few tens of phonemes in a language (but they make up all 
-  words), this will be a lot easier. However, the pronunciation of phonemes 
-  depends on what phonemes they're next to, and so it's going to sound pretty 
-  bad when our recordings don't take that into account. Furthermore, it's 
-  actually impossible to say some phonemes in isolation, so you can't even 
-  record all the sounds!
+  \item \textbf{Phoneme recording}\\
+  Instead of recording whole words, we could just record phonemes. Since there
+  are only a few tens of phonemes in a language (but they make up all words),
+  this will be a lot easier. However, the pronunciation of phonemes depends on
+  what phonemes they're next to, and so it's going to sound pretty bad when our
+  recordings don't take that into account. Furthermore, it's actually impossible
+  to say some phonemes in isolation, so you can't even record all the sounds!
 
-  \item A solution between the two ones above, is to record \textit{diphones}, 
-  which are pairs of phonemes. This is far more comprehensible than listening to 
-  concatenated phonemes, and isn't too far off full words, while only requiring 
-  a few thousand recordings. However, the result is monotone since words have 
-  stress patterns that aren't replicated. However, if we make seperate 
-  recordings with different pitch and duration, then we can simulate the pitch 
+  \item \textbf{Diphome recording}\\
+  A solution between the two ones above, is to record \textit{diphones}, which
+  are pairs of phonemes. This is far more comprehensible than listening to
+  concatenated phonemes, and isn't too far off full words, while only requiring
+  a few thousand recordings. However, the result is monotone since words have
+  stress patterns that aren't replicated. However, if we make separate
+  recordings with different pitch and duration, then we can simulate the pitch
   rising at the end of questions, falling at the end of statements etc.
 
   In fact, raising and lowering the pitch can be done automatically if you
@@ -1704,7 +1706,16 @@ There are lots of different ways of synthesising:
   chunks to make it longer.
 \end{description}
 
-Making the join between two recordings that you've stiched together is hard, but luckliy there's an algorithm to do it (the `PSOLA' algorithm).
+Making the join between two recordings that you've stitched together is hard, but
+luckily there's an algorithm to do it (the `PSOLA' algorithm).
 
-%p 563
-% TODO: Read through and improve the last bit
+\section{Machine Translation}
+
+We want to make a computer translate a document from one language into another.
+More precisely, we want to construct a new document from the old one that
+expresses the same message, but in a different language. We could generate a
+datastructure that represents the meaning of the source message and then use it
+to generate the document in the target language.
+
+Unfortunately, I don't think I can explain this section particularly well, so
+you're going to have to refer to the course notes for this!
