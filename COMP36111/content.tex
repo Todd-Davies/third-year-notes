@@ -905,6 +905,7 @@ polynomial alternatives, in practice it beats all the other algorithms! Is this
 because we only ever run it on the inputs which are solvable in polynomial time?
 
 \section{Integer Programming}
+\label{sec:ip}
 
 Integer programming is just like linear programming, except we are only allowed
 solutions inside $\mathbb{N}$ (the integers) instead of $\mathbb{R}$ (real
@@ -1679,6 +1680,10 @@ Just to jog your memory, here are some PL things you should know:
   \item Similarly, \texttt{k-SAT} is the problem where each clause has at most
   $k$ literals.
 
+  \marginpar{Horn satisfiability is actually \texttt{PTime-Complete} (see 
+  Section~\ref{sec:reduce-and-hard}), since we can convert any deterministic TM 
+  into a set of Horn clauses.}
+
   \item Horn clauses are clauses where there is only 0 or one non-negative 
   literals. In other words, all but at most one literals are negative, e.g.
   $\neg x \vee \neg y \vee \neg z$ or $\neg x \vee y \vee \neg z$
@@ -1786,7 +1791,8 @@ there is, then the clause is \textit{unsatisfiable}. This runs in $O(n^2)$ time,
 since finding a path takes $O(n)$ time, and we have to do it for each clause, so
 we have to do it $n$ times.
 
-\section{Reducibility}
+\section{Reducibility and Hardness}
+\label{sec:reduce-and-hard}
 
 You many already know that we can map some problems onto other problems. In
 fact, we did this in the previous example with \texttt{2-SAT}, where we mapped
@@ -1884,12 +1890,68 @@ However, \textit{many-one logspace} reducibility trumps its polynomial cousin,
 since while they're both transitive, the former is theoretically a bit more
 useful, and many polytime reduciblities are in fact logspace ones.
 
-\subsection{Hard and Complete Problems}
+A problem $P \in X$ is said to be \textit{X}-\textbf{complete}, when $X$ is a
+complexity class, when for all problem $Q \in X$, $Q \leq_m^{log} P$. This means
+that $P$ is at least as hard as all problems $X$.
 
-A problem $P \in X$ is said to be \textit{X}-complete, when $X$ is a complexity
-class, when for all problem $Q \in X$, $Q \leq_m^{log} P$. This means that $P$
-is at least as hard as all problems $X$.
+If $P \notin X$, then $P$ is not \textit{X}-complete, but is
+\textit{X}-\textbf{hard}.
 
-If $P \notin X$, then $P$ is not \textit{X}-complete, but is \textit{X}-hard.
+\subsection{Cook's theorem}
 
-% Slide 16, lecture 8
+The Cook Levin theorem proves that \texttt{SAT} is \texttt{NPTime-Complete}.
+This is important, because certain problems were shown to be \texttt{NP-
+Complete}, and if any of these problems are solved in (deterministic) polynomial
+time, then all of the problems would be solvable in polynomial time.
+
+The idea behind the Cook Levin theorem, is to turn any Turing Machine $M$ that
+solves a problem $P$ into a set of clauses that can be solved by \texttt{SAT},
+and we can do this in deterministic polynomial time. If we can solve
+\texttt{SAT} in better-than \texttt{NPTime}, then we can solve $P$ in the same
+time.
+
+We can also show that \texttt{3-SAT} is \texttt{NP-Complete}. Obviously
+\texttt{3-SAT} $\in$ \texttt{SAT}, but to prove completeness, we need to show
+that every problem in \texttt{SAT} can be converted to a problem in
+\texttt{3-SAT}. We can use the following rules:
+
+\begin{itemize}
+  \item For each input clause of length 1:
+    $\{a\} \rightarrow \{a \vee a \vee a\}$ 
+  \item For each input clause of length 2:
+    $\{a \vee b\} \rightarrow \{a \vee b \vee a\}$ 
+  \item For each input clause of length 3, do nothing!
+  \item For each input clause of length n > 3:
+    $\{a \vee b \vee c \vee d \vee e\} \rightarrow
+      \{a \vee b \vee x\},
+      \{!x \vee c \vee y\},
+      \{!y \vee d \vee e\}$ 
+\end{itemize}
+
+Hence \texttt{3-SAT} is \texttt{NP-Complete}. Similarly, we can reduce
+\texttt{3-SAT} to the $0/1$ Integer Linear Programming problem and hence (since
+we know it's in \texttt{NP-Time}) prove that ILP is \texttt{NP-Complete}.
+
+As was said in Section~\ref{sec:ip}, it is possible to do cool stuff with
+Integer Programming. In order to convert \texttt{3-SAT} clauses to integer
+programming equations we need to:
+
+\begin{itemize}
+  \item Make an equation for each literal $x$ such that $l_x + l_{\neg x} = 1$,
+  so that every literal is either positive or negative.
+
+  \item For every clause $\{a \vee b \vee c\}$ in the input, we make an 
+  equation with two new variables ($u,v$) in (unique to the equation):
+  $l_a + l_b + l_c + u + v = 3$. Then if the clause is true (so at least one of 
+  its literals is true), then we can set $u$ and $v$ to a value that will make 
+  the equation hold.
+\end{itemize}
+
+\marginpar{N.b., \texttt{NP-Complete} is mostly synonymous with
+\texttt{NPTime-Complete}.}
+
+If we then solve the ILP programming problem for these equations, then we can
+find a suitable truth assignment for \texttt{3-SAT}, and so we have proved that
+\texttt{ILP(0/1)} is \texttt{NPTime-Complete}.
+
+% Todo: Carry on from the graphs bit (lecture 9, graph bit is above somewhere)
