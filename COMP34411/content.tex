@@ -64,7 +64,7 @@ each.
 \subsection{Tries}
 
 \marginpar{Tries are very handy datastructures for technical interviews, you
-should read up on them an implement one!}
+should read up on them and implement one!}
 
 In order to examine the syntactic and semantic properties of the words, we need
 to represent them in the computer. A common way to do this is with a
@@ -136,7 +136,7 @@ in some way, and we can put words into buckets according to how the meaning of
 the sentence is changed; for example, a verb specifies what kind of event is
 happening. Having a verb on its own doesn't do us much good; we will know that
 \textit{something} is happening, but not where, why, what, when etc. Verbs need
-other parts of sentence around them to make them work.
+other parts of a sentence around them to make them work.
 
 We can treat each word as part of a jigsaw, specifying what other words or
 phrases it needs in order to have meaning, and then fit the pieces together
@@ -279,11 +279,11 @@ morphemes doesn't tell us too much; having `ing' at the end means that a word is
 probably a verb and is in the present tense, but doesn't tell us what's actually
 going on.
 
-There are two different classes of classes of words \textit{open} and
-\textit{closed}. Open classes are verbs, adjectives, nouns etc where there are
-lots of them and you can easily add more (new nouns are created all the time).
-Closed classes are things like prepositions (`in', `on'), and auxiliaries (`be',
-`have', `would') where you rarely if ever get new words being added.
+There are two different classes of words; \textit{open} and \textit{closed}.
+Open classes are verbs, adjectives, nouns etc where there are lots of them and
+you can easily add more (new nouns are created all the time). Closed classes are
+things like prepositions (`in', `on'), and auxiliaries (`be', `have', `would')
+where you rarely if ever get new words being added.
 
 So, if we cannot recognise a word using the morphological rules we used before,
 then we should \textbf{back off} to using a more robust but less accurate
