@@ -387,8 +387,6 @@ will contain different words.}
   your dictionary, you can use the last $n$ letters of it to determine what tag
   to assign.
 
-  %TODO: Sefine precision and recall somewhere
-
   \item \textbf{Transition probabilities and HMM's}\\
 
   HMM's use probabilities and context to determine what tag a word should get.
@@ -516,6 +514,16 @@ will contain different words.}
   characteristics of the base tagger, you can get anywhere from half a
   percentage extra accuracy, to a full ten percent extra. Remember though, if
   the base tagger is already 98\% accurate, half a percent is a big improvement!
+\end{description}
+
+For the exam, you might need to know exact definitions of \textit{precision},
+\textit{recall} and \textit{f-measure}. They are:
+
+\begin{description}
+	\item \textbf{Precision}: When the tagger emits a POS tag, how likely is it
+	to be right?
+	\item \textbf{Recall}: How many of the right things does it say?
+	\item \textbf{F-measure}: $F = \frac{2 \times p \times r}{p + r}$
 \end{description}
 
 \paragraph{Confusion matrices}
