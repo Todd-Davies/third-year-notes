@@ -1,4 +1,4 @@
-\documentclass[a5paper]{article}
+\documentclass[a6paper]{article}
 % Lets us set the author and title of the compiled pdf file
 \usepackage[pdftex]{hyperref}
 
@@ -8,11 +8,14 @@
 % Make a box around would-be margin paragraphs
 \usepackage{tcolorbox}
 
+% Have a header and footer to keep the page sizes constant on the kindle
+\usepackage{fancyhdr}
+
 % Make the borders really small
-\usepackage[left=1cm,
+\usepackage[left=0.3cm,
 			top=1cm,
-			right=1cm,
-			bottom=1cm,
+			right=0.2cm,
+			bottom=0.2cm,
 			marginparwidth=0mm,
 			marginparsep=0mm]{geometry}
 
@@ -35,6 +38,14 @@
 
 % Get the author, the title etc
 \input{meta.tex}
+
+\pagestyle{fancy}% Change page style to fancy
+
+\fancyhf{}% Clear header/footer
+\fancyhead[C]{}
+\fancyfoot[C]{}
+\renewcommand{\headrulewidth}{0.01pt}
+\renewcommand{\footrulewidth}{0.01pt}
 
 \maketitle
 
