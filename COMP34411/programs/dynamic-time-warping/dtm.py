@@ -1,4 +1,4 @@
-#!env/bin/python
+#!/usr/bin/python
 
 # For reading from stdin and checking args
 import sys
