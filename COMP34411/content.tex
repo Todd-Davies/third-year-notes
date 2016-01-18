@@ -64,7 +64,7 @@ each.
 \subsection{Tries}
 
 \marginpar{Tries are very handy datastructures for technical interviews, you
-should read up on them an implement one!}
+should read up on them and implement one!}
 
 In order to examine the syntactic and semantic properties of the words, we need
 to represent them in the computer. A common way to do this is with a
@@ -136,7 +136,7 @@ in some way, and we can put words into buckets according to how the meaning of
 the sentence is changed; for example, a verb specifies what kind of event is
 happening. Having a verb on its own doesn't do us much good; we will know that
 \textit{something} is happening, but not where, why, what, when etc. Verbs need
-other parts of sentence around them to make them work.
+other parts of a sentence around them to make them work.
 
 We can treat each word as part of a jigsaw, specifying what other words or
 phrases it needs in order to have meaning, and then fit the pieces together
@@ -279,11 +279,11 @@ morphemes doesn't tell us too much; having `ing' at the end means that a word is
 probably a verb and is in the present tense, but doesn't tell us what's actually
 going on.
 
-There are two different classes of classes of words \textit{open} and
-\textit{closed}. Open classes are verbs, adjectives, nouns etc where there are
-lots of them and you can easily add more (new nouns are created all the time).
-Closed classes are things like prepositions (`in', `on'), and auxiliaries (`be',
-`have', `would') where you rarely if ever get new words being added.
+There are two different classes of words; \textit{open} and \textit{closed}.
+Open classes are verbs, adjectives, nouns etc where there are lots of them and
+you can easily add more (new nouns are created all the time). Closed classes are
+things like prepositions (`in', `on'), and auxiliaries (`be', `have', `would')
+where you rarely if ever get new words being added.
 
 So, if we cannot recognise a word using the morphological rules we used before,
 then we should \textbf{back off} to using a more robust but less accurate
@@ -386,8 +386,6 @@ will contain different words.}
   probabilities for the last $n$ letters of the word, so if the word isn't in
   your dictionary, you can use the last $n$ letters of it to determine what tag
   to assign.
-
-  %TODO: Sefine precision and recall somewhere
 
   \item \textbf{Transition probabilities and HMM's}\\
 
@@ -516,6 +514,16 @@ will contain different words.}
   characteristics of the base tagger, you can get anywhere from half a
   percentage extra accuracy, to a full ten percent extra. Remember though, if
   the base tagger is already 98\% accurate, half a percent is a big improvement!
+\end{description}
+
+For the exam, you might need to know exact definitions of \textit{precision},
+\textit{recall} and \textit{f-measure}. They are:
+
+\begin{description}
+	\item \textbf{Precision}: When the tagger emits a POS tag, how likely is it
+	to be right?
+	\item \textbf{Recall}: How many of the right things does it say?
+	\item \textbf{F-measure}: $F = \frac{2 \times p \times r}{p + r}$
 \end{description}
 
 \paragraph{Confusion matrices}
@@ -841,9 +849,9 @@ have to pay for some of them (i.e. Penn Treebank, where you get 10\% free and
 you have to stump up for the rest), but its very rare that they exist in the
 format you want.
 
-For my third year project, I'm using the British National Corpus. Its encoded in
-XML, and I've often found parsing the XML to be the largest bottleneck in my
-project (performance wise).
+For my third year project, I'm using the British National Corpus, which is
+encoded in XML (in fact, I've often found parsing the XML to be the largest
+bottleneck in my project, performance wise).
 
 Unfortunately, its not always as easy as `parse this XML'. For example, the Penn
 Treebank derives its name partly from the \textit{headed phrase structure trees}
@@ -909,7 +917,7 @@ N-Fold Cross Validation is a method used to prevent overfitting of Machine
 Learning models. Essentially, you split your data into $N$ parts, and train your
 model $N$ times. Then, you do $N$ iterations of the training (training on $N-1$
 parts each time), and then test on the remaining part. You can then average the
-results and thus obtain a reasonable accurate estimate for the error rate of
+results and thus obtain a reasonably accurate estimate for the error rate of
 your model. Figure~\ref{fig:cross-validation} explains this.
 
 \begin{figure}[h]
@@ -936,7 +944,7 @@ word by how many stars there are.
 
 How could we get a computer to solve this problem? Well, one way might be to see
 how many of the words in the sentence are associated with soldier; I bet
-`general, `salute, `uniform and possibly `crisply'`are all commonly used
+`general, `salute, `uniform and possibly `crisply' are all commonly used
 whenever `soldier' is used.
 
 To get information about which words commonly occur with which other words, we
@@ -1139,7 +1147,7 @@ how they're related. For example, we can tell that two sentences are related
 driving a fiat the opposite of driving a car, is it better than driving a car?
 
 In order to solve this problem, we're going to need to create (or obtain some
-data that our algorithms can use to help distinguish between words. WordBanks
+data that our algorithms can use to help distinguish between words). WordBanks
 have \textbf{Synsets}, which are collections of the different senses of words.
 This lets us get a list of potential meanings for a word in a sentence, like
 this (but in a different format obviously):
@@ -1193,7 +1201,7 @@ probability of them clicking the link to $x$:
 
 \[
   prob(\text{Web Page}_x^{t + 1}) =
-    \sum (prob(\text{Web Page}_i^t) + prob(S_i \rightarrow S_x))
+    \sum (prob(\text{Web Page}_i^t) \times prob(S_i \rightarrow S_x))
 \]
 
 If you construct a weighted graph representing the web pages and their
@@ -1371,7 +1379,7 @@ badly thought out at the least, but sacrilegious, irreverent and heretic at
 worst. An \textit{Either} type might work better?}
 
 \begin{itemize}
-  \item Making every function taking an extra argument (usually a function 
+  \item Making every function take an extra argument (usually a function 
     pointer, called the continuation), which is what should be called if 
     everything goes well.
   \item If the function doesn't work properly, then it returns.
@@ -1382,8 +1390,7 @@ worst. An \textit{Either} type might work better?}
 This is a simple (if messy) way of handling backtracking search, since you use
 the normal call/return stack to keep track of state (which is efficient, since
 function calls are generally quite efficient). Exceptions are only used when you
-find the right answer (which is good, since exceptions are usually comparatively
-slow).
+find the right answer (which is good, since exceptions are usually slow).
 
 If we apply continuation programming to our subsumption methods, then we can do
 pretty well. However, edge cases, particularly the polarity of certain
@@ -1452,8 +1459,8 @@ waveform (the inverse FFT can also create a wave from the frequencies).
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth]{images/fft}
-  \caption{Here is the output from the FFT function (top) and the input wave (
-  bottom). You can see that the frequencies that make up the wave have been 
+  \caption{Here is the output from the FFT function (top) and the input wave
+  (bottom). You can see that the frequencies that make up the wave have been 
   extracted. Note that the top graph is a mirror image, this is always the
   case.}
   \label{fig:fft}
