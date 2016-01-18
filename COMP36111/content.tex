@@ -417,6 +417,91 @@ probably have your own implementation in C.
 
 %TODO: Expand on Tarjan's algorithm when a whiteboard is present
 
+\subsubsection{Graph colouring}
+
+Graph colouring is a problem where we want to assign colours to nodes in a
+graph, but no adjacent node can have the same colour. A \textit{k-colouring} of
+a graph $G$ is a function $f : V \rightarrow \{ 0, 1, \dots, k - 1 \}$ such that
+for any edge $(u, v) \in E, f(u) \neq f(v)$, and the output from $f$ is each
+node's colour.
+
+For some graphs, there is no valid colouring with $k$ colours. A graph is
+\textit{k-colourable} if there exists a \textit{k-colouring} for that graph.
+
+Of course, we can write a Turing Machine that can solve
+\textit{k-colourability}. We can encode a graph by writing $n$ as the number of
+nodes, and the pairs as the edges between them:
+
+\[
+  (n, (u_1, v_1), \dots, (u_m, v_m))
+\]
+
+We can show that \textit{3-colourability} is \texttt{NP-Time} hard, because we
+can convert an instance of \texttt{3-SAT} into it. Given a \texttt{3-SAT}
+problem, we compute in log space (since we want a many-one log reduction (see
+Section~\ref{sec:reduce-and-hard})), a function to create a graph from the
+satisfiability problem's clauses.
+
+To do this, we create three `gadgets' which let us represent logical gates in
+graph form. The gadgets have internal nodes which make them easier to draw, the
+internal nodes are not shown in larger sketches, but are when describing the
+gadgets initially in order to make the properties of the gadget known.
+
+\begin{description}
+  \item \textbf{Gadget 1: Equality}\\
+    We want to make a gadget that will make sure that two nodes have the same 
+    colour. Here, $a$ and $b$ are the input and output nodes, while the other 
+    two nodes are internal. In any $3$ colouring, $a$ and $b$ must be the same  
+    colour:
+
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.4\textwidth]{diagrams/graph11}
+      \caption{Gadget 1}
+      \label{fig:gadget1}
+    \end{figure}
+
+  \item \textbf{Gadget 2: XOR Gate}\\
+    I'm not sure if this is strictly an XOR gate, but that's what it reminds me 
+    of. $a$ is either the same colour as $b$ or $c$, while $d$ is an internal 
+    node.
+
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.4\textwidth]{diagrams/graph12}
+      \caption{Gadget 2}
+      \label{fig:gadget2}
+    \end{figure}
+
+    Note that we can chain this gadget like a normal XOR gate if we attach
+    another Gadget 2 to the $c$ node. Then $a$ will have the same colour as $b$,
+    or the one of the children of the second gadget.
+
+  \item \textbf{Gadget 3: OR Gate}\\
+    This gadget has lots of nodes, though again, only $a$, $b$ and $c$ are 
+    external. Now, $a$ is the same as either $b$, or $c$, or both $b$ and $c$.
+
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.4\textwidth]{diagrams/graph13}
+      \caption{Gadget 3}
+      \label{fig:gadget3}
+    \end{figure}
+\end{description}
+
+Now lets encode the \texttt{3-SAT} problem $(a \vee \neg b), (b \vee c)$, shown
+in Figure~\ref{fig;k-color-3-sat}. Have a go at colouring it in yourself!
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=\textwidth,angle=90]{diagrams/graph14}
+  \caption{An encoding in \textit{k-colourability} of the \texttt{3-SAT} 
+  problem $(a \vee \neg b), (b \vee c)$.}
+  \label{fig:k-colour-3-sat}
+\end{figure}
+
+% Carry on from slide 30
+
 \section{Linear Programming}
 
 Linear programming is an optimisation problem, where we want to find the `best'

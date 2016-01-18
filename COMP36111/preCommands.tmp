@@ -1,6 +1,10 @@
 cd diagrams && pdflatex connected-graph.tex && cd ..
 cd diagrams && pdflatex directed-graph.tex && cd ..
 cd diagrams && pdflatex graph10.tex && cd ..
+cd diagrams && pdflatex graph11.tex && cd ..
+cd diagrams && pdflatex graph12.tex && cd ..
+cd diagrams && pdflatex graph13.tex && cd ..
+cd diagrams && pdflatex graph14.tex && cd ..
 cd diagrams && pdflatex graph1.tex && cd ..
 cd diagrams && pdflatex graph2.tex && cd ..
 cd diagrams && pdflatex graph3.tex && cd ..

@@ -1,0 +1,19 @@
+\documentclass{standalone} 
+\PassOptionsToPackage{usenames,dvipsnames,svgnames}{xcolor}  
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning,automata}
+
+\begin{document}
+\begin{tikzpicture}[>=stealth',shorten >=1pt,node distance=3cm,on grid,initial/.style    ={}]
+  \node[state]          (a)                          {$a$};
+  \node[state]          (d)  [below       = of a]    {$d$};
+  \node[state]          (c)  [below right = of d]    {$c$};
+  \node[state]          (b)  [below left  = of d]    {$b$};
+
+  \path (a)     edge [-]                    node   {} (d);
+  \path (d)     edge [-]                    node   {} (c);
+  \path (d)     edge [-]                    node   {} (b);
+  \path (c)     edge [-]                    node   {} (b);
+
+\end{tikzpicture}
+\end{document}

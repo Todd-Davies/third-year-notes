@@ -1,0 +1,82 @@
+\documentclass{standalone} 
+\PassOptionsToPackage{usenames,dvipsnames,svgnames}{xcolor}  
+\usepackage{tikz}
+\usetikzlibrary{arrows,positioning,automata,calc}
+
+\begin{document}
+\begin{tikzpicture}[>=stealth',shorten >=1pt,node distance=3cm,on grid,initial/.style    ={}]
+  \node[state]          (a4)                          {};
+  \node[state]          (a3)  [right of = a4]         {};
+  \node[state]          (a1)  [above right of = a3]   {$a$};
+  \node[state]          (a2)  [below right of = a3]   {$\neg a$};
+
+  \node[state]          (b1)  [below       of = a2]   {$b$};
+  \node[state]          (b2)  [below left  of = b1]   {};
+  \node[state]          (b3)  [below right of = b2]   {$\neg b$};
+  \node[state]          (b4)  [      left  of = b2]   {};
+
+  \node[state]          (c1)  [below       of = b3]   {$c$};
+  \node[state]          (c2)  [below left  of = c1]   {};
+  \node[state]          (c3)  [below right of = c2]   {$\neg c$};
+  \node[state]          (c4)  [      left  of = c2]   {};
+
+  \node[state]          (x1)  [above right of = a1]   {$\neg b$};
+  \node[state]          (x3)  [above right of = x1]   {};
+  \node[state]          (x2)  [below right of = x3]   {$\neg c$};
+  \node[state]          (x4)  [above left  of = x3]   {};
+  \node[state]          (x5)  [below left  of = x4]   {$a$};
+  \node[state]          (x6)  [above       of = x4]   {};
+
+  \node[state]          (y1)  [      right of = x2]   {$c$};
+  \node[state]          (y3)  [above right of = y1]   {};
+  \node[state]          (y2)  [below right of = y3]   {$b$};
+  \node[state]          (y4)  [above right  of = y3]   {};
+  \node[state]          (y5)  [above right of = y2]   {$a$};
+  \node[state]          (y6)  [above       of = y4]   {};
+
+  \node[state]          (z1) at ($(x6)!0.5!(y6)$) {};
+  \node[state]          (z2)  [above       of =z1]   {};
+
+  \path (a1)     edge [-]                    node   {} (a3);
+  \path (a2)     edge [-]                    node   {} (a3);
+  \path (a3)     edge [-]                    node   {} (a4);
+
+  \path (b1)     edge [-]                    node   {} (b2);
+  \path (b3)     edge [-]                    node   {} (b2);
+  \path (b2)     edge [-]                    node   {} (b4);
+
+  \path (c1)     edge [-]                    node   {} (c2);
+  \path (c3)     edge [-]                    node   {} (c2);
+  \path (c2)     edge [-]                    node   {} (c4);
+
+  \path (x3)     edge [-]                    node   {} (x1);
+  \path (x3)     edge [-]                    node   {} (x2);
+  \path (x5)     edge [-]                    node   {} (x4);
+  \path (x4)     edge [-]                    node   {} (x3);
+  \path (x6)     edge [-]                    node   {} (x4);
+
+  \path (y3)     edge [-]                    node   {} (y1);
+  \path (y3)     edge [-]                    node   {} (y2);
+  \path (y5)     edge [-]                    node   {} (y4);
+  \path (y4)     edge [-]                    node   {} (y3);
+  \path (y6)     edge [-]                    node   {} (y4);
+
+  \path (a1)     edge [-]                    node   {} (x5);
+  \path (a1)     edge [-, bend right, in=270]        node   {} (y5);
+
+  \path (b1)     edge [-, bend right, in=-90]        node   {} (y2);
+  \path (b3)     edge [-, bend right]        node   {} (x1);
+
+  \path (c3)     edge [-, bend right]        node   {} (x2);
+  \path (c1)     edge [-, bend right]        node   {} (y1);
+
+  \path (z1)     edge [-]        node   {} (y6);
+  \path (z1)     edge [-]        node   {} (x6);
+  \path (z1)     edge [-]        node   {} (z2);
+
+  \path (z2)     edge [-, bend right, in=-110, out=-100]        node   {} (a4);
+  \path (z2)     edge [-, bend right, in=-100, out=-110]        node   {} (b4);
+  \path (z2)     edge [-, bend right, in=-90, out=-120]        node   {} (c4);
+
+\end{tikzpicture}
+\end{document}
