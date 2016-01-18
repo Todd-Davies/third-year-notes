@@ -1,5 +1,13 @@
 #!/usr/bin/python
 
+"""
+Simple example of dynamic time warping.
+Finds the distance between two strings, where it rates a character swap as
+costing '3' and adding/deleting characters as costing '2'.
+
+Please excuse my unpythonicness.
+"""
+
 # For reading from stdin and checking args
 import sys
 
