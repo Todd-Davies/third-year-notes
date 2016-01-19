@@ -13,7 +13,7 @@ import sys
 
 # Check we've got two words as command line arguments
 if len(sys.argv) != 3:
-  print "Usage: %s <word> <word>" % sys.argv[0]
+  print("Usage: %s <word> <word>" % sys.argv[0])
   exit(-1)
 
 # Pad the words with a placeholder to represent the empty string
@@ -57,7 +57,7 @@ def printMatrix(matrix):
   """
   Pretty prints the matrix
   """
-  print "   " + "  ".join(word2)
+  print("   " + "  ".join(word2))
   x = 0
   for line in matrix:
     output = ""
@@ -65,7 +65,7 @@ def printMatrix(matrix):
     x += 1
     for num in line:
       output += "%2d " % num
-    print output
+    print(output)
 
 # Iterate through the words
 for j in range(0, len(word1)):
