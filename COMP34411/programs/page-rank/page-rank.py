@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Simple example of page rank
+Simple example of page rank (as used for Word Sense Disambugation in COMP34411)
 """
 
 # For reading from stdin and checking args
