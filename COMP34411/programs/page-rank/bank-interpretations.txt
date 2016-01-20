@@ -1,0 +1,11 @@
+{'river': 0.25, 'finance': 0.25, 'train-station': 0.25, 'flying': 0.25}
+{'river': 0.2792, 'finance': 0.3917, 'train-station': 0.1542, 'flying': 0.175}
+{'river': 0.3136, 'finance': 0.3792, 'train-station': 0.149, 'flying': 0.1583}
+{'river': 0.3032, 'finance': 0.3764, 'train-station': 0.1548, 'flying': 0.1656}
+{'river': 0.3045, 'finance': 0.3776, 'train-station': 0.1534, 'flying': 0.1645}
+{'river': 0.3046, 'finance': 0.3774, 'train-station': 0.1535, 'flying': 0.1645}
+{'river': 0.3045, 'finance': 0.3774, 'train-station': 0.1536, 'flying': 0.1645}
+{'river': 0.3045, 'finance': 0.3774, 'train-station': 0.1535, 'flying': 0.1645}
+{'river': 0.3045, 'finance': 0.3774, 'train-station': 0.1535, 'flying': 0.1645}
+Finished!
+Top score: finance

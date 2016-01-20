@@ -1180,9 +1180,13 @@ These are lots of different strategies for working out what the words in a
 sentence mean, as we'll see in the following subsections. However, note that
 they all have different strengths and weaknesses.
 
-Most strategies are coarse (bag of words, string edit distance etc), having a high recall but poor precision.
+Most strategies are coarse (bag of words, string edit distance etc), having a
+high recall but poor precision.
 
 \subsubsection{Page Rank}
+
+\marginpar{See \texttt{COMP34411/programs/page-rank} in my third year notes Git
+repo for an implementation of this.}
 
 We can use the \textbf{Page Rank} algorithm to decide on what interpretation of
 each word is correct. Page Rank is (was, I expect that its evolved quite a bit
@@ -1731,3 +1735,78 @@ to generate the document in the target language.
 
 Unfortunately, I don't think I can explain this section particularly well, so
 you're going to have to refer to the course notes for this!
+
+\section{Runs of example code}
+
+I've included some runs of dynamic time warping and page rank here.
+
+\subsection{Dynamic Time Warping}
+
+The distance between `bob' and `bill', where addition and deletion cost $2$ and
+swapping costs $3$:
+
+\begin{verbatim}
+   X  b  i  l  l
+X  0  2  4  6  8 
+b  2  0  2  4  6 
+o  4  2  3  5  7 
+b  6  4  5  6  8 
+\end{verbatim}
+
+The distance between `buffoon' and `baboon' with the same costs:
+
+\begin{verbatim}
+   X  b  u  f  f  o  o  n
+X  0  2  4  6  8 10 12 14 
+b  2  0  2  4  6  8 10 12 
+a  4  2  3  5  7  9 11 13 
+b  6  4  5  6  8 10 12 14 
+o  8  6  7  8  9  8 10 12 
+o 10  8  9 10 11 10  8 10 
+n 12 10 11 12 13 12 10  8 
+\end{verbatim}
+
+\subsection{Page rank}
+
+\marginpar{See the code for the gory details.}
+
+Here I run page rank on a graph consisting of different interpretations of
+`bank' (finance, flying, rivers and the tube station in London). The damping
+factor is $0.8$, and I reserve $0.3$ units of probability mass at each stage to
+inject into `finance' to simulate the sentence:
+
+\textit{I got my money on loan from the bank.}
+
+\begin{verbatim}
+{'river': 0.25, 'finance': 0.25, 'train-station': 0.25, 'flying': 0.25}
+{'river': 0.2792, 'finance': 0.3917, 'train-station': 0.1542, 'flying': 0.175}
+{'river': 0.3136, 'finance': 0.3792, 'train-station': 0.149, 'flying': 0.1583}
+{'river': 0.3032, 'finance': 0.3764, 'train-station': 0.1548, 'flying': 0.1656}
+{'river': 0.3045, 'finance': 0.3776, 'train-station': 0.1534, 'flying': 0.1645}
+{'river': 0.3046, 'finance': 0.3774, 'train-station': 0.1535, 'flying': 0.1645}
+{'river': 0.3045, 'finance': 0.3774, 'train-station': 0.1536, 'flying': 0.1645}
+{'river': 0.3045, 'finance': 0.3774, 'train-station': 0.1535, 'flying': 0.1645}
+{'river': 0.3045, 'finance': 0.3774, 'train-station': 0.1535, 'flying': 0.1645}
+Finished!
+Top score: finance
+\end{verbatim}
+
+Note, if I change the parameters so that there is no probability mass injected,
+then we don't get the right answer. This is because the page rank becomes un-
+personalised:
+
+\begin{verbatim}
+{'river': 0.25, 'finance': 0.25, 'flying': 0.25, 'train-station': 0.25}
+{'river': 0.4167, 'finance': 0.1167, 'flying': 0.25, 'train-station': 0.2167}
+{'river': 0.2967, 'finance': 0.1167, 'flying': 0.3034, 'train-station': 0.2833}
+{'river': 0.3376, 'finance': 0.1309, 'flying': 0.282, 'train-station': 0.2496}
+{'river': 0.3298, 'finance': 0.1252, 'flying': 0.2849, 'train-station': 0.2602}
+{'river': 0.3302, 'finance': 0.126, 'flying': 0.286, 'train-station': 0.2579}
+{'river': 0.3302, 'finance': 0.1263, 'flying': 0.2852, 'train-station': 0.2583}
+{'river': 0.3304, 'finance': 0.1261, 'flying': 0.2854, 'train-station': 0.2581}
+{'river': 0.3302, 'finance': 0.1261, 'flying': 0.2854, 'train-station': 0.2583}
+{'river': 0.3303, 'finance': 0.1261, 'flying': 0.2854, 'train-station': 0.2582}
+{'river': 0.3303, 'finance': 0.1261, 'flying': 0.2854, 'train-station': 0.2582}
+Finished!
+Top score: river
+\end{verbatim}

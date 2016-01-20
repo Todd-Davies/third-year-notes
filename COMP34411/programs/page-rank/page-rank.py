@@ -11,10 +11,12 @@ import sys
 import operator
 # For error checking
 import math
+# For reduce in python 3
+import functools
 
 # Check we've got two words as command line arguments
 if len(sys.argv) != 1:
-  print "Usage: %s" % sys.argv[0]
+  print("Usage: %s", sys.argv[0])
   exit(-1)
 
 # Make up a graph
@@ -36,7 +38,7 @@ graph = {"finance":["river"],
 damping = 0.8
 
 # Reserve 0.2 probability mass for personalisation
-personalise_amnt = 0.3
+personalise_amnt = 0.0
 # Set the personalisation terms (from a target sentence) to point to finance
 personalise = {"money":["finance"],
                "loan":["finance"]}
@@ -45,7 +47,7 @@ def page_rank(graph, damping, personalise, personalise_amnt):
   starting_prob = 1.0 / len(graph)
   # Build the initial scores
   scores = {k: starting_prob for k, v in graph.items()}
-  print scores
+  print(scores)
   prev_scores = None
   # Keep going while the scores aren't stable
   while not prev_scores or scores != prev_scores:
@@ -70,18 +72,18 @@ def page_rank(graph, damping, personalise, personalise_amnt):
       # personalisation
       s *= damping - personalise_amnt
       # Add the bits up to get the score
-      scores[k] = p + d + s
-    print scores
-  print "Finished!"
+      scores[k] = round(p + d + s, 4)
+    print(scores)
+  print("Finished!")
   return scores
 
 # Compute the scores
 scores = page_rank(graph, damping, personalise, personalise_amnt)
 
 # Print out the top score
-print "Top score: %s" % max(scores.iteritems(), key=operator.itemgetter(1))[0]
+print("Top score: " +  max(scores, key=lambda k: scores[k]))
 
 # Check that the values sum to ~1
-summation = reduce(lambda x, y: x + y, scores.values())
+summation = functools.reduce(lambda x, y: x + y, scores.values())
 if summation < 0.99 or summation > 1.01:
-  print "Something went wrong; sum = %f" % summation
+  print("Something went wrong; sum = %f", summation)

@@ -1,0 +1,13 @@
+{'river': 0.25, 'finance': 0.25, 'flying': 0.25, 'train-station': 0.25}
+{'river': 0.4167, 'finance': 0.1167, 'flying': 0.25, 'train-station': 0.2167}
+{'river': 0.2967, 'finance': 0.1167, 'flying': 0.3034, 'train-station': 0.2833}
+{'river': 0.3376, 'finance': 0.1309, 'flying': 0.282, 'train-station': 0.2496}
+{'river': 0.3298, 'finance': 0.1252, 'flying': 0.2849, 'train-station': 0.2602}
+{'river': 0.3302, 'finance': 0.126, 'flying': 0.286, 'train-station': 0.2579}
+{'river': 0.3302, 'finance': 0.1263, 'flying': 0.2852, 'train-station': 0.2583}
+{'river': 0.3304, 'finance': 0.1261, 'flying': 0.2854, 'train-station': 0.2581}
+{'river': 0.3302, 'finance': 0.1261, 'flying': 0.2854, 'train-station': 0.2583}
+{'river': 0.3303, 'finance': 0.1261, 'flying': 0.2854, 'train-station': 0.2582}
+{'river': 0.3303, 'finance': 0.1261, 'flying': 0.2854, 'train-station': 0.2582}
+Finished!
+Top score: river
