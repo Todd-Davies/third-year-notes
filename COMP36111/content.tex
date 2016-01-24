@@ -6,8 +6,6 @@
 
 \section{Algorithmic Wisdom}
 
-{\hspace{2.2em} \small Lectures 2 \& 3}
-
 The first two lectures of the course describe different types of algorithms,
 what is computable, where to optimise algorithms, asymptotics and heuristics.
 
@@ -28,10 +26,10 @@ There are three types of algorithms that are mentioned:
 
   \begin{lstlisting}[language=java]
     int countTreeSize(tree) {
-    int size = 1;
-    if (tree.left) size += countTreeSize(tree.left);
-    if (tree.right) size += countTreeSize(tree.right);
-    return size;
+      int size = 1;
+      if (tree.left) size += countTreeSize(tree.left);
+      if (tree.right) size += countTreeSize(tree.right);
+      return size;
     }
   \end{lstlisting}
 
@@ -44,13 +42,13 @@ There are three types of algorithms that are mentioned:
 
   \begin{lstlisting}[language=java]
     int countGraphSize(graph) {
-    if (graph.visited) return 0;
-    graph.visited = true;
-    int size = 1;
-    for (child in graph) {
-      size += countGraphSize(child);
-    }
-    return size;
+      if (graph.visited) return 0;
+      graph.visited = true;
+      int size = 1;
+      for (child in graph) {
+        size += countGraphSize(child);
+      }
+      return size;
     }
   \end{lstlisting}
 
@@ -124,7 +122,7 @@ you could even hard-code solutions to those!}
 
 The average case runtime of a algorithm is also important. Haskell uses a type
 checker that runs in $O(2^{n^n})$ time in the worst case, but for every program
-that isn't made specifically to mess with the compiler, runs in linear time.
+that isn't made specifically to mess with the compiler, it runs in linear time.
 
 \section{Graphs}
 
@@ -147,7 +145,8 @@ Figure~\ref{fig:bad-graphs} aren't allowed.
 
 A \textbf{directed graph} is just like a normal graph, except the edges do have
 arrows. The only mathematical difference is that the set $E$ is a set of ordered
-pairs.
+pairs. The third diagram in Figure~\ref{fig:bad-graphs} is a directed graph (it
+is always referred to as a directed graph!).
 
 The \textit{degree} of a node in a graph, is the number of edges that are
 adjacent to (touching) it. If the graph is directed, then it is the number of
@@ -417,7 +416,7 @@ probably have your own implementation in C.
 
 %TODO: Expand on Tarjan's algorithm when a whiteboard is present
 
-\subsubsection{Graph colouring}
+\subsubsection{Graph Colouring}
 
 Graph colouring is a problem where we want to assign colours to nodes in a
 graph, but no adjacent node can have the same colour. A \textit{k-colouring} of
@@ -436,71 +435,85 @@ nodes, and the pairs as the edges between them:
   (n, (u_1, v_1), \dots, (u_m, v_m))
 \]
 
-We can show that \textit{3-colourability} is \texttt{NP-Time} hard, because we
-can convert an instance of \texttt{3-SAT} into it. Given a \texttt{3-SAT}
-problem, we compute in log space (since we want a many-one log reduction (see
-Section~\ref{sec:reduce-and-hard})), a function to create a graph from the
-satisfiability problem's clauses.
+See Section~\ref{sat-colour} for more on this!
 
-To do this, we create three `gadgets' which let us represent logical gates in
-graph form. The gadgets have internal nodes which make them easier to draw, the
-internal nodes are not shown in larger sketches, but are when describing the
-gadgets initially in order to make the properties of the gadget known.
+\subsubsection{Hamiltonian Circuits}
 
-\begin{description}
-  \item \textbf{Gadget 1: Equality}\\
-    We want to make a gadget that will make sure that two nodes have the same 
-    colour. Here, $a$ and $b$ are the input and output nodes, while the other 
-    two nodes are internal. In any $3$ colouring, $a$ and $b$ must be the same  
-    colour:
+{\tiny \vspace{-2em} You might want to read the later sections about complexity 
+theory before this bit.}
 
-    \begin{figure}[H]
-      \centering
-      \includegraphics[width=0.4\textwidth]{diagrams/graph11}
-      \caption{Gadget 1}
-      \label{fig:gadget1}
-    \end{figure}
+A circuit of a graph is a path through the graph where every node is visited at
+least once. An Eulerian circuit of a graph is where each edge is traversed
+\textit{exactly} once, and a Hamiltonian circuit is one where each node is
+visited exactly once.
 
-  \item \textbf{Gadget 2: XOR Gate}\\
-    I'm not sure if this is strictly an XOR gate, but that's what it reminds me 
-    of. $a$ is either the same colour as $b$ or $c$, while $d$ is an internal 
-    node.
+\marginpar{Finding if a graph has a Eulerian Circuit is solvable in
+\texttt{PTime}, since we simply have to check if every node has an even
+out-degree, which can be done in $O(n^2)$.}
 
-    \begin{figure}[H]
-      \centering
-      \includegraphics[width=0.4\textwidth]{diagrams/graph12}
-      \caption{Gadget 2}
-      \label{fig:gadget2}
-    \end{figure}
+We're going to show that finding a Hamiltonian Circuit is a problem in
+\texttt{NPTime}. We can do this in one of two ways; either to give a
+nondeterministic Turing machine that will find a path, or we can come up with a
+deterministic polynomial time algorithm to verify that a given path is
+Hamiltonian.
 
-    Note that we can chain this gadget like a normal XOR gate if we attach
-    another Gadget 2 to the $c$ node. Then $a$ will have the same colour as $b$,
-    or the one of the children of the second gadget.
+You might be thinking \textit{``ummm, how can simply giving a polynomial time
+verification algorithm show that we're in \texttt{NPTime}?''}; that's what I
+thought at first. However, we could simply try all combinations of input to the
+verifier and see if there is one that is Hamiltonian. This would work in
+deterministic \texttt{ExpTime}, which can be computed in \texttt{NPTime}.
 
-  \item \textbf{Gadget 3: OR Gate}\\
-    This gadget has lots of nodes, though again, only $a$, $b$ and $c$ are 
-    external. Now, $a$ is the same as either $b$, or $c$, or both $b$ and $c$.
+In order to show that trying to find a Hamiltonian path in a graph is
+\texttt{NPTime-Complete}, we must map it to another \texttt{NPTime-Complete} 
+problem. The course notes (lecture 9) does this by mapping it to \texttt{3-SAT} 
+like we do for graph colouring in Section~\ref{sat-colour}.
 
-    \begin{figure}[H]
-      \centering
-      \includegraphics[width=0.4\textwidth]{diagrams/graph13}
-      \caption{Gadget 3}
-      \label{fig:gadget3}
-    \end{figure}
-\end{description}
+We can use the fact that finding Hamiltonian Circuits is
+\texttt{NPTime-Complete} to show that the Travelling Salesman problem is
+\texttt{NP-Hard}, and then \texttt{NP-Complete}.
 
-Now lets encode the \texttt{3-SAT} problem $(a \vee \neg b), (b \vee c)$, shown
-in Figure~\ref{fig;k-color-3-sat}. Have a go at colouring it in yourself!
+\marginpar{I've not shown how I computed the path with the matrix, but I did it 
+on a whiteboard by crossing out used paths on the matrix. Giving a full 
+explanation here would take too long now, and its not strictly on the syllabus.}
 
-\begin{figure}[H]
+To do this, we construct a $N \times N$ matrix, where $1$ corresponds to an edge
+between nodes and $2$ is for no edge. If we had a graph like in
+Figure~\ref{tsp:graph}, then we could produce a matrix like in
+Table~\ref{tsp:matrix}.
+
+\begin{figure}[h]
+\centering
+\begin{subfigure}{.5\textwidth}
   \centering
-  \includegraphics[height=\textwidth,angle=90]{diagrams/graph14}
-  \caption{An encoding in \textit{k-colourability} of the \texttt{3-SAT} 
-  problem $(a \vee \neg b), (b \vee c)$.}
-  \label{fig:k-colour-3-sat}
+  \includegraphics[width=.4\linewidth]{diagrams/graph15}
+  \caption{The input graph}
+  \label{tsp:graph}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \begin{tabularx}{0.2\textwidth}{M|M|M|M|M|MX}
+      & 0 & 1 & 2 & 3 & 4\\ \cline{1-6}
+    0 & 2 & 1 & 2 & 1 & \tikzmark{a}{1}\\
+    1 & \tikzmark{b}{1} & 2 & 1 & 2 & 2\\
+    2 & 2 & \tikzmark{c}{1} & 2 & 1 & 2\\
+    3 & 1 & 2 & \tikzmark{d}{1} & 2 & 2\\
+    4 & \tikzmark{e}{1} & 2 & 2 & 2 & 2
+  \end{tabularx}
+  \link{b}{a}
+  \link{c}{b}
+  \link{d}{c}
+  \link{a}{e}
+  \caption{The resulting matrix; start at 3, move to 2, then 1, then 0 and
+  finally 4.}
+  \label{tsp:matrix}
+\end{subfigure}
+\caption{Transforming the Hamiltonian Cycle problem to the TSP problem.}
 \end{figure}
 
-% Carry on from slide 30
+If the TSP problem finds a path with a total cost of less than or equal to $n$,
+then there will be a Hamiltonian path, like in the figure. This means that TSP
+is \texttt{NP-hard}. To show that it is \texttt{NP-Complete}, observe that TSP
+is in \texttt{NP}, which is easy, since we can obviously verify that a given
+path can be taken with a specific cost in polynomial time.
 
 \section{Linear Programming}
 
@@ -557,10 +570,10 @@ want.
 If we have the equations $3x + 4y \leq 6$, $2y - x \leq 2$ and $x \geq 0$, we
 will get something like in Figure~\ref{fig:graph-2}.
 
-\begin{figure}[h]
+\begin{figure}[H]
 \captionsetup{width=.4\linewidth}
 \centering
-\begin{minipage}{.5\textwidth}
+\begin{minipage}{.4\textwidth}
   \centering
   \includegraphics[width=\textwidth]{diagrams/graph2}
   \captionof{figure}{A graph plotting $3x + 4y \leq 6$, $2y - x \leq 2$ and
@@ -568,7 +581,7 @@ will get something like in Figure~\ref{fig:graph-2}.
   blue, green and red respectively. The clear region satisfies all points.}
   \label{fig:graph-2}
 \end{minipage}%
-\begin{minipage}{.5\textwidth}
+\begin{minipage}{.4\textwidth}
   \centering
   \includegraphics[width=\textwidth]{diagrams/graph3}
   \captionof{figure}{The valid region in the three inequalities from
@@ -586,9 +599,9 @@ gives the points in Figure~\ref{fig:graph-3}.
 
 \begin{mymulticols}
   \begin{itemize}
-    \item $x = 0, 3x + 4y = 6$
-    \item $x = 0, 2y - x = 2$
-    \item $2y - x = 2, 3x + 4y = 6$
+    \item $x = 0,~3x + 4y = 6$
+    \item $x = 0,~2y - x = 2$
+    \item $2y - x = 2,~3x + 4y = 6$
   \end{itemize}
 \end{mymulticols}
 
@@ -1457,7 +1470,8 @@ Now we've nearly finished defining a multi-tape TM, the final points are:
 
 \begin{itemize}
   \item Since the TM is deterministic, there can be \textit{at most} one 
-    transition for every $(state,~\bar{current~symbols})$ tuple.
+    transition for every $(state,~\overline{\text{\textit{current symbols}}})$ 
+    tuple.
   \item The tape never moves left $\vartriangleright$.
   \item Tape 1 is read only and tape $K$ is write only.
 \end{itemize}
@@ -1504,8 +1518,8 @@ coded as $M;x$, where `;' is a separator between the Turing Machine we're
 
 \subsubsection{Nailing that TM definition}
 
-If you want your Turing Machines better defined than Arnie's Biceps, then this
-how you do it (alternately, read Chapter 3 of Sipser).
+If you want your Turing Machines very well defined, then this how you do it
+(alternately, read Chapter 3 of Sipser).
 
 %TODO: Not sure about a configuration on slide 8 of lecture 7b. I emailed Ian.
 
@@ -1673,7 +1687,7 @@ is in \texttt{TIME/SPACE(G)} if there exists a deterministic TM that recognises
 $L$ in time/space G.
 
 Similarly, if we can find a non-deterministic TM to recognise $L$, then we say
-that $L$ is in \texttt{NTIME/NSPACE{G}}.
+that $L$ is in \texttt{NTIME/NSPACE\{G\}}.
 
 \subsubsection{Complexity classes}
 
@@ -2039,4 +2053,146 @@ If we then solve the ILP programming problem for these equations, then we can
 find a suitable truth assignment for \texttt{3-SAT}, and so we have proved that
 \texttt{ILP(0/1)} is \texttt{NPTime-Complete}.
 
-% Todo: Carry on from the graphs bit (lecture 9, graph bit is above somewhere)
+\subsection{3-SAT as a graph colouring problem}
+\label{sat-colour}
+
+We can show that \textit{3-colourability} is \texttt{NP-Time} hard, because we
+can convert an instance of \texttt{3-SAT} into it. Given a \texttt{3-SAT}
+problem, we compute in log space (since we want a many-one log reduction), a
+function to create a graph from the satisfiability problem's clauses.
+
+To do this, we create three `gadgets' which let us represent logical gates in
+graph form. The gadgets have internal nodes which make them easier to draw, the
+internal nodes are not shown in larger sketches, but are when describing the
+gadgets initially in order to make the properties of the gadget known.
+
+\begin{description}
+  \item \textbf{Gadget 1: Equality}\\
+    We want to make a gadget that will make sure that two nodes have the same 
+    colour. Here, $a$ and $b$ are the input and output nodes, while the other 
+    two nodes are internal. In any $3$ colouring, $a$ and $b$ must be the same  
+    colour:
+
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.4\textwidth]{diagrams/graph11}
+      \caption{Gadget 1}
+      \label{fig:gadget1}
+    \end{figure}
+
+  \item \textbf{Gadget 2: XOR Gate}\\
+    I'm not sure if this is strictly an XOR gate, but that's what it reminds me 
+    of. $a$ is either the same colour as $b$ or $c$, while $d$ is an internal 
+    node.
+
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.4\textwidth]{diagrams/graph12}
+      \caption{Gadget 2}
+      \label{fig:gadget2}
+    \end{figure}
+
+    Note that we can chain this gadget like a normal XOR gate if we attach
+    another Gadget 2 to the $c$ node. Then $a$ will have the same colour as $b$,
+    or the one of the children of the second gadget.
+
+  \item \textbf{Gadget 3: OR Gate}\\
+    This gadget has lots of nodes, though again, only $a$, $b$ and $c$ are 
+    external. Now, $a$ is the same as either $b$, or $c$, or both $b$ and $c$.
+
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.4\textwidth]{diagrams/graph13}
+      \caption{Gadget 3}
+      \label{fig:gadget3}
+    \end{figure}
+\end{description}
+
+Now lets encode the \texttt{3-SAT} problem $(a \vee \neg b), (b \vee c)$, shown
+in Figure~\ref{fig;k-color-3-sat}. Have a go at colouring it in yourself!
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=\textwidth,angle=90]{diagrams/graph14}
+  \caption{An encoding in \textit{k-colourability} of the \texttt{3-SAT} 
+  problem $(a \vee \neg b), (b \vee c)$.}
+  \label{fig:k-colour-3-sat}
+\end{figure}
+
+\subsection{Space complexity}
+
+\marginpar{Make sure you read over lectures 10 and 11; there's a lot of stuff 
+I've not included here.}
+
+Just like time complexity, space complexity is also measured using the Big-Oh
+notation. \texttt{Space(f(n))} is the space (number of tape cells) used by a
+deterministic Turing Machine, and \texttt{NSpace(f(n))} is the same for a
+nondeterministic Turing Machine.
+
+Savich's theorem describes the relationship between deterministic and non-
+deterministic space complexity. We know that we can make a deterministic TM
+simulate a non-deterministic one in exponential time by simulating all branches
+of the latter's computation tree. Savich's theorem shows that a deterministic TM
+can simulate a non-deterministic one in the square of the space that would
+normally be used:
+
+\marginpar{What does the Computer Scientist say when he goes into space?
+``OMG, $P = NP$!''}
+
+\[
+  NSpace(f(n)) \in Space(f^2(n))
+\]
+
+This is demonstrated by using directed graph reachability as an example. Given
+the directed graph $G$, we can determine if one node is reachable from another
+using an algorithm like:
+
+\begin{lstlisting}[language=python]
+  # For log
+  import math
+
+  graph = {0 : [1,3,4],
+           1 : [0,2],
+           2 : [1,3],
+           3 : [0,2],
+           4 : [0]}
+
+  def is_reachable(start, end, graph, steps):
+    print "is_reachable(%d, %d, graph, %d)" % (start, end, steps)
+    if steps == 0:
+      return start == end or (end in graph[start])
+    else:
+      for adj in graph[start]:
+        if is_reachable(start, adj, graph, steps - 1):
+          if is_reachable(adj, end, graph, steps - 1):
+            return True
+      return False
+
+  print is_reachable(0, 3, graph, int(math.log(len(graph), 2))) # True
+  print is_reachable(4, 2, graph, int(math.log(len(graph), 2))) # False
+\end{lstlisting}
+
+\texttt{is\_reachable} finds if there is a path between the start and end nodes
+within $2^steps$ steps. In order to find if the nodes are connected in the
+graph, we have to give it $log_2(|graph|)$ as the steps parameter. This works
+because any path from $start$ to $end$ in $2^x$ steps must have a midpoint
+$mid$. If we find a path from $start$ to $mid$ in $2^{x - 1}$ steps, and a path
+from $mid$ to $end$ in the same number, then we'll can put them together and
+find the complete path.
+
+On a Turing Machine, we implement this by writing a tuple
+\texttt{(start,end,steps)} to the work tape on every step of the recursion. This
+requires $O(h \times log_2(|V|))$ space, and since we set $steps$ to be $log_2
+(|graph|)$, the total space complexity is $O(log_2(|V|) \times log_2(|V|)) = O(
+log^2_2(|V|))$.
+
+We can generalise this to any TM; if we visualise the execution of a non-
+deterministic TM as a graph, we can use the reachability algorithm above to
+determine whether we can reach an accepting state from the start state and we
+can do it in $SPACE(O(f(n))^2)$. This gives the result that $NSpace(f(n)) \in
+Space(f^2(n))$.
+
+We can solve directed reachability with a depth first search in deterministic
+linear time and space, and have just shown that we can use
+\texttt{num\_reachability} to solve it in $Space(log(n)^2)$, but we can in fact
+do even better space-wise.

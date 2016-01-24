@@ -60,6 +60,21 @@
 % Make LaTeX pretty with better kerning etc
 \usepackage{microtype}
 
+\usepackage{tikz}
+
+\renewcommand\tabularxcolumn[1]{m{#1}}
+\newcolumntype{M}{>{\centering\arraybackslash}m{1cm}}
+
+\newcommand\tikzmark[2]{%
+\tikz[remember picture,baseline] \node[inner sep=1pt,outer sep=0] (#1){#2};%
+}
+
+\newcommand\link[2]{%
+\begin{tikzpicture}[remember picture, overlay, >=stealth, shift={(0,0)}]
+  \draw[->] (#1) to (#2);
+\end{tikzpicture}%
+}
+
 % If enabled, maybe skip certain stuff or do it for less time to compile faster
 \ifdefined\fastCompile
   % Fast param here:
