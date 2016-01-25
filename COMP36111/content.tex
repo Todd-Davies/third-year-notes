@@ -414,7 +414,25 @@ probably have your own implementation in C.
   end function
 \end{lstlisting}
 
-%TODO: Expand on Tarjan's algorithm when a whiteboard is present
+The algorithm basically applies a depth first search to the graph, and keeps
+track of two properties (the index and the lowlink) for each node. The index is
+the logical time at which the node was discovered by the algorithm, and the
+lowlink is the index of the oldest ancestor that can be reached from the current
+node.
+
+Once the index has been assigned, it never changes. However, the lowlink is
+updated during recursive depth first search calls to find back edges between the
+node and its ancestors.
+
+If any node has its index as the same value as its lowlink, then it is the root
+of a strongly connected component (possibly only containing itself). Nodes will
+be popped off the stack until the current node is removed, at which point we
+have found all the nodes in this component.
+
+If all nodes have not been discovered after a single depth first search, the
+algorithm is run again on a previously undiscovered node. This ensures that all
+the strongly connected components are found, even in graphs that have completely
+disjoint components.
 
 \subsubsection{Graph Colouring}
 
