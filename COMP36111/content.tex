@@ -108,7 +108,7 @@ making it faster, consider whether it is worth the effort. If this part takes up
 Returns}.
 
 As well as optimising specific parts of an algorithm, you also should consider
-its asymptotic run time. An algorithm that runs in $O(n^2)$ time is probably
+its asymptotic run time. An algorithm that runs in $O(n^2)$ time is probably not
 going to be better than one that runs in $O(n log(n))$ time. However, this isn't
 always the case; some algorithms (often ones with good asymptotic run times)
 take a long time to set up, usually when you have to transform the data into
@@ -351,7 +351,7 @@ function Dijkstra(Graph, source):
 
 If we use a Fibonacci heap, for the priority queue, then the runtime of
 Dijkstra's algorithm is $O(|E| + |V|log(|V|)$. If we use a normal heap, then the
-runtime is $O(|E|log(|V|))$.
+runtime is $O((|E|+|V|)log(|V|))$.
 
 \subsubsection{Tarjan's Algorithm}
 
