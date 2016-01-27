@@ -1,0 +1,207 @@
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[top=2.5cm, left=2.5cm, right=2.5cm, bottom=2.5cm]{geometry}
+%\usepackage{parskip}
+%\usepackage{verbatim}
+%\usepackage{listings}
+%\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+%\title{Supertagging}
+%\author{}
+%\date{}
+
+\lstdefinestyle{xmlish}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  xleftmargin=\parindent,
+  language=XML,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  commentstyle=\itshape\color{purple!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+
+%\begin{document}
+%\maketitle	
+
+Supertagging allows us to handle recursion with regexes. The main principle is
+that you write rules but you do not expand them.
+
+Instead you take the first rule that has a match, apply it to all of your text
+and see how your text changes. Now, you should ideally have fewer bigger phrases
+(the ones which do not have any rules applied to them yet), and some
+words/phrases that do have newly added tags around them. Then you can repeat the
+process again with the text formed after the first rule has been applied (with
+some new tags here and there). If the same rules apply again - you can see how
+the recursion happens, if the new rules apply - you can continue parsing the
+text.
+
+This resembles divide-and-conquer principle a bit - short strings are easier to
+parse, and having multiple rounds of this algorithm allows you to get those
+shorter strings. (This is where the \textbf{islands} bit comes from, correct me
+if I am wrong!)
+
+This thing is in-place - you are re-writing your entire text as you apply those
+regexes to it, so you have to get it right the first time.
+
+Here is how those rules look like:
+
+\begin{verbatim}
+	ctags = { 'nn': choice(tag'NN.'),
+						   choice(tag('AJ.'), tag('noun'))+tag('nn')),
+		      'np0': tag('(AT|D).')+tag('nn'),
+	          'np': choice(tag('np0'), tag('np')+tag('pp')),
+	          'pp': tag('PR.')+tag('np')}
+\end{verbatim}
+
+In this rule we can see that \texttt{nn} is defined in terms of itself (the
+\texttt{tag('nn')} bit at the end). Where we have \texttt{choice(\ldots)} - this
+is the same as having an \texttt{OR} operator. So the first rule would look like
+this \texttt{(NN|AJ|(noun + nn))}. This will apply to simple little phrases that
+have just a noun, or just an adjective, or a noun followed by a noun.
+
+The next rule means we have a determiner (an article or otherwise) followed by a
+noun. And so forth.
+
+Below is a dry run of this set of rules (taken from the course notes along with
+the rules). Can you work out what rules have been applied at each stage and how
+text has changed as a result?
+
+\textbf{Initial (before any rules)}
+\lstset{escapechar=@,style=xmlish}
+\begin{lstlisting}
+<AT0>the</AT0>
+<AJ0>fat</AJ0>
+<AJ0>old</AJ0>
+<NN1>man</NN1>
+<PRP>with</PRP>
+<AT0>a</AT0>
+<AJ0>big</AJ0>
+<NN1>nose</NN1>
+\end{lstlisting}
+
+\textbf{After the first pass}
+\lstset{escapechar=@,style=xmlish}
+\begin{lstlisting}
+<AT0>the</AT0>
+<AJ0>fat</AJ0>
+<AJ0>old</AJ0>
+<nn>
+	<NN1>man</NN1>
+</nn>
+<PRP>with</PRP>
+<AT0>a</AT0>
+<AJ0>big</AJ0>
+<nn>
+	<NN1>nose</NN1>
+</nn>
+\end{lstlisting}
+
+\textbf{After the second pass}
+
+\lstset{escapechar=@,style=xmlish}
+\begin{lstlisting}
+<AT0>the</AT0>
+<AJ0>fat</AJ0>
+<nn>
+	<AJ0>old</AJ0>
+	<nn>
+		<NN1>man</NN1>
+	</nn>
+</nn>
+<PRP>with</PRP>
+<AT0>a</AT0>
+<nn>
+	<AJ0>big</AJ0>
+	<nn>
+		<NN1>nose</NN1>
+	</nn>
+</nn>	
+\end{lstlisting}
+
+\textbf{After the third pass}
+
+\lstset{escapechar=@,style=xmlish}
+\begin{lstlisting}
+<AT0>the</AT0>
+<AJ0>fat</AJ0>
+<nn>
+	<AJ0>old</AJ0>
+	<nn>
+		<NN1>man</NN1>
+	</nn>
+</nn>
+<PRP>with</PRP>
+<np0>
+	<AT0>a</AT0>
+	<nn>
+		<AJ0>big</AJ0>
+		<nn>
+			<NN1>nose</NN1>
+		</nn>
+	</nn>
+</np0>
+\end{lstlisting}
+
+\textbf{After the fourth pass}
+\lstset{escapechar=@,style=xmlish}
+\begin{lstlisting}
+<AT0>the</AT0>
+<AJ0>fat</AJ0>
+<nn>
+	<AJ0>old</AJ0>
+	<nn>
+		<NN1>man</NN1>
+	</nn>
+</nn>
+<PRP>with</PRP>
+<np>
+	<np0>
+		<AT0>a</AT0>
+		<nn>
+			<AJ0>big</AJ0>
+			<nn>
+				<NN1>nose</NN1>
+			</nn>
+		</nn>
+	</np0>
+</np>
+
+\end{lstlisting}
+
+\ldots \\
+\textbf{After the final pass}
+\lstset{escapechar=@,style=xmlish}
+\begin{lstlisting}
+<np>
+	<np>
+		<np0>
+			<AT0>the</AT0>
+			<nn>
+				<AJ0>fat</AJ0>
+				<nn>
+					<AJ0>old</AJ0>
+					<nn>
+						<NN1>man</NN1>
+					</nn>
+				</nn>
+			</nn>
+		</np0>
+	</np>
+	<pp>
+		<PRP>with</PRP>
+		<np>
+			<np0>
+				<AT0>a</AT0>
+				<nn>
+					<AJ0>big</AJ0>
+					<nn>
+						<NN1>nose</NN1>
+					</nn>
+				</nn>
+			</np0>
+		</np>
+	</pp>
+</np>
+\end{lstlisting}
+(for the complete example see the course notes)

@@ -1,0 +1,238 @@
+The first few slides (under the big Machine Translation title, p565-566) just
+explain the logic of the English and Arabic sentences - ``The man wrote a book''
+and ``ktb Alrjl ktb'' which is the same thing in Arabic with some vowels
+omitted.
+
+Then he goes on to talk about how would we represent the meaning. (p568)
+
+The [., (arg (claim)] bits (p571) are again the translation rules, Allan drew
+the two different parse trees for English and Arabic (will be included as a
+separate picture, [number 1]).
+
+So those rules just say to translate this sentence ``The man wrote a book'' into
+Arabic.
+
+OK, by inspecting the tree structure you probably would have guessed that if you
+literally translate from English into Arabic and the other way, speak like Yoda
+you will. ``Wrote the man book'' would be the literal translation of ``yktb
+Alrjl ktb'' (Arabic $\rightarrow$ English, literal translation, I will trust my
+friend Google Translate on that one). There are a few other catches to it.
+Arabic has the no indefinite article ``a''. Whoops. And also... The definite
+article ``The'' is attached to the noun. Instead of Al rajul (The man) they have
+``Alrajul''. A bit like English has sometimes ``doesn't'' or ``o'clock'' written
+instead of ``does not'', ``on the clock''(is that even the correct version of
+o'clock?).
+
+But that means the Arabic tree messes up, because it doesn't correspond
+correspond to the English one (No ``a'', ``the man'' as one word...). So he
+discusses what would he do to still make those trees align in the machine
+translation. (That's how I understand it, yeah.) He could treat ``Al'' as
+separate word for analysis, and then attach it on afterwards. But he will have
+to delete the indefinite article ``the'' to translate it into Arabic.
+
+\textbf{Transfer rules}
+
+p.575 This is where the actual transfer rule part starts (sort of). [-def] means
+the indefinite article. [+def] means the definite article. This, I am guessing
+is a representation of a sentence in a tree in a flat form (I am guessing,
+again, he didn't say this on this specific part but, the ``.'' is at the top,
+because he mentioned that the meaning of the sentence changes with punctuation
+in some of the earlier lectures). Then we have the verb and other things with
+articles attached (English: book has ``a'', man has ``the''. Arabic doesn't, but
+we sort of map them anyway - we know that ``book'' has ``a'' in English. In
+Arabic it doesn't, but that's where the ``a'' would go if it was present in
+Arabic).
+
+p.576 we see the syntax. Again, I will do it as a separate drawing - see [number
+2] (because I am a visual person :) ). And apply this recursively to all of the
+English tree to get an Arabic one.
+
+Start with applying all the little rules to all of the tree (word->word
+mappings, as far as I understood), then apply bigger rules (such as this one? I
+may be wrong in that specific part. He just said the bits not in brackets.)
+
+p.578 has the same thing with an axillary. The thing is, English has more tenses
+than Arabic. So if you translate:
+
+1) English: ``I am writing a book''
+2) Arabic(translated): ``I write a book''
+3) English (translated from Arabic): ``I write a book''
+
+You see? The original meaning is lost! No problem when you translate TO Arabic.
+But when you translate FROM Arabic... This is what he means in  p.580. The rules
+themselves though, allow you to convert sentence to tree and backwards - tree to
+sentence.
+
+p.581 He carries on with the point he made earlier - what if one language has
+distinctions the other one doesn't. He gives you the example of ``they''.
+Russian also has a single, gender-neutral form ``oni'', so I was puzzled to find
+about those distinctions. French has ils and elles for plural masculine and
+plural feminine forms, Arabic, as well as having those two gender distinctions
+also distinguishes whether there are two of them or more than two.
+
+So again, when you have to translate - part of the meaning can get lost:
+
+1) John and Mary went to the cinema. They enjoyed the picture. Here we know from
+the surrounding context that we have a male and a female. So to translate that
+we use plural masculine (because if at least one person is a male - masculine
+form is used. This is true in all the languages I studied that make that
+distinction), representing 2 people for Arabic.
+
+2) Sam and Alex went outside. They enjoyed the sun. Here two gender-neutral
+names are used. How the heck are you supposed to know what form of ``they'' to
+use now? Only if you have more surrounding context, if you don't - Houston, we
+have a problem!
+
+Also, earlier tense distinctions still apply here.
+(He is so correct about the bare plural!!!)
+
+p.584 Here he explains how some things don't map to other languages as a single
+word. ``I am looking for a unicorn'' translates to French as ``I am in search of
+a unicorn''
+
+``looking for'' (2 words) $\rightarrow$ ``in search of'' (3 words)
+
+The opposite is true for English. You can say ``We dined'' but you don't say
+``We breakfasted'', ``We tead'' (as opposed to ``we had breakfast'', ``we had
+tea'') and you don't really say ``We lunched''. Some languages have (Russian
+definitely has) them all as verbs.
+
+For idioms, even if an idiom with an equivalent meaning exists you still
+translate it as a bare meaning (at least according to Allan, I clarified).
+
+So if you have ``kick the bucket'' in English and say you want to translate it
+to Russian, instead of using the equivalent phrase (``kon'ki otbrosit'',
+literally translates as ``throw away the ice skates'') you translate it as
+``become dead''.
+
+\textbf{The MT pyramid} (p.586)
+
+The gist here is the fact that no matter what language you use (out of the ones
+we studied) you have the same parts of speech. You say ``I'', ``je'', ``ich'',
+``ya'', ``watashi'' or ``he'', ``il'', ``er'', ``on'', ``kare''... you know they
+are pronouns. Doesn't matter what language, it's a pronoun! That's an
+interlingua.
+
+Another example of interlingua: transitive verb with subject and object becomes
+a transitive verb with subject and object.
+
+Interlingua is very general.
+
+
+p.591 (as far as I understood from there)  Textual entailment vs machine
+translation: in textual entailment you use logic to figure out the links:
+
+John and Mary got divorced --> John and Mary were once married.
+
+Machine translation - you map from one language to another, preserving the gist.
+Text simplification can also be interpreted as translation (Wikipedia:
+English--> Simple English!)
+
+\textbf{Ambiguity in MT} (p.592)
+
+3 kinds of ambiguity:
+
+structural ambiguity:
+
+strawberry jam jar
+
+Ok, that's pretty obvious. It's a jar of strawberry jam! Think again. They are 3
+nouns. Machine can't just say what you just said. Machine needs to know whether
+it is
+
+(strawberry jam) jar or strawberry (jam jar)
+
+Basically which two nouns to group to get the right meaning. For humans it is
+not such a big deal. Other languages (Dutch):
+
+aardbeienjam jar
+
+The words that need to be ``bracketed'' are just mashed together!
+
+Scope ambiguity:
+
+This one was trickier (at least for me). So I suggest you watch this: video:
+\url{https://www.youtube.com/watch?v=XC-MGuj75zQ} This guy will probably explain
+better than me. The next few lines are essentialy a TL;DR of the video.
+
+Basically we use quantifiers in our speech. They are not obvious, because our
+mind works differently from a machine.
+
+Any, every, a...
+
+These guys map to ``there exists'' and ``for all''. UBUQUITOUS LOGIC!
+
+All John's friends went to a fantasy land.
+
+There are two meanings:
+
+1) ``All John's friends went to the same fantasy land.''
+2) ``All John's friends went to different fantasy lands, it's just for every friend there exists a fantasy land they went to - Sarah went to Oz, Stephen went to Narnia''
+
+The first meaning comes from ``all'' friends (``all'' winning over ``a''), that
+is for each friend there exists a single one fantasy land that is the same for
+everyone.
+
+The second meaning comes from ``a'' (``a'' winning over ``all'') - for each
+friend there exists a fantasy land, which does not have to be the same fantasy
+land.
+
+Then he goes on to explain how does our brain pick the first interpretation,
+even though the second one is more logical.
+
+TL;DR ends.
+
+The 2 examples Allan gives in the lectures:
+
+1) You can't invite John. He will drink EVERYTHING.
+2) You can't invite John. He will drink ANYTHING.
+
+Here Allan explains that these two are both universal quantifiers but have a
+different scope. That is (WARNING: over-complication coming through):
+
+1) John will drink EVERYTHING.
+There exists ONE situation where he will drink ALL the drinks.
+2) John will drink ANYTHING.
+Whatever you offer John, there exists at least one situation where he will drink
+it. Total: MANY situations, many possibilities.
+
+And the unicorn example. This one was not obvious to me.
+
+The ambiguity comes from whether there actually exists a unicorn John is looking
+for or does it not exist? This can be interpreted in two ways:
+
+1) John is looking for a unicorn. Don't tell him they don't exist.
+There ISN'T a unicorn John is looking for.
+2) John is looking for a unicorn. It ran off the castle this morning.
+There IS a unicorn John is looking for.
+
+Lexical ambiguity: When you have a word with several meanings and you don't know
+which one is intended.
+
+So, from language to language structural ambiguity (not always, but sometimes)
+and scope ambiguities transfer. Lexical ambiguity doesn't.
+
+\textbf{Bilingual corpora, parallel corpora} (p.597)
+
+Here he just talks about how can he literally compare words side by side with
+some adjustments. He will match two words if they are in the same
+position/roughly the same number of consonants/all this bunch of rules
+together/etc.
+
+
+\textbf{Alignment} p.604
+
+Because of the word order he will have to use a thing similar to string-edit
+distance to be able to do that - insert a word on one language, delete on
+another one.
+
+professor of formal linguistics --> professeur de linguistique formelle.
+
+Insert ``formal'', delete ``formelle''.
+
+Then he goes on to talk about what happens if he deletes all the words that
+match with their positions. He will get some unmatched ones and he can
+reasonably match the unmatched ones by, for example, looking at their lengths.
+
+And that's the bit that I got to. :) 
+To be continued?
