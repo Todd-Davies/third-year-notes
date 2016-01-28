@@ -251,7 +251,7 @@ is traversed first. The four types of edges are:
   \caption{A
   \href{http://courses.csail.mit.edu/6.006/spring11/rec/rec13.pdf}{pictorial
   illustration} of the different edge types.}
-  \label{fig:connected-graph}
+  \label{fig:connected-graph-edge}
 \end{figure}
 
 \subsection{Graph Algorithms}
@@ -348,6 +348,11 @@ function Dijkstra(Graph, source):
 
   return dist[], prev[]
 \end{lstlisting}
+
+\marginpar{Remember, the maximum value of $E$ is actually $V^2$, and you can
+sometimes use that to play with the runtime bounds of graph algorithms (e.g. you
+could show something is linear in the number of edges, or polynomial in the
+number of nodes).}
 
 If we use a Fibonacci heap, for the priority queue, then the runtime of
 Dijkstra's algorithm is $O(|E| + |V|log(|V|)$. If we use a normal heap, then the
@@ -453,9 +458,9 @@ out-degree, which can be done in $O(n^2)$.}
 
 We're going to show that finding a Hamiltonian Circuit is a problem in
 \texttt{NPTime}. We can do this in one of two ways; either to give a
-nondeterministic Turing machine that will find a path, or we can come up with a
-deterministic polynomial time algorithm to verify that a given path is
-Hamiltonian.
+nondeterministic Turing machine that will find a path in polynomial time, or we
+can come up with a deterministic polynomial time algorithm to verify that a
+given path is Hamiltonian.
 
 You might be thinking \textit{``ummm, how can simply giving a polynomial time
 verification algorithm show that we're in \texttt{NPTime}?''}; that's what I
@@ -531,7 +536,7 @@ generally want to get all of the similar terms on one side (e.g. move all the
 variable terms over to one side, and all of the constants to another side). This
 \textit{mostly} works like a normal equation; you can add and subtract from both
 sides just like normal, however, if you want to divide or multiply \textbf{by a
-negative quantity}, then you need to \textbf{reverse the equality}.
+negative quantity}, then you need to \textbf{reverse the equality}, for example:
 
 \[
   \begin{split}
@@ -573,7 +578,7 @@ will get something like in Figure~\ref{fig:graph-2}.
 \begin{figure}[H]
 \captionsetup{width=.4\linewidth}
 \centering
-\begin{minipage}{.4\textwidth}
+\begin{minipage}{.45\textwidth}
   \centering
   \includegraphics[width=\textwidth]{diagrams/graph2}
   \captionof{figure}{A graph plotting $3x + 4y \leq 6$, $2y - x \leq 2$ and
@@ -581,7 +586,7 @@ will get something like in Figure~\ref{fig:graph-2}.
   blue, green and red respectively. The clear region satisfies all points.}
   \label{fig:graph-2}
 \end{minipage}%
-\begin{minipage}{.4\textwidth}
+\begin{minipage}{.45\textwidth}
   \centering
   \includegraphics[width=\textwidth]{diagrams/graph3}
   \captionof{figure}{The valid region in the three inequalities from
@@ -629,7 +634,7 @@ To answer this, we can make a table to describe it:
     \multirow{2}{*}{Bought Length} & \multicolumn{2}{c|}{Required length}\\
     \cline{2-3}
     & 5 meter & 1 meter\\ \hline
-    11 meter\newline 6 meter & 2 per board\newline 1 per board & 1 per
+    11 meter (x)\newline 6 meter (y) & 2 per board\newline 1 per board & 1 per
     board\newline 1 per board\\ \hline
     Amount needed & 30 & 20\\ \hline
   \end{tabular}
@@ -672,12 +677,12 @@ Where $x$ is the number of $5$ meter boards, and $y$ is the number of $1$ meter
 boards. We can factor this equation into our solution, to find the most
 profitable wood to buy.
 
-If you think about it, the further from the origin we get, the more profit we
-get. At $(0,0)$ we have no profit, since we have done nothing, but at $(5,0)$ we
-have $35$ profit since we have bought five, $5$ meter length boards. Since our
-lines always intersect to produce a region with a convex shape, the points
-furthest from the origin are the corner points. To figure out how much profit we
-can make, we just need to find the maximum of these points:
+If you think about it, the further from the origin we get, the more profit (in
+this instance) we get. At $(0,0)$ we have no profit, since we have done nothing,
+but at $(5,0)$ we have $35$ profit since we have bought five, $5$ meter length
+boards. Since our lines always intersect to produce a region with a convex
+shape, the points furthest from the origin are the corner points. To figure out
+how much profit we can make, we just need to find the maximum of these points:
 
 \begin{center}
   \begin{tabular}{c | c | c | c}
@@ -691,6 +696,20 @@ can make, we just need to find the maximum of these points:
 
 Therefore the most profitable choice is to buy $10$ 11 meter length boards and
 $10$ 6 meter length boards.
+
+\subsubsection{Matrix form}
+
+We can put problems into another form; matrix form, and solve them that way.
+Here is the example from the
+\href{https://en.wikipedia.org/wiki/Linear_programming}{Linear programming
+wikipedia article}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{images/matrix}
+  \caption{Putting a LP problem into matrix form.}
+  \label{matrixform}
+\end{figure}
 
 \subsection{The Simplex Method}
 
@@ -806,7 +825,7 @@ multiple steps with a running example here:
 
       \item[\textbf{Step 4b}] Subtract the pivot row from each other row
       so that the whole pivot column becomes $0$. For example here, we need to
-      $R1 = R1 - 2(R2), R3 = R3 + 12(R2)$ to make the cell below 
+      make $R1 = R1 - 2(R2), R3 = R3 + 12(R2)$ to make the cell below 
       the pivot $0$.
 
       \begin{center}
@@ -952,7 +971,7 @@ After we've done that, we get the following equation and inequalities:
     f = 4x - 2y - z\\
     x + y + z \leq 3\\
     2x + 2y + z \leq 4\\
-    x + y \geq 1\\
+    x - y \leq 1\\
     x \geq 0, y \geq 0,~z \geq 0
   \end{split}
 \]
@@ -1051,7 +1070,7 @@ problem; meaning that integer programming is NP hard!
 It turns out, that \textit{Branch and Bound} is a good way to solve these kinds
 of problems. If you remember the second year algorithms course, then you might
 be having a quiet little groan right now. However, I have good news! There's a
-really good explanation of B\&B in the course reading (The Chapter 9 handout you
+really good explanation of B\&B in the course reading (the Chapter 9 handout you
 should have picked up in the lecture).
 
 Though it's good, and thorough, it's also a bit boring and dense. Here's my
@@ -1103,7 +1122,7 @@ shorter version, broken up into steps:
 
   In order to progress, you split the feasible region into half, along where
   either the $x$ or $y$ axis is equal to the linear optimum. We could split at
-  $x = \frac{9}{4}$ or $y = {15}{4}$, and will do the latter. Since our
+  $x = \frac{9}{4}$ or $y = \frac{15}{4}$, and will do the latter. Since our
   solutions are integral, we can discard the area between $3 < y < 4$:
 
   \begin{figure}[H]
@@ -1188,8 +1207,8 @@ If we define that mathematically, then we let $G = (V, W, E)$, where $G$ is a
 bipartite graph\marginpar{A bipartite graph is one who's nodes can be divided
 into two disjoint sets, such that every edge in one of the sets connects to one
 in the other.}, $V$ is the set of boys, $W$ is the set of girls and $E$ is the
-set of edges. An edge from $v$to $w$ indicates that $v$ and $w$ both would marry
-eachother.
+set of edges. An edge from $v$ to $w$ indicates that $v$ and $w$ both would
+marry each other.
 
 $E' \subset E$ such that for all $v \in V$, there is at most one $w \in W$, and
 for all $w \in W$, there is at most one $v \in V$. I.e, $E'$ is a matching
@@ -1206,8 +1225,7 @@ A naive way of solving the problem is to iterate over each possible matching and
 see if it is perfect:
 
 \begin{lstlisting}[language=Java]
-  boolean naiveSoln(ImmutableSet<Node> boys, ImmutableSet<Node> girls,
-      ImmutableSet<Edge> preferences) {
+  boolean naiveSoln(Set<Node> boys, Set<Node> girls, Set<Edge> preferences) {
     if (boys.isEmpty()) {
       return girls.isEmpty();
     } else {
@@ -1232,13 +1250,12 @@ combination of boy and girl, which is obviously exponential.
 
 \subsection{Flow networks and flow matching}
 
-A \textit{flow network} is a quintuple, as shown in
-Figure~\ref{fig:flow-network-definition}.
+A \textit{flow network} is a quintuple, as shown:
 
 \begin{figure}[H]
   \centering
   \includegraphics{equations/flow-network}
-  \caption{}
+  \caption{Dissecting the definition of a flow network.}
   \label{fig:flow-network-definition}
 \end{figure}
 
@@ -1329,7 +1346,8 @@ We can find a path from any two nodes in linear time ($|V| + |E|$), as we do on
 then the maximum flow is $nC$, where $n$ is the number of nodes connected to the
 start node, which could be $|V|$.
 
-Therefore, the runtime of \texttt{maximumFlow} is $O(n(|V| + |E|)C)$
+Therefore, the runtime of \texttt{maximumFlow} is $O(n(|V| + |E|)C) =
+O(n(n+m)C)$
 
 \subsubsection{Costs in flow networks}
 
@@ -1472,22 +1490,23 @@ Now we've nearly finished defining a multi-tape TM, the final points are:
   \item Since the TM is deterministic, there can be \textit{at most} one 
     transition for every $(state,~\overline{\text{\textit{current symbols}}})$ 
     tuple.
-  \item The tape never moves left $\vartriangleright$.
+  \item The tape never moves left past the $\vartriangleright$ symbol.
   \item Tape 1 is read only and tape $K$ is write only.
 \end{itemize}
 
-\subsubsection{Acceptance, computability and decidability}
+\subsubsection{Acceptance, computability and recognisability}
 
 We say that a TM $M$ \textit{accepts} an input $x$ if it halts on $x$. The
-language \textit{recognised} my $M$ is the set of strings that is accepted by
+language \textit{recognised} by $M$ is the set of strings that is accepted by
 $M$.
 
 \marginpar{Remember, when we say `Turing Machine', we could mean either a 
 deterministic TM or a non-deterministic one (unless we explicitly said which one
 we meant of course!).}
 
-If a language is recognised by a Turing Machine $M$, then there is also a 
-deterministic Turing Machine $M'$ that will recognise the same language. 
+If a language is recognised by a nondeterministic Turing Machine $M$, then there
+is also a  deterministic Turing Machine $M'$ that will recognise the same
+language.
 
 A language is \textit{computable} (aka decidable), if there is a (deterministic)
 TM that will accept every string in the language, and reject every string not in
@@ -1501,21 +1520,6 @@ output `no', or it could just carry on computing for ever. All a Turing Machine
 does with a recognisable language, is recognise if a string is in the language,
 it makes no guarantees about string not in the language!
 
-\subsubsection{The Universal Machine}
-
-If you're that way inclined, you can find lots of cool things about Turing
-Machines. Another such cool thing, is that every TM is a finite thing (it's just
-a quintuple as shown in Figure~\ref{fig:tm-definition}), which means we can come
-up with a way of encoding any Turing Machine into a string over the alphabet
-$\Sigma$ and use it as input to another Turing Machine!
-
-If we can do this, then we can construct a \textbf{Universal Machine} $U$. This
-machine takes two `arguments', another TM $M$ (encoded of course) and some
-arbitrary input $x$. If $M \downarrow x$, then $U$ finishes with $y$ on its
-output tape. If $M \uparrow x$, then $U$ will never terminate. The input is
-coded as $M;x$, where `;' is a separator between the Turing Machine we're
-`simulating' and the input we'll give it.
-
 \subsubsection{Nailing that TM definition}
 
 If you want your Turing Machines very well defined, then this how you do it
@@ -1527,12 +1531,12 @@ A run of a TM is terminating if it is finite. If the input to a deterministic TM
 $M$ is $x$, and the run is finite, we write $M \downarrow x$ otherwise, if the
 run is infinite, we write $M \uparrow x$.
 
-Let $M$ be a deterministic TM that knows the alphabet $\Sigma$, and its input be
-$x \in \Sigma*$ (i.e. the input is zero or more symbols from the alphabet). If
-$M \downarrow x$ then the output tape of $M$ will contain some string $y \in
-\Sigma*$ once M has finished computing. The cool thing, is that we can treat $M$
-like a function, lets call it $f_M$, that operates over $\Sigma* \rightarrow
-\Sigma*$:
+Let $M$ be a deterministic TM over the alphabet $\Sigma$, and its input be $x
+\in \Sigma^*$ (i.e. the input is zero or more symbols from the alphabet). If $M
+\downarrow x$ then the output tape of $M$ will contain some string $y \in
+\Sigma^*$ once M has finished computing. The cool thing, is that we can treat
+$M$ like a function, lets call it $f_M$, that operates over $\Sigma^*
+\rightarrow \Sigma^*$:
 
 \[
   f_M(x) = \begin{cases}
@@ -1542,6 +1546,21 @@ like a function, lets call it $f_M$, that operates over $\Sigma* \rightarrow
 \]
 
 In this case, $M$ computes the function $f_M$.
+
+\subsubsection{The Universal Machine}
+
+If you're that way inclined, you can do lots of cool things with Turing
+Machines. One such cool thing, is that every TM is a finite thing (it's just a
+quintuple as shown in Figure~\ref{fig:tm-definition}), which means we can come
+up with a way of encoding any Turing Machine into a string over the alphabet
+$\Sigma$ and use it as input to another Turing Machine!
+
+If we can do this, then we can construct a \textbf{Universal Machine} $U$. This
+machine takes two `arguments', another TM $M$ (encoded of course) and some
+arbitrary input $x$. If $M \downarrow x$, then $U$ finishes with $y$ on its
+output tape. If $M \uparrow x$, then $U$ will never terminate. The input is
+coded as $M;x$, where `;' is a separator between the Turing Machine we're
+`simulating' and the input we'll give it.
 
 \subsubsection{Enumerators}
 
@@ -1646,7 +1665,7 @@ to make another TM $Q$ that is defined so:
   \end{itemize}
 \end{enumerate}
 
-Now, if we give $Q$ the input $Q$, then the embedded $P$ will receive $(Q,Q)$,
+Now, if we give $Q$ the input $Q$, then the embedded $P$ will receive $(Q;Q)$,
 meaning that if:
 
 \begin{description}
@@ -1683,7 +1702,7 @@ operations it takes to multiply two numbers).
 
 In fact, possibly the simplest definition of complexity is to let $L$ be a
 language, and $G$ be a set of functions from $\mathbb{N}$ to $\mathbb{N}$. $L$
-is in \texttt{TIME/SPACE(G)} if there exists a deterministic TM that recognises
+is in \texttt{TIME/SPACE(G)} if there exists a deterministic TM that decides
 $L$ in time/space G.
 
 Similarly, if we can find a non-deterministic TM to recognise $L$, then we say
@@ -1899,7 +1918,7 @@ it onto a graph pathfinding problem.
 
 It turns out that mapping problems onto other problems can be well defined
 theoretically. if one problem $P_1$ can be mapped onto $P_2$, then we say that
-$P_1$ is reducible to $P_2$.
+$P_1$ is many-one-logspace reducible to $P_2$.
 
 Formally, let $P_1$ be over the alphabet $\Sigma_a$, and $P_2$ be over the
 alphabet $\Sigma_b$. $P_1$ is reducible to $P_2$ if there exists a function $f :
@@ -1912,18 +1931,16 @@ the first problem into an equivalent instance of the second problem.
 
 The notation for reducibility is:
 
-% TODO: What's m?
-
 \marginpar{This is also called a many-one logspace reduction.}
 
 \[
-  P_1 \leq^log_m P_2
+  P_1 \leq^{log}_m P_2
 \]
 
 Reducibility is helpful for a number of reasons:
 
 \begin{itemize}
-  \item If $P_1 \leq^log_m P_2$, then $P_2$ is at least as hard as $P_1$.
+  \item If $P_1 \leq^{log}_m P_2$, then $P_2$ is at least as hard as $P_1$.
   \item Similarly, $P_1$ is no harder than $P_2$.
   \item If anybody comes up with a way of solving $P_2$ fast, then we can use 
     the same way to solve $P_1$.
@@ -1935,7 +1952,7 @@ Reducibility is helpful for a number of reasons:
     class.}
 \end{itemize}
 
-Reducibility is transitive, so if $P_1 \leq^log_m P_2$ and $P_2 \leq^log_m P_3$, then $P_1 \leq^log_m P_3$. The reason why, is that if:
+Reducibility is transitive, so if $P_1 \leq^{log}_m P_2$ and $P_2 \leq^{log}_m P_3$, then $P_1 \leq^{log}_m P_3$. The reason why, is that if:
 
 \[
   f_1 : \Sigma^*_{P_1} \rightarrow \Sigma^*_{P_2}
@@ -1970,11 +1987,12 @@ Lets define $M$:
 
 Although $M$ horrifies my programmer-mind at how inefficient it is, I conclude
 that it does in fact run in logarithmic space (it seems to run in constant space
-at first, but then you realise that the counter requires $log_2(n)$ bits).
+at first, but then you realise that the counter requires $log_2(n)$ bits, and
+that the functions its emulating, $f_1$ and $f_2$, run in log space).
 
 A \textit{many-one polytime} reduction is a weaker notion of reducibility where
 instead of a function that runs in log space to convert the strings of one
-problem into the strings of another, we have one that is in \texttt{TIME{P}}
+problem into the strings of another, we have one that is in \texttt{TIME\{P\}}
 instead. If this is the case, then the reducibility is mathematically written
 as:
 
@@ -1999,9 +2017,10 @@ If $P \notin X$, then $P$ is not \textit{X}-complete, but is
 \subsection{Cook's theorem}
 
 The Cook Levin theorem proves that \texttt{SAT} is \texttt{NPTime-Complete}.
-This is important, because certain problems were shown to be \texttt{NP-
-Complete}, and if any of these problems are solved in (deterministic) polynomial
-time, then all of the problems would be solvable in polynomial time.
+This is important, because certain interesting problems were shown to be
+\texttt{NP-Complete}, and if any of these problems are solved in
+(deterministic) polynomial time, then all of the problems would be solvable in
+polynomial time.
 
 The idea behind the Cook Levin theorem, is to turn any Turing Machine $M$ that
 solves a problem $P$ into a set of clauses that can be solved by \texttt{SAT},
@@ -2020,11 +2039,11 @@ that every problem in \texttt{SAT} can be converted to a problem in
   \item For each input clause of length 2:
     $\{a \vee b\} \rightarrow \{a \vee b \vee a\}$ 
   \item For each input clause of length 3, do nothing!
-  \item For each input clause of length n > 3:
+  \item For each input clause of length $n \geq 3$:
     $\{a \vee b \vee c \vee d \vee e\} \rightarrow
       \{a \vee b \vee x\},
-      \{!x \vee c \vee y\},
-      \{!y \vee d \vee e\}$ 
+      \{\neg x \vee c \vee y\},
+      \{\neg y \vee d \vee e\}$ 
 \end{itemize}
 
 Hence \texttt{3-SAT} is \texttt{NP-Complete}. Similarly, we can reduce
@@ -2063,8 +2082,8 @@ function to create a graph from the satisfiability problem's clauses.
 
 To do this, we create three `gadgets' which let us represent logical gates in
 graph form. The gadgets have internal nodes which make them easier to draw, the
-internal nodes are not shown in larger sketches, but are when describing the
-gadgets initially in order to make the properties of the gadget known.
+internal nodes are not often shown in larger sketches, but are when describing
+the gadgets initially in order to make the properties of the gadget known.
 
 \begin{description}
   \item \textbf{Gadget 1: Equality}\\
@@ -2108,14 +2127,19 @@ gadgets initially in order to make the properties of the gadget known.
     \end{figure}
 \end{description}
 
-Now lets encode the \texttt{3-SAT} problem $(a \vee \neg b), (b \vee c)$, shown
-in Figure~\ref{fig;k-color-3-sat}. Have a go at colouring it in yourself!
+I tried to encode $(a \vee \neg b), (b \vee c)$ as a colourability problem (shown
+in Figure~\ref{fig:k-color-3-sat}) but I did it wrong\dots Since it takes so
+long to write the graphs in \LaTeX, I thought I'd let you spot the mistake I
+made ;)
 
 \begin{figure}[H]
   \centering
-  \includegraphics[height=\textwidth,angle=90]{diagrams/graph14}
-  \caption{An encoding in \textit{k-colourability} of the \texttt{3-SAT} 
-  problem $(a \vee \neg b), (b \vee c)$.}
+  \includegraphics[width=\textwidth]{diagrams/graph14}
+  \caption{An incorrect encoding in \textit{k-colourability} of the \texttt{SAT} 
+  problem $(a \vee \neg b), (b \vee c)$. The problem is that I used the wrong
+  gadget (I used the second one instead of the third one) for the top row of
+  nodes. Also, I've encoded a \texttt{SAT} problem, not a \texttt{3-SAT} problem
+  so that's not really right either. Feel free to fix this with a pull request!}
   \label{fig:k-colour-3-sat}
 \end{figure}
 
@@ -2173,7 +2197,7 @@ using an algorithm like:
 \end{lstlisting}
 
 \texttt{is\_reachable} finds if there is a path between the start and end nodes
-within $2^steps$ steps. In order to find if the nodes are connected in the
+within $2^{steps}$ steps. In order to find if the nodes are connected in the
 graph, we have to give it $log_2(|graph|)$ as the steps parameter. This works
 because any path from $start$ to $end$ in $2^x$ steps must have a midpoint
 $mid$. If we find a path from $start$ to $mid$ in $2^{x - 1}$ steps, and a path
