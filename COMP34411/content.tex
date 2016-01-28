@@ -8,8 +8,8 @@
 
 We want computers to be able to interact with us, just like we interact with
 them. This involves having them understand written text and voiced speech, as
-well as being able to synthesise speech and text themselves. This includes
-things like translating text and searching for key words in text.
+well as being able to synthesise speech and text itself. This includes things
+like translating text and searching for key words in text.
 
 A computer or a suite of programs that can do all of this is the goal for
 Natural Language Systems. The catch is, that language is hard and complicated,
@@ -117,13 +117,13 @@ It would turn \textit{biggest} into \textit{big} + \textit{est}.
 
 \subsection{Categorical descriptions}
 
-Even if we find the meaning of every word by splitting it info morphemes, we
+Even if we find the meaning of every word by splitting it into morphemes, we
 just end up with a collection of words that we know the construction of, but
 we're still no closer to understanding a sentence.
 
-In order to find the relationships between words in a sentence, we should use
-the approach in Figure~\ref{fig:trees}, and try to fit the words into some tree
-structure.
+In order to find the relationships between words in a sentence, we should first
+use the approach in Figure~\ref{fig:trees}, and try to fit the words into some
+tree structure.
 
 One way of doing this, is to specify lots of different forms that a sentence can
 take. For example `noun verb noun' might describe a sentence such as `Todd
@@ -148,10 +148,10 @@ We need to specify a schema with which we can specify what different words requi
   <word> = <rules>
 \end{verbatim}
 
-The rules are their own language, which has a few rules. Brackets are
-treated as they usually are in maths, and the only other special characters are
-forward and backward slashes. These indicate whether a word or phrase should be
-before or after the word.
+The rules are their own language, which has a few rules. Brackets are treated as
+they usually are in maths, and the only other special characters are forward and
+backward slashes. These indicate whether a word or phrase should be before or
+after the word.
 
 \begin{verbatim}
   writes = (s\np)/np
@@ -207,9 +207,9 @@ There are two types of morphology that we're going to look at:
 
   \item \textbf{Derivational morphology}\\
     This is where the meaning of the stem is significantly changed by other 
-    morphemes. For example, `smelly' could be combined with `er' to give 
-    `smellier', or `est' to give `smelliest'. Obviously we need spelling rules 
-    to do this correctly!
+    morphemes (i.e. the part of speech tag of the word will change). For
+    example, `smelly' could be combined with `er' to give `smellier', or `est'
+    to give `smelliest'. Obviously we need spelling rules to do this correctly!
 \end{description}
 
 We need a way to specify what words can have what suffixes/affixes. For example,
@@ -387,8 +387,7 @@ will contain different words.}
   your dictionary, you can use the last $n$ letters of it to determine what tag
   to assign.
 
-  \item \textbf{Transition probabilities and HMM's}\\
-
+  \item \textbf{Transition probabilities and Hidden Markov Models}\\
   HMM's use probabilities and context to determine what tag a word should get.
   To train a HMM, we collect statistics on what part of speech tags
   \textit{follow and precede} other ones. For example, the probability of a noun
@@ -521,8 +520,10 @@ For the exam, you might need to know exact definitions of \textit{precision},
 
 \begin{description}
 	\item \textbf{Precision}: When the tagger emits a POS tag, how likely is it
-	to be right?
-	\item \textbf{Recall}: How many of the right things does it say?
+	to be right? $p = \frac{\text{True Positives}}{\text{True Positives} +
+  \text{False Positives}}$
+	\item \textbf{Recall}: How many of the right things does it say?  $p =
+  \frac{\text{True Positives}}{\text{True Positives} + \text{False Negatives}}$
 	\item \textbf{F-measure}: $F = \frac{2 \times p \times r}{p + r}$
 \end{description}
 
@@ -580,9 +581,10 @@ This technique is called \textbf{underspecification}.
 Now we can find the part of speech tag for any word (or at least give a good
 guess for it), we can start to assign structure to the sentence. Given the words
 of a sentence and their part of speech tags, using a grammar to parse sentences
-can be done in $O(n^3)$ time \textbf{so long as lecixal ambiguity and out- of-
-place words are ignored}. The trouble with this, is that both these things
-really matter, and an algorithms that doesn't work, isn't very much use at all.
+can be done in $O(n^3)$ time \textbf{so long as lecixal ambiguity and
+out-of-place words are ignored}. The trouble with this, is that both these
+things really matter, and an algorithm that doesn't work isn't very much use
+at all.
 
 So, when our grammar does break down in those cases, we need to be able to
 \textit{back off} to another more robust technique. This could be regular
@@ -658,7 +660,7 @@ Then you end up with something like:
 you one answer (i.e. `the string you gave matches this structure'), or no answers 
 at all.}
 
-This is good, and reasonable fast when your regex is small, but unfortunately,
+This is good, and reasonably fast when your regex is small, but unfortunately,
 the regex has to get quite large for the output to be a correct parsing of the
 sentence, and then the regex parsing is quite slow. Furthermore, the output
 looks horrible, and since regex matching is an opaque thing, you can't debug it
@@ -672,7 +674,7 @@ Unfortunately, regexes don't know about recursion, so we need to cascade them:
 
 \begin{verbatim}
   'a': 'c b'
-  'b': 'a d'
+  'b': 'a? d'
   ...
 \end{verbatim}
 
@@ -686,8 +688,8 @@ This section has been contributed by Tatjana Sidorenko, thank you!
 
 Using a regex to parse the structure of a sentence isn't widely done. In
 practice, the way that gets the best results is to use a non-deterministic
-algorithm. However, (as you may know all to well from \texttt{COMP36111}) non-
-deterministic algorithms don't run very quickly at all on deterministic
+algorithm. However, (as you may know all to well from \texttt{COMP36111})
+non-deterministic algorithms don't run very quickly at all on deterministic
 computing machines, and will often exhibit an exponential runtime.
 
 We therefore want to find a deterministic algorithm to extract a sentence
@@ -696,7 +698,7 @@ structure. When we're thinking about this, we want to optimise for three things:
 \begin{itemize}
   \item Accuracy - get the correct answer
   \item Robustness - at least \textit{give} an answer
-  \item Speed - try to have a polynomial time complexity
+  \item Speed - try to have a polynomial (or better) time complexity
 \end{itemize}
 
 A good approach is to try and make a system that has a good accuracy, then
@@ -985,6 +987,9 @@ the classes of `near' vectors.
 This \textit{isn't} what we're going to do here, but it's pretty similar. For
 each vector, we can find the cosine of the angle between them:
 
+\marginpar{If you don't like the cosine stuff, you can also use the Euclidean
+distance.}
+
 \[
   \frac{\sum (d_1 \times \dots \times d_n)}
        {\sqrt{\sum (d_0^2) \times \dots \times \sum (d_n^2)}}
@@ -1007,10 +1012,6 @@ To normalise the vector spaces, we can divide each number in the vector by:
 \[
   \sqrt{\sum_{i=1}^ns_i^2}
 \]
-
-Where (I think, please correct me if I'm wrong), $s_i$ is the value associated
-with the $i$th word in the vector space. This reduces the values in the vector
-space proportional to the size of the vector space.
 
 Another thing that makes vector spaces less effective, is the large amount of
 noise we get from common words such as `and', `the' and `a'. We want these words
@@ -1194,7 +1195,7 @@ Page rank works by using the \textit{random surfer model}, which is the
 assumption that a web surfer will click random links on a web page to get to
 other web pages (each link has a $\frac{1}{n}$ chance of being clicked).
 
-We can use a markov model to represent this; where the probability of the user
+We can use a Markov model to represent this; where the probability of the user
 being on web page $x$ at time $t + 1$ is equal to the sum of the probability of
 them being on a web page with a link to $x$ at time $t$ multiplied by the
 probability of them clicking the link to $x$:
@@ -1217,7 +1218,8 @@ convergence, so long as the following criteria hold:
 If one of these criteria is not met, then the model will converge to zero. This
 is an issue, since we can't always guarantee that our input web pages will
 conform to these rules. See the course notes (p309-314) for an example of the
-convergence.
+convergence, or the end of the document when I provide some runs of the page
+rank implementation I wrote for revision (which is on Github; take a look).
 
 We can also supply a damping parameter for some page, which is the chance that a
 surfer will visit it. Then, the chance of visiting other pages linked by a page
@@ -1381,7 +1383,8 @@ is a good way to solve this problem. This involves:
 
 \marginpar{Through I've never tried this, I view this use of exceptions as 
 badly thought out at the least, but sacrilegious, irreverent and heretic at 
-worst. An \textit{Either} type might work better?}
+worst. I don't want to descend into the static and dynamic typing debate, but
+maybe an \textit{Either} type might work better?}
 
 \begin{itemize}
   \item Making every function take an extra argument (usually a function 
