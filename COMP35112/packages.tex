@@ -1,0 +1,85 @@
+% Tell me about my LaTeX bad practices
+\usepackage[l2tabu, orthodox]{nag}
+% For the split environment
+\usepackage{amsmath}
+% For more symbols in math mode
+\usepackage{amssymb}
+% Lets us use text in math mode
+\usepackage{amstext}
+% For coloured tables
+\usepackage{color, colortbl}
+% For tabs in verbatim
+\usepackage{moreverb}
+% Images
+\usepackage{graphicx}
+% For better centered tables
+\usepackage{array}
+% For fancier figures
+\usepackage{caption}
+\usepackage{subcaption}
+% For float placement
+\usepackage{float}
+% Better tables
+\usepackage{booktabs}
+\usepackage{multirow}
+% For fancy verbatim (use this one in mymulticol)
+\usepackage{alltt}
+% For splitting long lists into columns
+\usepackage{multicol}
+% For no multicol on the kindle
+\usepackage{environ}
+\newif\ifmulticols
+\NewEnviron{mymulticols}{
+\ifmulticols
+  \begin{multicols}{2}
+    \BODY
+  \end{multicols}
+\else
+  \BODY
+\fi}
+% For poems
+\let\orignewcommand\newcommand  % store the original \newcommand
+\let\newcommand\providecommand  % make \newcommand behave like \providecommand
+\RequirePackage{verse}
+\let\newcommand\orignewcommand  % use the original `\newcommand` in future
+\makeatletter
+% Use the original definition from verse.sty
+\renewcommand*{\theHpoemline}{\arabic{verse@envctr}.\arabic{poemline}}
+\makeatother
+\newcommand{\attrib}[1]{%
+\nopagebreak{\raggedleft\footnotesize #1\par}}
+\renewcommand{\poemtitlefont}{\normalfont\large\itshape\centering}
+% Listings
+\usepackage{listings}
+% Means you don't have to put \\ to start a new line.
+\usepackage[parfill]{parskip}
+% For \hypersetup
+\usepackage{hyperref}
+% For line brakes in tables
+\usepackage{tabularx}
+% Make LaTeX pretty with better kerning etc
+\usepackage{microtype}
+
+\usepackage{tikz}
+
+\renewcommand\tabularxcolumn[1]{m{#1}}
+\newcolumntype{M}{>{\centering\arraybackslash}m{1cm}}
+
+\newcommand\tikzmark[2]{%
+\tikz[remember picture,baseline] \node[inner sep=1pt,outer sep=0] (#1){#2};%
+}
+
+\newcommand\link[2]{%
+\begin{tikzpicture}[remember picture, overlay, >=stealth, shift={(0,0)}]
+  \draw[->] (#1) to (#2);
+\end{tikzpicture}%
+}
+
+% If enabled, maybe skip certain stuff or do it for less time to compile faster
+\ifdefined\fastCompile
+  % Fast param here:
+  % \newcommand{\samplesScaleFactor}{0.1}
+\else
+  % Slow param here:
+  % \newcommand{\samplesScaleFactor}{1.0}
+\fi

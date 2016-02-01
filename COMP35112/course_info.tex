@@ -1,0 +1,37 @@
+\section*{Overview}
+
+Due to technological limitations, it is proving increasingly difficult to
+maintain a continual increase in the performance of individual processors.
+Therefore, the current trend is to integrate multiple processors on to a single
+chip and exploit the resulting parallel resources to achieve higher computing
+power. However, this may require significantly different approaches to both
+hardware and software particularly for general purpose applications. This course
+will explore these issues in detail.
+
+\section*{Syllabus}
+\begin{mymulticols}
+\begin{description}
+\item{\textbf{Introduction}} Trends in technology, limitations and consequences. The move to multi-core parallelism in programs, ILP, Thread Level, Data Parallelism.
+\item{\textbf{Parallel Architectures}} SIMD, MIMD, Shared Memory, Distributed Memory, strengths and weaknesses.
+\item{\textbf{Parallel Programming}} Multithreaded programming, Data parallel programming, Explicit vs Implicit parallelism, automatic parallelisation. The Case for Shared Memory. When to share?
+\item{\textbf{Shared Memory Multiprocessors}} Basic structures, the cache coherence problem. The MESI protocol. Limitations. Directory based coherence.
+\item{\textbf{Programming with Locks and Barriers}} The need for synchronisation. Problems with explicit synchronisation
+\item{\textbf{Other Parallel Programming Approaches}} MPI and OpenMP
+\item{\textbf{Speculation}} The easy route to automatic parallelisation?
+\item{\textbf{Transactional Memory}} Principles. Hardware and Software approaches
+\item{\textbf{Memory Issues}} Memory system design. Memory consistency
+\item{\textbf{Other Architectures and Programming Approaches}}
+GPGPUs, CUDA
+\item{\textbf{Data Driven Parallelism}} Dataflow principles and Functional Programming
+\end{description}
+\end{mymulticols}
+
+\section*{Attribution}
+
+These notes are based off of both the course notes
+(\url{http://studentnet.cs.manchester.ac.uk/ugt/2015/COMP35112/}). Thanks to John Gurd for such a good course! If you find any errors, then I'd love to hear about them!
+
+\section*{Contribution}
+
+Pull requests are very welcome:
+\url{https://github.com/Todd-Davies/third-year-notes}
