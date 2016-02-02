@@ -5,22 +5,23 @@
 % Lets make the text nice and big
 \usepackage[14pt]{extsizes}
 
-% Make a box around would-be margin paragraphs
-\usepackage{tcolorbox}
 
 % Have a header and footer to keep the page sizes constant on the kindle
 \usepackage{fancyhdr}
 
 % Make the borders really small
 \usepackage[left=0.3cm,
-			top=1cm,
-			right=0.2cm,
-			bottom=0.2cm,
-			marginparwidth=0mm,
-			marginparsep=0mm]{geometry}
+      top=1cm,
+      right=0.2cm,
+      bottom=0.2cm,
+      marginparwidth=0mm,
+      marginparsep=0mm]{geometry}
 
 % Import the packages for the notes
 \input{packages.tex}
+
+% Make a box around would-be margin paragraphs
+\usepackage{tcolorbox}
 
 % Set the tab size in verbatim to 1
 \def\verbatimtabsize{1\relax}
