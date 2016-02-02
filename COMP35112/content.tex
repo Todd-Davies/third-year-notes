@@ -4,3 +4,144 @@
   pdfauthor = {\Author}
 }
 
+\section{The need for parallelism}
+
+Even though we've been unable to increase the clock speed of processors since
+around 2005, we have seen the `power' of processors roughly double every 18-24
+months since then in line with Moore's Law. The reason why, is that we have been
+able to increase the amount of transistors in chips (due to the feature size
+decreasing), and use the extra ones to provide more processing cores, which are
+able to process data in parallel. The degree of parallelism is increasing as
+time progresses.
+
+In an ideal world providing a greater degree of parallelism would merely entail
+chip designers copy and pasting multiple processor cores onto the silicon, and
+programmers getting linear performance increases. In practice, there are lots of
+architectural issues (such as how processors are connected and how they're
+organised) as well as software issues (how do we make our app run on multiple
+cores).
+
+As transistors are becoming smaller, we can also make them switch faster. The
+switching speed is determined by $R*C$, where $R$ is the resistance and $C$ is
+the capacitance. When we reduce the area of the transistor, $C$ decreases, so in
+doing so, we make the circuit able to compute faster.
+
+This was fine until 2005, at which point we started to have problems with things
+like \textit{interconnect capacitance} (the capacitance between neighbouring
+wires). Also, the power density increased (smaller transistors means more per
+unit area), which has serious cooling implications. As we approach the
+theoretical limit of one atom per transistor, any impurity in the silicon
+becomes a major issue.
+
+We have tried using extra transistors to build more complex single core
+processors (using Instruction Level Parallelism (ILP)) and by adding bigger
+caches so that they exhibit lower miss rates, however both of these techniques
+suffer from diminishing returns. Control statements such as \texttt{branches}
+make us have to periodically throw away all the partially completed instructions
+in a pipeline, and caches already have hit-rates in the high $90$'s.
+
+Though we might be able to increase the number of cores on a chip, how does a
+programmer utilise this extra power? It is relatively easy for an operating
+system to schedule programs so that they can run on different cores and
+therefore have true multi-tasking (process level parallelism), but what if we
+want to make one program run faster by running it over many cores?
+
+\subsection{ILP vs TLP}
+
+Instruction Level Parallelism and Thread Level Parallelism are two different
+approaches to utilising parallel hardware, and both can be used at the same
+time.
+
+In ILP, the processor is able to execute instructions out of order and in
+parallel, meaning that fewer clock cycles are needed to execute the same number
+of instructions. This form of parallelism is very limited, and can only be used
+in certain situations. Vector parallelism is similar, and lets you do things
+like do four 8-bit additions in one instruction (by splitting a 32-bit word into
+four 8-bit parts).
+
+In TLP, a program can be composed of separate threads, each
+being its own sequence of instructions. Many threads can be executing in
+parallel and since their instructions are independent of each other, can be
+interleaved on the processor (or run on multiple cores). The output of threaded
+programs must be deterministic, i.e. for all possible sequences of execution,
+the output must be the same.
+
+TLP is far more general purpose than ILP (and much more so than vector
+parallelism, which is only really useful in simple operations like array
+addition). However, it relies on the programmer finding a way to express an
+algorithm in a parallel manner.
+
+\subsection{Data and instruction parallelism}
+
+\textit{Flynn} classified parallelism as \textbf{instruction stream} and
+\textbf{data stream} parallelism.
+
+Data parallelism is when the same computation is carried out on multiple
+elements of some dataset, usually an array. Vector parallelism is an example of
+this. Only certain problems amenable to this type of parallelism can be sped up
+in this manner.
+
+Instruction parallelism is when multiple instructions can be executed in
+parallel (with no side effects that cause problems to each other).
+
+Different combinations of these types of parallelism have different names:
+
+\begin{description}
+  \item \textbf{SISD}: Single Instruction Single Data is like a normal program.
+  A serial sequence of executions working on a stream of data, one word at a
+  time.
+  \item \textbf{MIMD}: Multiple Instruction Multiple Data is the most parallel
+  one, where there are multiple instruction streams and they can all operate on 
+  their own independent stream of data. This is most normal computer chips.
+  \item \textbf{SIMD}: Single Instruction Multiple Data is stuff like when you 
+  use instructions like \texttt{ADD8} to process multiple data elements at once 
+  with the same instruction, or a GPU processing lots of pixels at once with 
+  the same filter. If it's not a vector instruction, then it's one or more 
+  processors working in lockstep to process elements of an array or something.
+  \item \textit{SPMD}: Single Program Multiple Data is a generalisation of SIMD,
+  where different processors execute the same code but don't need to be in 
+  lockstep. This is most often how parallel programs are written for CPU's.
+\end{description}
+
+\subsection{Connecting processors}
+
+In order to make them work in parallel, multiple cores of a processor need to be
+connected to each other, and to memory. There are lots of different ways to do
+this, and the best way depends on the use case.
+
+\begin{description}
+  \item The processors can be laid out in a grid. In this case, each processor
+  can communicate with its neighbours, and memory is usually private to each 
+  core. In order for cores to access memory in other cores, they must send 
+  messages through the grid.
+  \item A Torus is a variation of the grid, where each edge is linked to the 
+  opposite edge. This makes a doughnut shape (in a logical, not physical sense)
+  and means that fewer steps are needed to communicate between cores.
+  \item A bus can be used to connect multiple cores. The memory is usually
+  situated on the bus, and all cores have access to it (though they may also
+  have their own memory instead). Time slicing is used to give equal access to 
+  the bus, but can make the bus become a processing bottleneck.
+\end{description}
+
+There are, of course, more types of interconnects. Crossbars are where each node
+is connected to each other node (which has a complexity of $n(n-1)$), but the
+best ones are usually tree structures or hierarchical buses where the complexity
+is logarithmic ($n log(n)$).
+
+\subsection{Shared and distributed memory}
+
+Shared memory is accessible from all of the cores and every part of the
+computation, while distributed memory is spread out in different components, and
+is usually only accessible by the component that owns it. We are considering
+systems that are either one of these, or the other. Either one of these can
+emulate the other from a software point of view; it is fairly easy to provide
+abstraction layers that make a distributed memory behave like a shared one, or
+impose restrictions on shared memory so that parts are unavailable to certain
+components. Imposing a foreign memory layout onto the hardware comes at a
+performance penalty.
+
+Most supercomputers use distributed memory, since its easier to build, provides
+a higher total communication bandwidth and is more suited to many data-parallel
+problems. However, programs using data sharing (shared memory) are widely seen
+to be easier to code than programs using message passing (distributed memory),
+so there is an overhead involved with distributed memory.
