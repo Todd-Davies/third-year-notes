@@ -1,0 +1,56 @@
+% Set the author and title of the compiled pdf
+\hypersetup{
+  pdftitle = {\Title},
+  pdfauthor = {\Author}
+}
+
+\section{Finite precision computation}
+
+Unfortunately, the world is not solely restricted to integers, and computers
+often need to work with real numbers $\mathbb{R}$. With integers, the main
+problem we have in computer terms is overflow, and since there is a finite
+distance from one to the next, they are easy to encode in a computer.
+
+On the other hand, between any two real numbers, there are infinitely many more
+real numbers. Since computers are discrete, we need to sample the real numbers
+so that we can find a representation for them in the computer. However, this
+introduces errors, since we can't represent every value exactly and therefore
+most approximate.
+
+\subsection{Floating point numbers}
+
+%Slide 1
+One problem we have with computation is that we don't know what the error is with computations; how good is the result of an algorithm or computation?
+
+%Slide 2
+In the $70$'s, it was realised that different floating point implementations produced different results. This had significant concerns for reproducability, and as a result the ANSII IEEE standard for binary floating point arithmetic was created.
+
+%Slide 3
+
+Each floating point number is represented as four integers; the base, the precision, the exponent and the mantissa.
+
+%TODO: Equation here
+
+We can represent different numbers in different ways, for example:
+
+\[
+  0.121e10^3 = 0.0121e10^4
+\]
+
+In this case, we can normalise the way in which we represent numbers and at
+least all computers will get the same errors.
+
+% Slide 4
+
+% TODO: Many examples of normalising numbers and putting them into binary
+% This is homework answer on slide 4
+
+Floating point numbers are relatively spaced; even though they might not be the
+same distance apart, the ratio between them is the same. The unit round off
+(basically the last digit) is called the \textit{relative machine precision}.
+
+%Slide 5
+
+In the exam, assume explicit storage of leading bit of mantissa
+
+%Slide 6
