@@ -1,0 +1,37 @@
+\documentclass{standalone}
+\usepackage{tikz}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usetikzlibrary{positioning}
+
+\begin{document}
+
+% x = \pm m \times b^{e-n}
+%       
+
+\tikz[baseline]{
+    \node (start) {x $ = \pm$};
+    \node[draw=red,rounded corners,right = 0cm of start] (m1) {$m$};
+    \node[above = 0.8cm of m1] (l1) {The mantissa};
+    \draw[-,red] (l1) -- (m1);
+    %
+    \node[rounded corners,right = 0.2cm of m1] (m2) {$\times$};
+    %
+    \node[draw=red,rounded corners,right = 0.2cm of m2] (m3) {$b$};
+    \node[above right of=m3] (l3) {The end node ($the base/radix$)};
+    \draw[-,red] (l3) -- (m3);
+    %
+    \node[draw=red,rounded corners,right = 0.01cm of m3] (m4) {$^e$};
+    \node[below = 0.8cm of m4] (l4) {the exponent};
+    \draw[-,red] (l4) -- (m4);
+    %
+    \node[rounded corners,right = 0.01cm of m4] (dash) {$^-$};
+    %
+    \node[draw=red,rounded corners,right = 0.01cm of dash] (m5) {$^n$};
+    \node[below = 0.8cm of m5] (l5) {the precision};
+    \draw[-,red] (l5) -- (m5);
+}
+
+\end{document}

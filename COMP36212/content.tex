@@ -20,16 +20,38 @@ most approximate.
 \subsection{Floating point numbers}
 
 %Slide 1
-One problem we have with computation is that we don't know what the error is with computations; how good is the result of an algorithm or computation?
+
+One problem we have with computation is that we don't know what the error is
+with computations; how `good' is the result of an algorithm or computation? We
+would like to know the error bounds of a solution, and have the output be
+reliable.
 
 %Slide 2
-In the $70$'s, it was realised that different floating point implementations produced different results. This had significant concerns for reproducability, and as a result the ANSII IEEE standard for binary floating point arithmetic was created.
+
+In the $70$'s, it was realised that different floating point implementations
+produced different results. This had significant concerns for reproducability,
+and as a result the ANSII IEEE standard for binary floating point arithmetic was
+created.
 
 %Slide 3
 
-Each floating point number is represented as four integers; the base, the precision, the exponent and the mantissa.
+Each floating point number is represented as four integers; the base, the
+precision, the exponent and the mantissa.
 
-%TODO: Equation here
+\[
+  x = \pm m \times b^{e-n}
+\]
+
+Where:
+
+\begin{center}
+  \begin{tabular}{>{$}l<{$}|l}
+    m & The Mantissa (the bit before the decimal place)\\
+    b & The base (or radix), usually two or ten\\
+    e & The exponent (the power of the radix)\\
+    n & The precision (the numbewr of digits in the mantissa)
+  \end{tabular}
+\end{center}
 
 We can represent different numbers in different ways, for example:
 
@@ -42,15 +64,84 @@ least all computers will get the same errors.
 
 % Slide 4
 
-% TODO: Many examples of normalising numbers and putting them into binary
-% This is homework answer on slide 4
+The amount of numbers we can represent with the floating points depends on the
+values permissable for $b,n$ and $e$. When $b=2,n=2$ and $e=[-2\dots2]$:
+
+\marginpar{The Python code used to generate this is found in the
+\texttt{/COMP36212/programs} folder of the source for these notes.}
+
+\begin{center}
+  \begin{tabular}{>{$}c<{$} >{$}c<{$} >{$}c<{$} >{$}c<{$} >{$}c<{$}}
+    2 & \times & 2^{-2} & = & 0.500000\\
+    3 & \times & 2^{-2} & = & 0.750000\\
+    2 & \times & 2^{-1} & = & 1.000000\\
+    3 & \times & 2^{-1} & = & 1.500000\\
+    2 & \times & 2^{0} & = & 2.000000\\
+    3 & \times & 2^{0} & = & 3.000000\\
+    2 & \times & 2^{1} & = & 4.000000\\
+    3 & \times & 2^{1} & = & 6.000000\\
+    2 & \times & 2^{2} & = & 8.000000\\
+    3 & \times & 2^{2} & = & 12.000000\\
+  \end{tabular}
+\end{center}
+
+The mantissa is always $2$ or $3$ since we're using an explicit one, so the
+binary values are either $[1,0]$ or $[1,1]$.
 
 Floating point numbers are relatively spaced; even though they might not be the
 same distance apart, the ratio between them is the same. The unit round off
 (basically the last digit) is called the \textit{relative machine precision}.
 
+The \textbf{Relative Machine Precision} is given by $u = 0.5 \times b^{1 - n}$,
+and is the largest possible difference between a real number and its floating
+point representation. In the above example, $u = 0.5 \times 2^{-1} =
+\frac{1}{4}$. The value $2u$ is called the \textbf{Machine Precision}.
+
 %Slide 5
 
-In the exam, assume explicit storage of leading bit of mantissa
+In the exam, assume explicit storage of leading bit of mantissa.
 
-%Slide 6
+\subsubsection{Real world floats}
+
+% TODO: Insert diagram of float format here
+
+For the sign bit, $0$ is for positive numbers and $1$ is for negative ones. The
+exponent must also be able to represent negative numbers (in the case of
+$24\times2^{-2}$ for example), and thus in single precision floats, a bias of
+$+127$ is added to the exponent and that value is stored. The exponent values
+$-127$ and $+128$ are reserved for special numbers.
+
+The first bit of the mantissa is implicitly $1$ in the IEEE base two floating
+point representation. This is because normalised numbers always have $1$ as the
+first digit of their mantissa, and then we can get another digit of precision.
+
+% TODO: Ranges of floating point numbers slide 1
+
+Sixty-four bit floating point numbers have one sign bit, $11$ exponent bits and
+$52$ mantissa bits. This means their bias will be $2^11 = 2048$ and the range
+will be $2 - 2^{52} \times 2^{2^{11}}$.
+
+The standard also has special values built in:
+
+\begin{description}
+  \item \textbf{Zero}: When the exponent is all zeros and the mantissa equal to 
+  zero.
+  \item \textbf{Denormalised number}: If the exponent is all zero, but the
+  mantissa is non-zero, then the number is
+  $-1^{sign} \times 0.m\times 2^{-126}$.
+  \item \textbf{Infinity}: Exponent is all 1's and mantissa is all 0's. The
+  sign dictates between positive and negative inifinity.
+  %TODO: Signalling and quite NaN's
+  \item \textbf{NaN}: Not your grandma, this is when the value isn't a real
+  number, such as when a dividion by zero occurs.The exponent is all 1's and
+  the mantissa is non-zero.
+\end{description}
+
+% TODO: Special operation flashcards
+
+% Lecture 2...
+
+% Example exam q:
+% Given a decimal number x, convert it to normal form and then into binary
+% with specific values for e, m and b. Then trunctuate/round it and estimate
+% the error
