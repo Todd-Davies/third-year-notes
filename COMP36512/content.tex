@@ -1,0 +1,66 @@
+% Set the author and title of the compiled pdf
+\hypersetup{
+  pdftitle = {\Title},
+  pdfauthor = {\Author}
+}
+
+\section{Intro}
+
+A compiler is a program that reads another program written in one language and
+translates it into an equivalent proram written in another language.
+
+An interpreter reads the source code of a program and produces the results of
+executing the source. Many issues related to compilers are also present in the
+construction and execution of interpreters.
+
+A good compiler exhibits the following qualities:
+
+\begin{itemize}
+  \item It generates correct code
+  \item It generates code that runs fast
+  \item It confirms to the specification of the input language
+  \item It copes with any input size, number of variables, line length etc
+  \item The time taken to compile source code is linear in its size
+  \item It has good diagnostics
+  \item It has \textit{consistent} optimisations
+  \item It works will with a debugger
+\end{itemize}
+
+An example of a compiler that optimises code is if we had a for-loop such as:
+
+\begin{verbatim}
+  A = []
+  for i = 0 to N:
+    A[i] = i
+  endfor
+\end{verbatim}
+
+If \texttt{N} was always equal to \texttt{1}, then the compiler should optimise
+this to:
+
+\begin{verbatim}
+  A = [1]
+\end{verbatim}
+
+There are two things that any sensible compiler \textit{must} do:
+
+\begin{itemize}
+  \item Preserve the meaning of the program being compiled
+  \item Improve the source code in some way
+\end{itemize}
+
+In addition, it could do some (it's pretty much impossible to do all) of these
+things:
+
+\begin{itemize}
+  \item Make the output code run fast
+  \item Make the size of the output code small
+  \item Provide good feedback to the programmer; error messages, warnings etc
+  \item Provide good debugging information (this is hard since transforming the
+  program from one language into another often obscures the relationship between
+  an instance of a program at runtime and the source code it was derived from).
+  \item Compile the code quickly
+\end{itemize}
+
+
+
