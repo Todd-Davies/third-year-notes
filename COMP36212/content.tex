@@ -139,9 +139,106 @@ The standard also has special values built in:
 
 % TODO: Special operation flashcards
 
-% Lecture 2...
-
+\subsubsection{Error in floating point numbers}
 % Example exam q:
 % Given a decimal number x, convert it to normal form and then into binary
 % with specific values for e, m and b. Then trunctuate/round it and estimate
 % the error
+
+% TODO: How can a computer work out this error? It only knows floats...
+
+When a real number is converted to floating point number, it may lose precision.
+If the real number if $x$ and the floating point representation is
+$\bar{x}$, then the error is:
+
+\[
+  e = \bar{x} - x
+\]
+
+You can find how many significant digits a floating point number approximates a
+real number to by doing:
+
+\[
+  |\bar{x} - x| = 10^{-\text{significant digits}}
+\]
+
+
+However, the absolute error $e$ does not give us a very good description of the
+accuracy (if the error is $10^{-6}$ but the value is $10^{-7}$ then we're very,
+very inaccurate)! To rectify this, we have relative error:
+
+\[
+  r = \frac{e}{x} = \frac{\bar{x} - x}{x}
+\]
+
+%TODO: Wat is bounds?!
+
+When we're getting the floating point number from the real number, we can
+trucate the (possibly infinate) digts so that it fits in the mantissa. Simply
+chopping the number so it fits in $m$ bits is called \textbf{simple trucation}.
+
+If we round numbers instead of using simple truncation, then we can reduce the
+error. We need some rules though:
+
+\begin{itemize}
+  \item If the part of the mantissa to be chopped of is less than $0.5$, use
+  simple truncation.
+  \item If it's greater, then increment the last digit of the mantissa, and then
+  truncate.
+  \item If it's equal to $0.5$, then we can do either (though IEEE says to round
+  up).
+\end{itemize}
+
+Now the relative error is:
+
+\[
+  |r| = \frac{|e|}{|x|} = \frac{0.5 \times b^{e-n}}{|m|\times b}
+      = \frac{1}{2 \times m \times b^n}
+\]
+
+There are three types of errors that computers can make:
+
+\begin{itemize}
+  \item Essential errors are ones that cannot be avoided (e.g. from erroneous
+  input).
+  \item Rounding errors are when we have to approximate real numbers with
+  floating point ones. This error can be measured and controlled.
+  \item Methodology errors come into play when replacing one problem by another
+  similar, easier but less accurate problem is done. The solution is close, but
+  not exact.
+\end{itemize}
+
+Unfortunately, errors can propogate through a computation. We must know the
+errors introduced by every operation a computer performs on floating point
+numbers. If we know $e_x = \bar{x} - x$ and $e_y = \bar{y} - y$, what is $e_{x
+\cdot y}$?
+
+The error introduced by addition, subtraction, multiplication and division is:
+
+\begin{description}
+  \item Addition:
+  \[
+    \bar{x} + \bar{y} = (x + e_x) + (y + e_y) = (e_x + e_y) + (x + y)
+  \]
+  \[
+    e_{x+y} = e_x + e_y
+  \]
+  \item Subtraction:
+  \[
+    e_{x-y} = e_x - e_y
+  \]
+  \item Multiplication:
+  \[
+    \bar{x} \times \bar{y} = (x + e_x) \times (y + e_y) = xy + xe_y + ye_x + e_xe_y
+  \]
+  \[
+    e_{x \times y} \equiv xe_y + ye_x
+  \]
+  \item Division:
+  %TODO: Equation here...
+  \[
+    e_\frac{x}{y} \equiv \frac{1}{y}e_x - \frac{x}{y^2}e_y
+  \]
+\end{description}
+
+%TODO: Relative error
