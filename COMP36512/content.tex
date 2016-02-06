@@ -62,5 +62,74 @@ things:
   \item Compile the code quickly
 \end{itemize}
 
+\section{Parts of the compiler}
 
+In this section, we'll give a brief overview of all the bits inside a compiler.
+Most compilers can be roughly split into two parts; the front end and the back
+end:
 
+\begin{description}
+  \item The front end is concerned with analysis of the source language, making
+  sure that the input is legal and producing an intermediate representation.
+  \item The bacl end translates the intermediate representation into the target
+  code. This usually involves choosing appropriate instructions for each 
+  operation in the intermediate representation.
+\end{description}
+
+Usually, the front end can run in linear time, while the back end is
+\texttt{NP-Complete}. We cam automate much of the front end of the compiler.
+
+Having an intermediate representation (IR) of the program is so helpful since it
+means we can completely seperate the front and back ends of a compiler.
+Concequently, we can have multiple front ends all compiling different languages
+into the same IR, and multiple back ends producing instructions for different
+architectures.
+
+If we have $n$ languages and $m$ architectures, then we'd need to write $n
+\times m$ monolithic compilers, but can instead write $n$ front ends and $m$
+back ends ($n+ m$). This is \textit{almost} as good as it sounds; in practice,
+you need to choose your IR very carefully, since its hard to make it encapsulate
+everything all the features of a language (a good example of this is compiling
+Scala onto code that runs on the JVM, where type erasure is a big limitation for
+Scala).
+
+In more detail, we code goes through the following steps inside the compiler:
+
+\begin{description}
+  \item \textbf{Lexical Analysis} (front end):\\
+  Here, the source language is read in and tokenized (grouped into tokens for 
+  later). If the input was \texttt{a = b + x}, you might get
+  \texttt{(id,a)(=)(id,b)(+)(id,c)} out of the other end. Whitespace is usually
+  ignored (or, depending on the language, incorperated into the parsing), and
+  a symbol table is generated, containing the words that are not reserved words
+  in the language (e.g. variable names).
+
+  \item \textbf{Syntax Analysis} (front end):\\
+  Here, the tokens are given a heirarchical structure, often using recursive
+  rules such as Context Free Grammars. The output might be an \textbf{Abstract
+  Syntax Tree} (AST), which is an abstract representation of the program
+  (basically an IR).
+
+  \item \textbf{Semantic Analysis} (front end):\\
+  Here, we check for semantic errors (such as type checking, flow control
+  checks etc). The AST is annotated with the results of the checks which can be
+  used for optimisation later.
+
+  \item \textbf{Intermediate code generation} (front end):\\
+  The AST is now translated into the IR. If the AST is constructed well, and IR
+  is well chosen, then this should be fairly straightforward. Three address code
+  might be an example of an IR.
+
+  \item \textbf{Optimisation} (back end):\\
+  The IR is now optimised to increase how quickly it runs, or decrease how much
+  space it uses etc. Some optimisitions are easier than others, and some are
+  very complex! Often, the optimisation stage is so complex, that it could be
+  a whole seperate part of the compiler (a middle stage in-between the front and
+  back ends).
+
+  \item \textbf{Code generation} (back end):\\
+  This phase is concerned with things such as register allocation (NP-Complete),
+  instruction selection (pattern matching), instruction scheduling (NP-Complete)
+  and more. Architecture specific information may be used for further
+  optimisation here, and machine code is the output.
+\end{description}
