@@ -1,0 +1,124 @@
+\documentclass[frontgrid]{flacards}
+\usepackage{color}
+% For funky database symbols
+\usepackage{newlfont}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{mathtools}
+
+\definecolor{light-gray}{gray}{0.75}
+
+\newcommand{\frontcard}[1]{\textcolor{light-gray}{\colorbox{light-gray}{$#1$}}}
+\newcommand{\backcard}[1]{#1} 
+
+\newcommand{\flashcard}[1]{% create new command for cards with blanks
+    \card{% call the original \card command with twice the same argument (#1)
+        \let\blank\frontcard% but let \blank behave like \frontcard the first time
+        #1
+    }{%
+        \let\blank\backcard% and like \backcard the second time
+        #1
+    }%
+}
+
+\begin{document}
+
+\pagesetup{2}{4} 
+
+\flashcard{Each DNA molecule is packed into a \blank{chromosome}.}
+
+\flashcard{\blank{Genes} contain instructions for making \blank{proteins}.}
+
+\flashcard{The two strands of DNA twist to form a \blank{double helix}.}
+
+\flashcard{When replicating, the \blank{hydrogen bonds} between the DNA strands break, and \blank{new bases} come to bind with the exposed ones on the separated strands to form new strands.}
+
+\flashcard{Proteins act alone or in \blank{complexes} to perform many cellular functions.}
+
+\card{The four DNA bases are...}{Adenine, Thymine, Guanine, Cytosine}
+
+\flashcard{A \blank{sugar-phosphate} backbone provides structure for the DNA.}
+
+\flashcard{\blank{Hydrogen} bonds hold the two strands of DNA together.}
+
+\flashcard{\blank{Adenine} binds to \blank{Thymine}, \blank{Cytosine} binds to \blank{Guanine.}}
+
+\flashcard{Before a cell divides, its DNA is duplicated using \blank{semi-conservative replication}.}
+
+\card{What is the Karyotype?}{The 23 pairs of chromosomes in the cell.}
+
+\card{What is an autosome?}{One of the 22 pairs of normal chromosomes in humans.}
+
+\card{In addition to the autosomes, what other chromosomes are there?}{One pair of sex chromosomes.}
+
+\flashcard{\blank{Meiosis} is the process where a sperm producing cell or an egg producing cell makes a new cell with 23 chromosomes.}
+
+\flashcard{\blank{Mitosis} is when an exact replica of the genome is made (46 chromosomes).}
+
+\flashcard{\blank{Meiosis} is when only one chromosome from each pair is passed on to the new \blank{gamete} (sperm/egg).}
+
+\flashcard{DNA $\xrightarrow[]{\blank{transcription}}$ RNA $\xrightarrow[]{\blank{translation}}$ protein}
+
+\flashcard{When a gene is \blank{transcribed}, it forms many \blank{RNA} molecules.}
+
+\flashcard{\blank{RNA} molecules get \blank{translated} into proteins.}
+
+\card{Define an allele}{Any of several forms of a gene, usually arising through mutation. Alleles are responsible for hereditary variation.}
+
+\card{Define polymorphism (in the context of DNA)}{The existence of several alleles for one gene locus. Individuals have one or two alleles per locus.}
+
+\flashcard{\blank{Homozygous} is when a person has two copies of one allele on a gene locus.}
+
+\flashcard{\blank{Heterozygous} is when a person has two different alleles on a gene locus.}
+
+\flashcard{A gene is \blank{recessive} if the \blank{mutated} protein that it produces can be compensated for by the correct protein produced by \blank{an alternative allele}.}
+
+\flashcard{If a mutated gene produces proteins that fulfil a new function, then it may be \blank{co-dominant}, since the original function will be fulfilled by \blank{the other allele}.}
+
+\flashcard{Genes can be \blank{recessive}, \blank{dominant} or \blank{co-dominant}.}
+
+\card{Define genotype.}{The genetic make-up of an individual, which includes the genes or alleles present in it.}
+
+\card{Define phenotype}{The physical appearance of an individual, including its observable or measurable traits.}
+
+\flashcard{The phenotype is controlled by \blank{proteins} derived from \blank{genes}, and the \blank{environment}.}
+
+\card{What bloodgroup is made from two co-dominant alleles?}{AB}
+
+\flashcard{
+  Blood groups:
+  \begin{tabular}{>{$}c<{$}|>{$}c<{$}>{$}c<{$}>{$}c<{$}}
+        & I^A & I^B & i\\ \hline
+    I^A & \blank{A}  & \blank{AB}  & \blank{A}\\
+    I^B & \blank{AB} & \blank{B}   & \blank{B}\\
+    i   & \blank{A}  & \blank{B}   & \blank{O}
+  \end{tabular}
+}
+
+\flashcard{Allele frequency is linked to \blank{the fitness it provides} to its \blank{carriers} in a given \blank{environment}.}
+
+\card{Define genetic fitness}{The reproductive success of a genotype, measured as the number of offspring produced by and individual that survive to a reproductive age relative to the average age for the population.}
+
+\flashcard{If an allele provides \blank{an advantage}, it is likely to \blank{persist} and become \blank{more prominent} in a given population.}
+
+\flashcard{Mutations have allowed us to \blank{diversify} our diet. This includes a mutation that lets us produce \blank{lactase} during adulthood (to drink milk) and another one that reduces the function of a \blank{bitter substance taste receptor} allowing us to eat broccoli and sprouts! This is an example of \blank{natural selection}.}
+
+\flashcard{Carriers of \blank{sickle cell anaemia} alleles are \blank{asymptomatic} and get protection from malaria.}
+
+\flashcard{Carriers of \blank{sickle cell anaemia} alleles die if they are \blank{homozygous} since their haemoglobin does not function well.}
+
+\flashcard{People \blank{homozygous} for a mutation affecting \blank{CCR5} are asymptomatic and immune to HIV. Probably because this gave protection against \blank{the plague} and \blank{smallpox} in the past. This mutation is less effective agains pathogens from \blank{developing countries}.}
+
+\flashcard{Environment interaction can influence the genotype. \blank{Himalayan rabbits} and \blank{arctic foxes} are sensitive to temperature, and change colour at different temperatures. This is caused by temperature sensative \blank{tyrosine}.}
+
+\flashcard{The environment affects the phenotype; a \blank{worse diet} can make a human twin grow to be smaller, and flowers have \blank{different colours} based on the soil \blank{pH}.}
+
+\flashcard{Most \blank{phenotypes} are due to several genes and the environment (e.g. \blank{skin colour}, \blank{height}, \blank{weight}).}
+
+\flashcard{A greater similarity between \blank{identical twins} for a particular \blank{trait} compared to \blank{fratermal twins} provides evidence that \blank{genetic} factors play a role.}
+
+\flashcard{\blank{Identical} twins share all their genes and their home environment. \blank{Fraternal} twins share \blank{half} their genes and a home environment.}
+
+
+
+\end{document} 
