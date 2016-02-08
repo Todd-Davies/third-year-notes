@@ -145,3 +145,51 @@ a higher total communication bandwidth and is more suited to many data-parallel
 problems. However, programs using data sharing (shared memory) are widely seen
 to be easier to code than programs using message passing (distributed memory),
 so there is an overhead involved with distributed memory.
+
+% Lecture 3
+
+\section{Using threads}
+
+A thread is a flow of control executing a program, and a process can consist of
+one or more threads. Each thread inside a progcess has access to the same
+address space, and most programming languages provide some method of using
+threads.
+
+Now, go and look up Java threads
+(\url{https://docs.oracle.com/javase/tutorial/essential/concurrency/}) and C's
+pThreads (\url{https://computing.llnl.gov/tutorials/pthreads/}).
+
+The easiest form of parallelism to find and exploit using threads is data
+parallelism. This is where computation is divided into roughly equal chunks,
+where hopefully, each chunk is independent of the next.
+
+An example of this is multiplying two $n\times n$ matrices. We could use $n^2$
+threads, each computing one element (remember the area of the output matrix is
+going to be $n^2$), or we could use $n$ threads and have each thread compute a
+whole row or column. If we didn't have that many threads (or perhaps making more
+threads is inefficient), then we could make $p$ threads and have each one
+compute $q$ columns or rows, where $p\times q = n$.
+
+In Fortran, \texttt{DOALL} statements let us execute the body of a loop in
+parallel.
+
+There are two types of parallelism:
+
+\begin{description}
+  \item \textbf{Implicit:} This is when the system works out how the parallelise
+  something for itself. This is particurlaly relevant to functional languages,
+  since many operations (map, reduce etc) are inherently parallelisable.
+  \item \textbf{Explicit:} Here, the programmer must have a mental model of the
+  parallelism in his or her head, and specifies exactly what should be done.
+\end{description}
+
+A lot of the time, parallel programs are made in a way that blends the two (so
+you might not have to specify everything explicitly, but you have to give hints
+to the system as to what should be parallelised and how). An example of this is
+the \texttt{DOALL} statement mentioned above.
+
+In an ideal world, we would have computers that would automatically parallelise
+programs. However, since dependency analysis is hard to do, this approach is
+limited. Computers do automatic parallelisation to an extent (e.g. instruction
+reordering), but must be $100\%$ sure that an operation is safe to parallise,
+and the results will be correct.
