@@ -232,13 +232,34 @@ The error introduced by addition, subtraction, multiplication and division is:
     \bar{x} \times \bar{y} = (x + e_x) \times (y + e_y) = xy + xe_y + ye_x + e_xe_y
   \]
   \[
-    e_{x \times y} \equiv xe_y + ye_x
+    e_{x \times y} \approx xe_y + ye_x
   \]
   \item Division:
   %TODO: Equation here...
   \[
-    e_\frac{x}{y} \equiv \frac{1}{y}e_x - \frac{x}{y^2}e_y
+    e_\frac{x}{y} \approx \frac{1}{y}e_x - \frac{x}{y^2}e_y
   \]
 \end{description}
 
-%TODO: Relative error
+Relative error can also be calculated:
+
+\begin{description}
+  \item Addition:
+    \[
+      r_{x+y} = \frac{e_{x+y}}{x + y} = \frac{x}{x + y}r_x + \frac{y}{x + y}r_y
+    \]
+  \item Subtraction:
+    \[
+      r_{x-y} = \frac{e_{x-y}}{x - y} = \frac{x}{x - y}r_x + \frac{y}{x - y}r_y
+    \]
+  \item Multiplication:
+    \[
+      r_{x \times y} = \frac{e_{x \times y}}{x \times y} \approx r_x + r_y
+    \]
+  \item Division:
+    \[
+      r_{x / y} = \frac{e_{x / y}}{x / y} \approx r_x - r_y
+    \]
+\end{description}
+
+In general, $\bar{x} \circ \bar{y} = (x \circ y)(1 + r_{x \circ y})$.
