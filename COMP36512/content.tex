@@ -7,7 +7,7 @@
 \section{Intro}
 
 A compiler is a program that reads another program written in one language and
-translates it into an equivalent proram written in another language.
+translates it into an equivalent program written in another language.
 
 An interpreter reads the source code of a program and produces the results of
 executing the source. Many issues related to compilers are also present in the
@@ -22,7 +22,7 @@ A good compiler exhibits the following qualities:
   \item It copes with any input size, number of variables, line length etc
   \item The time taken to compile source code is linear in its size
   \item It has good diagnostics
-  \item It has \textit{consistent} optimisations
+  \item It has \textit{consistent} optimisation's
   \item It works will with a debugger
 \end{itemize}
 
@@ -71,7 +71,7 @@ end:
 \begin{description}
   \item The front end is concerned with analysis of the source language, making
   sure that the input is legal and producing an intermediate representation.
-  \item The bacl end translates the intermediate representation into the target
+  \item The back end translates the intermediate representation into the target
   code. This usually involves choosing appropriate instructions for each 
   operation in the intermediate representation.
 \end{description}
@@ -80,8 +80,8 @@ Usually, the front end can run in linear time, while the back end is
 \texttt{NP-Complete}. We cam automate much of the front end of the compiler.
 
 Having an intermediate representation (IR) of the program is so helpful since it
-means we can completely seperate the front and back ends of a compiler.
-Concequently, we can have multiple front ends all compiling different languages
+means we can completely separate the front and back ends of a compiler.
+Consequently, we can have multiple front ends all compiling different languages
 into the same IR, and multiple back ends producing instructions for different
 architectures.
 
@@ -100,12 +100,12 @@ In more detail, we code goes through the following steps inside the compiler:
   Here, the source language is read in and tokenized (grouped into tokens for 
   later). If the input was \texttt{a = b + x}, you might get
   \texttt{(id,a)(=)(id,b)(+)(id,c)} out of the other end. Whitespace is usually
-  ignored (or, depending on the language, incorperated into the parsing), and
+  ignored (or, depending on the language, Incorporated into the parsing), and
   a symbol table is generated, containing the words that are not reserved words
   in the language (e.g. variable names).
 
   \item \textbf{Syntax Analysis} (front end):\\
-  Here, the tokens are given a heirarchical structure, often using recursive
+  Here, the tokens are given a hierarchical structure, often using recursive
   rules such as Context Free Grammars. The output might be an \textbf{Abstract
   Syntax Tree} (AST), which is an abstract representation of the program
   (basically an IR).
@@ -122,9 +122,9 @@ In more detail, we code goes through the following steps inside the compiler:
 
   \item \textbf{Optimisation} (back end):\\
   The IR is now optimised to increase how quickly it runs, or decrease how much
-  space it uses etc. Some optimisitions are easier than others, and some are
+  space it uses etc. Some optimisation are easier than others, and some are
   very complex! Often, the optimisation stage is so complex, that it could be
-  a whole seperate part of the compiler (a middle stage in-between the front and
+  a whole separate part of the compiler (a middle stage in-between the front and
   back ends).
 
   \item \textbf{Code generation} (back end):\\
@@ -133,3 +133,152 @@ In more detail, we code goes through the following steps inside the compiler:
   and more. Architecture specific information may be used for further
   optimisation here, and machine code is the output.
 \end{description}
+
+% Lecutre 3
+
+\section{Lexical Analysis}
+
+So, lexical analysis is where we read the characters in the input and produce a
+sequence of tokens (i.e. tokenize the input). We want to do this in an automatic
+manner.
+
+When translating from a programming language or a natural language, we need to
+map words to parts of speech. In programming languages, this is syntactic (as
+opposed to being idiosyncratic in natural languages), and is based on notation.
+Things like reserved words are very important in tagging a programming language.
+
+To talk about lexical analysis, we should make some definitions:
+
+\marginpar{See my computation notes (\texttt{COMP11212}) for more on CFG's}
+
+\begin{itemize}
+  \item A vocabulary (or alphabet) is some finite set of symbols.
+  \item A String is a finite sequence of symbols from the vocabulary.
+  \item A Context Free Grammar (CFG) is a 4-tuple; $(S,N,T,P)$:
+    \begin{itemize}
+      \item $S$: The starting symbol.
+      \item $N$: The non-terminal symbols.
+      \item $T$: The set of terminal symbols.
+      \item $P$: A set of production rules.
+    \end{itemize}
+  \marginpar{Terminal symbols will usually start with a lower case letter, and
+  non-terminal symbols will start with an upper case one.}
+  \item A Language is any set of strings over a fixed vocabulary, or the set of
+  terminal productions of a CFG. 
+\end{itemize}
+
+We can use repeated substiturion to derive \textit{sentential forms}.
+% See notes for example
+
+Leftmost derivation is when the leftmost non-terminal symbol is expanded at each
+step. When we're recognising a valid sentence, we reverse this process.
+
+%TODO: Try example on page 4 of lecture 3.
+
+If we have a knowledge about lexical analysis, we can avoid having to write a
+lexical analyser by hand, and can simplify the specification and implementation
+of a language. We need to specify a \textit{lexical pattern} to derive tokens,
+which is essentially a CFG.
+
+Some parts of this are easy, for example:
+
+\[
+  \text{WhiteSpace} \rightarrow \text{blank} | \text{tab}
+    | \text{WhiteSpace blank} | \text{WhiteSpace} tab
+\]
+
+Things like keywords, operators and comments are easy to use as well. However,
+some parts of languages are more complicated, such as identifiers and numbers.
+We want a notation that lets us go easily to an implementation.
+
+Regular expressions are a way of specifying a regular language; they are
+formulas that represent a possibly infinate set of strings. A Regular Expression
+(RE) over the vocabulary $V$ is defined as:
+
+\begin{itemize}
+  \item $\epsilon$ is a RE denoting the empty set.
+  \item If $a \in V$ then $a$ denotes $\{a\}$.
+  \item If $r_1$ and $r_2$ are RE's, then:
+  \begin{itemize}
+    \item $r^{*}_1$ denotes zero or more occurances of $r_1$
+    \item $r_1r_2$ denotes concatenation
+    \item $r_1|r_2$ denotes either or.
+  \end{itemize}
+  \item Shorthands include $[a-d]$ which expands to $[a|b|c|d]$, $r^+$ for
+  $rr^*$ and $r?$ for $[r|\epsilon]$
+\end{itemize}
+
+%TODO: What languages cannot be described by regular expressions?
+
+Building a lexical analyser by hand may involve a function with lots of if/else
+statements as we try to classify each character one by one.
+
+A different idea is to try and match the input to different regular expressions
+and use the one with the longest match. This would be linear in the number of
+regular expressions we have (we would need to do a fresh search for each). 
+%See slide 9 of lecture 3
+
+We could study the regular expressions we have and try to automate the
+construction of a scanner. Some regular expressions can be converted into
+transition diagrams. For example, matching a register ($r(0-9)+$) can be
+converted to the following:
+
+% TODO: Insert transition diagram here
+
+The regex would accept the string if the transition diagram ends in an accept
+state after the string has been run through it. We can produce a transition
+table (one way of encoding automata in computers) and (once we've figured out
+how to produce the table, which we'll soon find out) run through the input
+string in linear time.
+
+\subsection{Deriving a Determinstic Finite Automata from a Regular Expression}
+
+\marginpar{Remeber that a DFA is a special case of an NFA.}
+
+Every regular expression can be converted to a deterministic finite automaton
+(DFA), and DFA's can automate lexical analysis.
+
+For example, the regular expression describing CPU registers (0-31) could be:
+
+\[
+  \text{Register} \rightarrow
+    r((0|1|2)(\text{Digit}|\epsilon)|([4-9])|(3|30|31))
+\]
+
+ % TODO: Reproduce transition table from notes.
+
+If we generated the DFA shown in Figure~\ref{fig:DFA-1}, we could produce a
+transition table like:
+
+\begin{center}
+  \begin{tabular}{>{$}c<{$}|>{$}c<{$} >{$}c<{$} >{$}c<{$} >{$}c<{$} >{$}c<{$}}
+    State & r & 0,1 & 2 & 3 & 4 \dots 9\\ \hline
+    0     & 1 & -   & - & - & -\\
+    1     & - & 2   & 2 & 5 & 4\\
+    2(fin)& - & 3   & 3 & 3 & 3\\
+    3(fin)& - & -   & - & - & -\\
+    4(fin)& - & -   & - & - & -\\
+    5(fin)& - & 6   & - & - & -\\
+    6(fin)& - & -   & - & - & -\\
+  \end{tabular}
+\end{center}
+
+Converting a RE into an NFA is more direct, but its also a lot slower to parse
+(since NFA's can have many paths through them). Converting to a DFA is slower
+(and the resulting automata is slower), but lets us parse an input in linear
+time.
+
+The idea is:
+
+\margin{That's Ken Thompson, the guy who wrote unix.}
+
+\begin{enumerate}
+  \item Write down the RE for the input language
+  \item Convert it to an NFA (Thompson's construction)
+  \item Build a DFA to simulate the NFA (subset construction)
+  \item Shrink the DFA (Hopcroft's algorithm)
+\end{enumerate}
+
+%TODO: Include NFA's from slide 5 of lecture 4
+
+%TODO: Construct the NFA of a(b|c)* 
