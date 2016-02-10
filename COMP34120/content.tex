@@ -223,3 +223,96 @@ To find the largest maxima, we simply find the one that is largest value of
 $f(x)$.
 
 % See slide 15
+
+\section{Solving Stackelberg game problems}
+
+We know that there are two steps to solve a Stackleberg game; first of all, you
+must solve the maximisation problem $\text{max}{u_F\in U_F}J_F(u_L,u_F)$, giving
+the reaction function $R(u_L)$. Then you must find the best leader strategy by
+solving $\text{max}_{u_L \in U_L} J_L(u_L, R(u_L))$ such that $(u_L, u_F)$ is
+the Stackelberg strategy.
+
+The strategy space (i.e. the different prices that the leader and follower can
+set) is $U_L = [c_L, +\infty], U_F = [c_F, +\infty]$, where $c_L, c_F$ are the
+cost of each unit for the leader and follower respectively.
+
+The payoff function (i.e. how much profit the leader and follower make) is
+defined by:
+
+\[
+  J_L(u_L, u_F) = (u_L - c_L) \times S_L(u_L, u_F)
+\]
+
+\[
+  J_F(u_L, u_F) = (u_F - c_F) \times S_F(u_L, u_F)
+\]
+
+This is essentially the profit per unit (sale price minus cost) multiplied by
+the number of units sold in the sale. The sale function is given to you in exam
+questions and is a quadratic function over $u_L$ and $u_F$.
+
+We want to find the values of $u_L$ and $u_F$. To do this, we first
+differentiate $J_F$., then we differentiate $J_L$ and sub in the value for $u_F$
+we found in the first stage so we can get answers. Here is an example:
+
+\[
+  J_L(u_L, u_F) = (u_L - c_L) \times S_L(u_L, u_F)
+\]
+
+\[
+  J_F(u_L, u_F) = (u_F - c_F) \times S_F(u_L, u_F)
+\]
+
+\[
+  c_F = 1 = c_F
+\]
+
+\[
+  S_L =  5 - 2u_L + u_F
+\]
+
+\[
+  S_F = 6 + u_L - 2u_F
+\]
+
+To get the reaction function, we differentiate $J_F$:
+
+\[
+  \begin{split}
+    0 &= \frac{d}{du_F}J_F(u_L,u_F)\\
+      &= \frac{d}{du_F}(u_F - 1)(6 + u_L - 2u_F)\\
+      &= \frac{d}{du_F}6u_F + u_Fu_L - 2u_F^2 - 6 - u_L + 2u_F\\
+      &= u_L - 4u_F + 8
+  \end{split}
+\]
+
+If we differentiate again, we see that this is a maxima ($-4 > 0$).
+
+We can rearrange it so that: $R(u_L) = \frac{u_L}{4} + 2$.
+
+Now we can sub in the value for $u_F$ into $J_L$:
+
+\[
+  \begin{split}
+    J_L(u_L, R(u_L)) &= (u_L - 1)(5 0 2u_L + R(u_L))\\
+                     &= \frac{1}{4}(35u_L - 7u_L^2 - 28)
+  \end{split}
+\]
+
+And differentiate:
+
+\[
+  \frac{d}{du_L}J_L(u_L, R(u_L)) = \frac{1}{4}(35 - 14u_L) = 0
+\]
+
+If we rearrange that, we get $u_L = \frac{35}{14}$, therefore $u_F = 2.625$.
+
+This means the profits are:
+
+\[
+  J_L(\frac{35}{14}, 2.625) = (\frac{35}{14} - 1)(5 - 2\frac{35}{14} + 2.625) = 3.9375
+\]
+
+\[
+  J_F(\frac{35}{14}, 2.625) = (2.625 - 1)(6 + \frac{35}{14} - 2(2.625)) = 5.28125
+\]
