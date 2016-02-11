@@ -151,7 +151,7 @@ so there is an overhead involved with distributed memory.
 \section{Using threads}
 
 A thread is a flow of control executing a program, and a process can consist of
-one or more threads. Each thread inside a progcess has access to the same
+one or more threads. Each thread inside a process has access to the same
 address space, and most programming languages provide some method of using
 threads.
 
@@ -177,7 +177,7 @@ There are two types of parallelism:
 
 \begin{description}
   \item \textbf{Implicit:} This is when the system works out how the parallelise
-  something for itself. This is particurlaly relevant to functional languages,
+  something for itself. This is particularly relevant to functional languages,
   since many operations (map, reduce etc) are inherently parallelisable.
   \item \textbf{Explicit:} Here, the programmer must have a mental model of the
   parallelism in his or her head, and specifies exactly what should be done.
@@ -191,5 +191,92 @@ the \texttt{DOALL} statement mentioned above.
 In an ideal world, we would have computers that would automatically parallelise
 programs. However, since dependency analysis is hard to do, this approach is
 limited. Computers do automatic parallelisation to an extent (e.g. instruction
-reordering), but must be $100\%$ sure that an operation is safe to parallise,
+reordering), but must be $100\%$ sure that an operation is safe to parallelise,
 and the results will be correct.
+
+\section{Caches in shared memory multiprocessors}
+
+Obviously caches are vital to the efficient functioning of processors. Without
+them, every memory access would cause the CPU to wait around 200 cycles, and so
+having a cache is vital to having the CPU run at close to full speed.
+
+However, caches don't just fix the problem; we need to work out how to populate
+them, and keep the data in them correct. Data that we write to a cache must
+eventually be written back to memory, and new memory locations need to be loaded
+into the cache when they're required by the CPU.
+
+We solved these problems in \texttt{COMP25111}, however, more problems arise
+when you consider a multi-core processor. In most multi-core processors, each
+core has its own cache, and since each cache can potentially hold its own copy
+of the same memory location, we need to make sure that they agree with each
+other about the values of these locations. This is the \textbf{cache coherence
+problem.}
+
+An easy solution to this would be to require that every write would go through
+to memory straight away, and the other cache(s) in other cores would load the
+value. This is obviously slow though and there may be bus bandwidth problems.
+Furthermore, we'd only be getting a benefit from cache-reads, which defeats
+(half of) the object of the cache!
+
+We can overcome this by making the caches talk to each other. When a new value
+is written to one cache, the others should invalidate their own cache lines
+containing this value. This means a write to a cache doesn't need to go straight
+through to memory, but just flips a bit inside the other caches.
+
+However, when we introduce more state to our caches (such as invalidated cache
+lines) we also increase the complexity, and need a model to make sure things
+don't go wrong. Each cache line can be in three states:
+
+\begin{description}
+  \item Invalid; There might be an address math on this line, but the data is 
+  not valid any more. It needs to be fetched from memory again.
+  \item Dirty; The cache line is valid, and has been update in the cache since 
+  it was loaded from memory. It must be written to memory at some point in the 
+  future.
+  \item Valid; The cache line matches what's currently in memory.
+\end{description}
+
+In order to let caches know what other core's caches are doing, we have them do
+\textbf{bus snooping}. This involves having hardware watch each core's cache and
+modify the cache independently of the core so that the flags on the cache lines
+are correct.
+
+Given two cores, the following states are valid and invalid:
+
+\begin{center}
+  \begin{tabular}{c|c c c}
+      & V & D & I\\ \hline
+    V & T & F & T\\
+    D & F & F & T\\
+    I & T & T & T
+  \end{tabular}
+\end{center}
+
+Notice how the table is a mirror image of itself. We can't have two dirty
+states, since then we won't know which we should write to memory, and we can't
+have a dirty and valid state (since then, by definition, the valid state is not
+valid).
+
+% TODO: Talk about state transitions
+
+% Slide 22 onwards
+
+There are two types of messages between cores; read requests for a cache line
+(one core hopes that another core's cache has the cache line so that it doesn't
+have to go to memory), and invalidate messages.
+
+We can easily extend the protocol we've described beyond two cores; any core
+with a valid value can respond to read requests (the bus will decide who
+`wins'), and invalidate requests work as normal, invalidating the cache line on
+all cores.
+
+The only extra requirement is that invalidation must happen in one cycle, since
+we want all cores to have the same view of memory, and if one core receives the
+invalidation message after another, there will be a period of time where their
+views of memory will be inconsistent. This gets harder as we increase the number
+of cores; the bus gets longer and so slows down (signals take longer to
+propagate, and the clock will have to be reduced).
+
+The impact from this is that the consistency protocol is the biggest limitation
+when trying to add more cores to a processor. The protocol we have described is
+called the \texttt{MSI protocol} (modified, shared, invalid).
