@@ -316,3 +316,104 @@ This means the profits are:
 \[
   J_F(\frac{35}{14}, 2.625) = (2.625 - 1)(6 + \frac{35}{14} - 2(2.625)) = 5.28125
 \]
+
+%Lecture 4
+
+\section{Stackelberg games with imperfect information}
+
+It is very rare that both players in a two person Stackelberg game will have
+perfect information; in any case, it is in their interest to hide information
+from one-another. In a game of imperfect information, the follower is not
+affected; their job is the same (repond to whatever the leader does).
+
+However, this is a huge change for the leader. Without knowing the strategy
+space for the follower, or the follower's reaction function, they can't work out
+a good strategy. We need to come up with a technique to let the leader `guess' a
+good strategy based of what we \textit{do} know about the game.
+
+There are two obvious solutions, and one machine learning solution to this.
+We're interested in the ML solution, but the obvious solutions are:
+
+\begin{itemize}
+  \item Choose to be the follower. Then we don't have to decide on the first
+  strategy, and can just choose a reaction. However, this isn't always possible
+  (sometimes you're forced to move first), and in some games, the follower may
+  always win.
+  \item Find the best strategy for the worst scenario; that is to say we should
+  find the best, worst strategy:
+  \[
+    u_L = argmax_{u_L \in U_L}(min_{u_F \in U_F}J_L(u_L, u_F))
+  \]
+  Though this gives a lower bound on the payoff, it is also far too
+  conservative. Imagine if you always planned for the worst and never considered
+  (never mind hoped) for the best!
+\end{itemize}
+
+However, the best solution is to attempt to learn what the follower will do
+based on what has happened in the past. Many two person Stackelberg games are
+played repeatedly (e.g. setting oil prices every day), and therefore there is a
+lot of information available to learn from. All we need to learn is the
+follower's reaction function; i.e. what value they will choose for $u_F$ given
+any chosen $u_L$.
+
+The approach we're going to use to do this is called linear regression. This
+involves finding a linear function that gives similar values to what the
+follower has done in the past. You could also use a polynomial function or a
+neural network (neural networks are called the \textit{universal approximator},
+since they can mimic any function).
+
+So, if $y = R(x)$ be the unknown function, and imagine we have a set of $T$
+datapoints where we know the input $x$ and the value $y$. We want to make a new
+function $\hat{R}(x)$ that will approximate $R(x)$.
+
+We define $\epsilon(x) = R(x) - \hat{R}(x)$, and try to make $\epsilon$ as small
+as possible for all values of $x$. Unfortunately, since we don't know $R$, we
+can't work out $\epsilon$. However, we can work out the value of $\epsilon$ for
+all the datapoints we do have:
+
+\[
+  \sum^T_{t=1}\epsilon^2[x(t)] = \sum^T_{t=1}\left(y(t) - \hat{R}(x(t))\right)^2
+\]
+
+Trying to make this value as small as possible is our goal. The value is called
+the least square criterion.
+
+Designing a function is problem dependent, but we know our reaction function
+will be linear:
+
+\[
+  R(x) = a + bx
+\]
+
+To make $\hat{R}(x)$ imitate $R(x)$, we must find values for $a$ and $b$ that
+minimise the squared criterion we had before:
+
+\[
+  min_{a,b} \sum^T_{t=1}\left(y(t) - (a + b x(t)))\right)^2
+\]
+
+Instead of solving the minimising problem, we can instead solve the following
+maximisation problem:
+
+\[
+  max_{a,b} - \sum^T_{t=1}\left(y(t) - (a + b x(t)))\right)^2
+\]
+
+Of course, we can use partial differentiation to do this (just like in
+\texttt{COMP36212}), where you eventually get:
+
+\[
+  a = \frac{
+    \sum^T_{t=1}x^2(t)\sum^T_{t=1}y(t) - \sum^T_{t=1}x(t)\sum^T_{t=1}x(t)y(t)
+  }{
+    T\sum^T_{t=1}x^2(t) - (\sum^T_t{=1}x(t))^2
+  }
+\]
+
+\[
+  b = \frac{
+    T\sum^T_{t=1}x(t)y(t) - \sum^T_{t=1}x(t)\sum^T_{t=1}y(t)
+  }{
+    T\sum^T_{t=1}x^2(t) - (\sum^T_t{=1}x(t))^2
+  }
+\]
