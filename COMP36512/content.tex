@@ -263,6 +263,12 @@ transition table like:
   \end{tabular}
 \end{center}
 
+This is done by creating an NFA for each thing you can do in a regular
+expression (concatenation, either operator, star operator etc) and putting them
+together.
+
+% Example of creating an NFA from a RE
+
 Converting a RE into an NFA is more direct, but its also a lot slower to parse
 (since NFA's can have many paths through them). Converting to a DFA is slower
 (and the resulting automata is slower), but lets us parse an input in linear
@@ -270,7 +276,7 @@ time.
 
 The idea is:
 
-\margin{That's Ken Thompson, the guy who wrote unix.}
+\marginpar{That's Ken Thompson, the guy who wrote unix.}
 
 \begin{enumerate}
   \item Write down the RE for the input language
@@ -282,3 +288,39 @@ The idea is:
 %TODO: Include NFA's from slide 5 of lecture 4
 
 %TODO: Construct the NFA of a(b|c)* 
+
+We have seen the subset construction algorithm before (in \text{COMP11212}),
+where it was called `Algorithm One'. There is a rather compact but (I think)
+working implementation in \texttt{COMP36512/programs/nfa-dfa.py} on Github that
+you could look at.
+
+Before we look at the algorithm itself, we need to look at two operations:
+
+\begin{description}
+  \item \texttt{move(states, a)} Returns all the states to which there is a
+  transition from some state in \texttt{states} with the symbol \texttt{a}.
+  \item \texttt{e-closure(states)} All the states that are reachable using only
+  epsilon transitions from any state in \texttt{states}.
+\end{description}
+
+The algorithm is:
+
+\begin{lstlisting}
+  dStates = e-closure(startState)
+  markedStates = []
+  dTable = {}
+  // While there are unmarked states
+  while (dStates - markedStates) is not []:
+    t = (dStates - markedStates).get(0)
+    markedStates.add(t)
+    for symbol in alphabet:
+      U = e-closure(move(t, symbol))
+      if U in dStates:
+        dStates.add(U)
+      dTable(t, a) = U
+\end{lstlisting}
+
+This builds up a table (representing a DFA) by creating states representing all
+the states reachable with a specific symbol from a set of states within the NFA.
+
+%TODO: Example of NFA->DFA
