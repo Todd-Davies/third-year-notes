@@ -49,7 +49,7 @@ Where:
     m & The Mantissa (the bit before the decimal place)\\
     b & The base (or radix), usually two or ten\\
     e & The exponent (the power of the radix)\\
-    n & The precision (the numbewr of digits in the mantissa)
+    n & The precision (the number of digits in the mantissa)
   \end{tabular}
 \end{center}
 
@@ -65,7 +65,7 @@ least all computers will get the same errors.
 % Slide 4
 
 The amount of numbers we can represent with the floating points depends on the
-values permissable for $b,n$ and $e$. When $b=2,n=2$ and $e=[-2\dots2]$:
+values permissible for $b,n$ and $e$. When $b=2,n=2$ and $e=[-2\dots2]$:
 
 \marginpar{The Python code used to generate this is found in the
 \texttt{/COMP36212/programs} folder of the source for these notes.}
@@ -130,10 +130,10 @@ The standard also has special values built in:
   mantissa is non-zero, then the number is
   $-1^{sign} \times 0.m\times 2^{-126}$.
   \item \textbf{Infinity}: Exponent is all 1's and mantissa is all 0's. The
-  sign dictates between positive and negative inifinity.
+  sign dictates between positive and negative infinity.
   %TODO: Signalling and quite NaN's
   \item \textbf{NaN}: Not your grandma, this is when the value isn't a real
-  number, such as when a dividion by zero occurs.The exponent is all 1's and
+  number, such as when a division by zero occurs.The exponent is all 1's and
   the mantissa is non-zero.
 \end{description}
 
@@ -174,8 +174,8 @@ very inaccurate)! To rectify this, we have relative error:
 %TODO: Wat is bounds?!
 
 When we're getting the floating point number from the real number, we can
-trucate the (possibly infinate) digts so that it fits in the mantissa. Simply
-chopping the number so it fits in $m$ bits is called \textbf{simple trucation}.
+truncate the (possibly infinite) digits so that it fits in the mantissa. Simply
+chopping the number so it fits in $m$ bits is called \textbf{simple truncation}.
 
 If we round numbers instead of using simple truncation, then we can reduce the
 error. We need some rules though:
@@ -208,7 +208,7 @@ There are three types of errors that computers can make:
   not exact.
 \end{itemize}
 
-Unfortunately, errors can propogate through a computation. We must know the
+Unfortunately, errors can propagate through a computation. We must know the
 errors introduced by every operation a computer performs on floating point
 numbers. If we know $e_x = \bar{x} - x$ and $e_y = \bar{y} - y$, what is $e_{x
 \cdot y}$?
@@ -229,7 +229,8 @@ The error introduced by addition, subtraction, multiplication and division is:
   \]
   \item Multiplication:
   \[
-    \bar{x} \times \bar{y} = (x + e_x) \times (y + e_y) = xy + xe_y + ye_x + e_xe_y
+    \bar{x} \times \bar{y} = (x + e_x) \times (y + e_y) =
+      xy + xe_y + ye_x + e_xe_y
   \]
   \[
     e_{x \times y} \approx xe_y + ye_x
@@ -263,3 +264,129 @@ Relative error can also be calculated:
 \end{description}
 
 In general, $\bar{x} \circ \bar{y} = (x \circ y)(1 + r_{x \circ y})$.
+
+\marginpar{Remember, error propagation is not associative. The error from a
+multiplication and then an add is probably not the same as doing the add then
+the multiplication.}
+
+While it is useful to know the error of one operation, we also need to be able
+to work out the error of consecutive operations. That is to say given $e_x =
+\bar{x} - x$ and  $e_y = \bar{y} - y$, determine $e_{x \bar{\circ} y}$.
+\[
+  \begin{split}
+  \bar{x} &= FP(\bar{x_1} \circ \bar{x_2})\\
+          &= \bar{x_1} \bar{\circ} \bar{x_2}\\
+          &= (\bar{x_1} \circ \bar{x_2})(1 + u)\\
+  \end{split}
+\]
+
+Where $|u| \leq 0.5 \times b^{-n + 1}$.
+
+The total relative error is given by:
+
+\[
+  r^t_z = \frac{e^t_z}{x} = r_{x \circ y} + u = a_xr_x + a_yr_y + u
+\]
+
+$a_x$ and $a_y$ is the error introduced by the $\circ$ operation.
+
+Lets put all that into an example. Given the numbers $x,y$ and $x$ with their
+relative round off errors $r_x, r_y$ and $r_z$, determine the relative error in
+$u = (x + y)z$:
+
+\[
+  r^t_{x + y} = \frac{x}{x + y}r_x + \frac{y}{x + y}r_y + r_+
+\]
+
+%TODO: Ask Milan about this slide (23)
+
+\[
+  r^t_{u} = \frac{x}{x + y}r_x + \frac{y}{x + y}r_y + r_+ + r_z + r_*
+\]
+
+%END TODO
+
+
+\subsection{Finding the number of significant digits}
+
+We want to find an integer that represents how many digits in our number are
+non-nonsense (i.e. how many significant digits we have). The number of
+significant digits in the floating point number $\bar{x}$ where its real
+equivalent is $x$ is:
+
+\marginpar{Z is the set of integers.}
+
+\[
+  l = Z(log_b\frac{|x|}{|\bar{x} - x|})
+\]
+
+If we rearrange this, the relative error is:
+
+%TODO: Is $l \leq n$ part of the equation on slide 24?
+
+\[
+  r_x \approx b^{-l}
+\]
+
+If we have a computation that takes $m$ real numbers as arguments and outputs a
+real number, if the arguments are floating point numbers with $l_i$ significant
+digits then we can estimate:
+
+\[
+  |e| \approx |\sum^m_{i=1} x_i\frac{\delta f}{\delta x_i}b^{-l_i}|
+\]
+
+Also:
+
+\[
+  |\sum^m_{i=1} x_i\frac{\delta f}{\delta x_i}b^{-l_i}|
+    \leq b^{-l_{min}}|\sum^m_{i=1} x_i\frac{\delta f}{\delta x_i}|
+\]
+
+The number of significant digits in the answer is:
+
+\[
+  l = l_{min} - \delta
+\]
+
+Where $\delta$ is the loss of significant digits:
+
+\[
+  \delta = Z(log_b(
+    \frac{
+      \sum^m_{i=1}|x_i\frac{\delta f}{\delta x_i}|
+    }{
+      |f(x_1, \dots, x_m)|
+    }
+  )
+\]
+
+% TODO: Flashcards on this + multiplication, division and subtraction on p26
+
+If we try and subtract numbers that are close in magnitude, then we will lose
+lots of significant digits. If we do $\sqrt{2.01} - \sqrt{2}$ (where both
+numbers are known to 9 significant digits), then we get:
+
+\[
+  \delta = Z(log_10(
+    \frac{
+      |\sqrt{2.01}| + |\sqrt{2}|
+    }{
+      |\sqrt{2.01} - \sqrt{2}|
+    })) = 3
+\]
+
+Our answer would be to six significant figures. In order to get all of the
+significant figures, we need to use a different method:
+
+\[
+  \begin{split}
+    z &= \sqrt{2.01} - \sqrt{2}\\
+      &= (\sqrt{2.01} - \sqrt{2})\frac{\sqrt{2.01}
+         + \sqrt{2}}{\sqrt{2.01} + \sqrt{2}}\\
+      &= \frac{\sqrt{2.01}^2 - \sqrt{2}^2}{\sqrt{2.01} + \sqrt{2}}\\
+      &= \frac{0.01}{\sqrt{2.01} + \sqrt{2}}
+  \end{split}
+\]
+
+%p 29
