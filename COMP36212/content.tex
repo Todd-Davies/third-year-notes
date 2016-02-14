@@ -385,4 +385,119 @@ significant figures, we need to use a different method:
   \end{split}
 \]
 
-%p 29
+\marginpar{Revision break? Read this:
+\href{https://randomascii.wordpress.com/2014/01/27/theres-only-four-billion-floatsso-test-them-all/}{https://randomascii.wordpress.com
+/2014/01/27/theres-only-four
+-billion-floatsso-test-them-all/}}
+
+\subsubsection{Accurately computing sample variance}
+
+Computing the sample variance of a set of numbers is done by the formula:
+
+\[
+  s^2_n = \frac{1}{n - 1}\sum^n_{i=1}(x_i - \hat{x})^2
+\]
+
+Where $\hat{x} = \frac{1}{n}\sum^n_{i=1}x_i$ is the mean of the values.
+
+In order to compute the variance, we would need to calculate the mean first,
+then calculate the variance, which requires two for loops. However, a
+numerically equivalent formula exists for doing the same thing:
+
+\[
+  s^2_n = \frac{1}{n-1}(\sum^n_{i=1}x_i^2 - \frac{1}{n}(\sum^n_{i=1}x_i)^2)
+\]
+
+If we use the following data:
+
+\begin{center}
+  \begin{tabular}{>{$}c<{$}|>{$}c<{$}}
+    \text{Value} & \text{Floating point representation}\\ \hline
+    100 & 0.1000\times10^3\\
+    101 & 0.1010\times10^3\\
+    102 & 0.1020\times10^3
+  \end{tabular}
+\end{center}
+
+If we use formula one for the variance with these input numbers, then we get an answer of $1$, if we use formula two, then we get the answer to be $-1.667$
+
+% TODO: Why???
+
+\subsubsection{Overflow and underflow}
+
+We must be aware of overflow and underflow in our operations. For example, if we
+were calculating the length of the hypotenuse of a triangle
+($\sqrt{\text{opposite}^2 + \text{adjacent}^2}$), then we could have an overflow
+if $x = y = 10^{200}$, since the range representable by a single precision float
+is $10^{\pm308}$.
+
+This can be remedied by using a different formula:
+
+\begin{center}
+  \includegraphics[width=0.3\textwidth]{images/safe-pythag}
+\end{center}
+
+\subsection{Condition of a problem}
+
+The condition of a problem is how sensitive it is to changes in the data. A
+problem is ill-conditioned if a small change in the data results in a large
+change in the solution. This is concerned with the problem, not the method used
+to solve it.
+
+Consider the equation $x^3 - 21 x^2 + 120x - 100 = 0$; the solutions are $x =
+\{1, 10\}$. However, if we change the value of $x^3$ to $0.99$ or $1.01$, then
+the roots become $x = \{1, 11.17, 9.041\}$ and $x = \{1, 9.896 \pm 1.044\}$
+respectively.
+
+We can work out the sensitivity by using partial differentiation, if the
+perturbed function if $\bar{f}(x) = f(x) + \epsilon g(x)$, where $g(x)$ is the
+change applied to $f(x)$, then:
+
+\[
+  |\delta| \approx |\frac{\epsilon g(x)}{f'(x)}|~\text{(single root)}
+\]
+
+\[
+  |\delta| \approx |\sqrt{-\frac{2\epsilon g(x)}{f''(x)}}|~\text{(double root)}
+\]
+
+In the above example, $g(x) = x^3, \epsilon = -0.01, f'(x) = 3x^2 - 42x + 120$:
+
+\[
+  |\delta| \approx |\frac{-0.01 \times 1^3}{81}| \approx 0.0001
+\]
+
+For the double root, $f''(x) = 6x - 42$
+
+\[
+  |\delta| \approx |\sqrt{-\frac{2 \times -0.01 \times 1000}{18}}| \approx 1.054
+\]
+
+So the double root is vastly affected, but the single root isn't.
+
+\subsection{Stability}
+
+The stability of a method is how sensitive it is to rounding errors. A method
+that guarantees as accurate solution as the input data allows is said to be
+stable, otherwise it's unstable. Condition is about the sensitivity of the
+problem, but stability is about the sensitivity of the method.
+
+Given the quadratic equation $1.6x^2 - 100.1x + 1.251 = 0$, the solution can be
+found using the standard formula (in floating point) ($x = \frac{-b \pm\sqrt{b^2
+- 4ac}}{2a}$), which gives $x = \{62.53, 0.03125\}$.
+
+If we only compute the first root to be $x_1 = 62.53$, but use $x = c/ax_1$ for
+the second, then we get the second root to be $0.01251$. The correct solutions
+are $x = \{62.53, 0.0125\}$.
+
+The problem was that $y_1 = -b = 100.1$, and  $y_2 = \sqrt{b^2 - 4ac} = 100.06$.
+Since if we do subtraction with very close numbers, the error is high. If we
+calculate $\delta$ for this then we get:
+
+\[
+  \delta = X(log_10\frac{|y_1| + |y_2|}{|y_1 - y_2|}) = 4
+\]
+
+Meaning all of our digits were rubbish!
+
+%TODO: Page 41 onwards for an example
