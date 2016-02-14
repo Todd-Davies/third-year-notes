@@ -25,6 +25,32 @@
 
 \pagesetup{2}{4} 
 
+\flashcard{
+  \begin{tabular}{>{$}c<{$} >{$}c<{$}}
+    (\pm \infty) \div (\pm \infty) & \blank{NaN}\\
+    (\pm \infty) \times (\pm \infty) & \blank{\pm \infty}\\
+    (\pm \infty) - (\pm \infty) & \blank{NaN}\\
+    \infty + \infty & \blank{0}
+  \end{tabular}
+}
 
+\flashcard{
+  \begin{tabular}{>{$}c<{$} >{$}c<{$}}
+    (\pm 0) \div (\pm 0) & \blank{NaN}\\
+    \pm n \div 0 & \blank{\pm \infty}\\
+    n \div (\pm \infty) & \blank{0}\\
+    (\pm \infty) \times 0 & \blank{NaN}
+  \end{tabular}
+}
+
+\card{The loss of significant digits from multiplication is...}{$\delta = Z(log_10 m)$ where $m$ is the minimum number of significant digits in the input.}
+
+\card{The loss of significant digits from division is...}{
+$\delta = Z(log_10 2) = 0$ where $m$ is the minimum number
+of significant digits in the input.}
+
+\card{The loss of significant digits from addition is...}{
+$\delta = Z(log_10 \frac{\sum^m_{i=1}|x_i|}{|\sum^m_{i=1}x_i|})$
+where $m$ is the minimum number of significant digits in the input.}
 
 \end{document} 
