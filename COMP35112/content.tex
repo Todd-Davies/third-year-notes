@@ -284,7 +284,7 @@ called the \texttt{MSI protocol} (modified, shared, invalid).
 \subsection{Other cache coherence protocols}
 
 In the previous cache coherence protocols we have discussed, we came across
-situations where there was unneccecary bus usage (e.g. when one core writes to
+situations where there was unnecessary bus usage (e.g. when one core writes to
 its cache and makes a cache line dirty, other cores would write their copies
 back to memory, even though that value would never be used since there was a
 newer dirty version).
@@ -353,7 +353,7 @@ words) in memory.
 For each cache line, the directory contains a bit map for which core has a copy,
 and whether that copy is dirty, which is another bit map (though only one bit is
 true). Each cache has its own valid and dirty bits, which are used to dictate
-whether to write back to memory or not. If a core wahts to make a memory access,
+whether to write back to memory or not. If a core whats to make a memory access,
 we have the following cases:
 
 \begin{description}
@@ -364,11 +364,50 @@ we have the following cases:
     \begin{description}
       \item \textbf{Directory dirty bit is false}:\\
         Read the data from main memory into the cache, set the directory
-        presense and local valid bit for that core.
+        presence and local valid bit for that core.
       \item \textbf{Directory dirty bit is true}:\\
         Cause the owner to write back the value to memory, which is also sent to
         the cache that was asking. The directory dirty bit is cleared, but the
         directory presence bits are set, as is the local valid bit.
     \end{description}
-  % TODO: Carry on from slide 11
+  \item \textbf{Write miss in the local cache}:\\
+    \begin{itemize}
+      \item Set the local cache to dirty.
+      \item Depending on the directory dirty bit:
+      \begin{description}
+        \item \textbf{It's false}:\\
+          Invalidate any cores that are valid for this cache line, set the
+          present bit for that core and set the dirty bit for the directory.
+        \item \textbf{It's true}:\\
+          Send a message to the core marked as O (owner) to write back (note,
+          this can be optimised out). Clear the owner's present bit, and set
+          if for the writing core. Leave the dirty bit set.
+      \end{description}
+    \end{itemize}
+  \item \textbf{Write hit in local cache}:\\
+    \begin{itemize}
+      \item If the local dirty bit is set, just update the value,
+      \item Otherwise, update the local cache and dirty bit then:
+      \begin{description}
+        \item \textbf{If the directory bit is not dirty}:\\
+          Invalidate any cores with the cache line present, then clear the
+          present bits.. After that, set the present bit for the writing core
+          and set the directory dirty bit to true.
+        \item \textbf{If the directory dirty bit is set}:
+          Send a message to the owner to update core memory (again, this can
+          be optimised out), clear the owner's present bit and set the
+          writing cache's present bit. Keep the directory bit set.
+      \end{description}
+    \end{itemize}
 \end{description}
+
+In this architecture, the directory becomes the bottleneck. To avoid this, we
+can distribute the directory between different caches, and make each part
+responsible for part of the address space. Sometimes in multi-processor systems,
+the memory is not all in one place and is spread over multiple chips.
+
+Since chips with a directory based protocol are often heavily networked (inside
+the chip) in order to connect all the subcomponents, messages can take variable
+amounts of time to send, requiring handshake protocols. This means that the CPU
+can sometimes waste a significant number of cycles waiting for responses from
+messages.
