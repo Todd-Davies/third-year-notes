@@ -280,3 +280,95 @@ propagate, and the clock will have to be reduced).
 The impact from this is that the consistency protocol is the biggest limitation
 when trying to add more cores to a processor. The protocol we have described is
 called the \texttt{MSI protocol} (modified, shared, invalid).
+
+\subsection{Other cache coherence protocols}
+
+In the previous cache coherence protocols we have discussed, we came across
+situations where there was unneccecary bus usage (e.g. when one core writes to
+its cache and makes a cache line dirty, other cores would write their copies
+back to memory, even though that value would never be used since there was a
+newer dirty version).
+
+However, the bus is a \textit{critical shared resource}, and we certainly don't
+want to waste bandwidth on messages that have no effect. We can distinguish
+between two cases of writing to a cache:
+
+\begin{itemize}
+  \item When the cache holds the only copy of a value, and it's not dirty (if it
+  was dirty, we'd just update it).
+  \item When the cache holds a copy of the value, but there are other copies in
+  other caches.
+\end{itemize}
+
+It is only the first case where we don't need to send an invalidate message, but
+this is nevertheless a common case. In most multithreaded programs, only a
+minority of memory locations are shared between threads (and a smaller minority
+are both read and written to by multiple threads), so the majority of memory
+locations are unshared. If we split the `V' (valid) state into two more states,
+we can account for this case:
+
+\begin{itemize}
+  \item \textbf{E} - Exclusive to one cache
+  \item \textbf{S} - Shared between multiple caches
+\end{itemize}
+
+This gives us the \texttt{MESI} protocol (as opposed to the \texttt{MSI}
+protocol). This is easy to implement on top of the \texttt{MSI} protocol; simply
+set the state to E if the value was read from memory, and to S if it was read
+from another cache.
+
+Though minor changes in the protocol are required, the only inconsistency is
+that if all E/S lines are evicted from other caches except one S line, then the
+S line is now exclusive (even though it is marked as S). This isn't a problem in
+practice, since it doesn't happen often, and since it's hard to detect, it's
+just ignored.
+
+The \texttt{MOSEI} protocol is a further optimisation, where the M state is
+split into:
+
+\begin{itemize}
+  \item \textbf{M} - Modified; the cache contains a copy which differs from 
+  memory, and no other caches contain a copy.
+  \item \textbf{O} - Owned; the cache contains a copy which differs from the one 
+  in memory, and some other caches also contains a copy, but those are in state 
+  S and have the same value as the owner.
+\end{itemize}
+
+With the additional O state, we can share the latest value and don't have to
+write it back to memory straight away. Only when a cache line in the O or M
+states is evicted, will any writing to memory be done.
+
+\subsection{Directory based coherence}
+
+So far, we've looked at methods for letting multiple cores communicate over a
+single bus, and have assumed that bus communication happens instantaneously.
+However, as the number of cores increases, the bus capacitance increases and you
+have to slow it down. This limit is at around 32 cores.
+
+A directory based coherence method is an attempt to make everything less
+directly connected to get around this limitation. A centralised directory is
+created that holds information about each cache line (which contains multiple
+words) in memory.
+
+For each cache line, the directory contains a bit map for which core has a copy,
+and whether that copy is dirty, which is another bit map (though only one bit is
+true). Each cache has its own valid and dirty bits, which are used to dictate
+whether to write back to memory or not. If a core wahts to make a memory access,
+we have the following cases:
+
+\begin{description}
+  \item \textbf{Read hit in local cache}:\\
+    Just read the local value!
+  \item \textbf{Read miss in the local cache}:\\
+    Ask the directory:
+    \begin{description}
+      \item \textbf{Directory dirty bit is false}:\\
+        Read the data from main memory into the cache, set the directory
+        presense and local valid bit for that core.
+      \item \textbf{Directory dirty bit is true}:\\
+        Cause the owner to write back the value to memory, which is also sent to
+        the cache that was asking. The directory dirty bit is cleared, but the
+        directory presence bits are set, as is the local valid bit.
+    \end{description}
+  % TODO: Carry on from slide 11
+\end{description}
