@@ -411,3 +411,60 @@ the chip) in order to connect all the subcomponents, messages can take variable
 amounts of time to send, requiring handshake protocols. This means that the CPU
 can sometimes waste a significant number of cycles waiting for responses from
 messages.
+
+% Lecture 6
+
+\section{Barriers and locks}
+
+\subsection{Barrier}
+
+The idea of a barrier is that a number of threads should all meet up at the same
+point. When all threads reach the point, they can continue, but until then, they
+al wait. It's natural when threads are used to implement data parallelism.
+
+Barriers are often used when there are data dependence (we need to wait for the
+whole answer before continuing). Take a look at
+\texttt{java.util.concurrent.CyclicBarrier}.
+
+\subsection{Locks}
+
+Any object can be locked in Java by using as the target of a
+\texttt{synchronized} block, or calling an instance method that is declared as
+being \texttt{synchronized}. Only one thread can lock an object at any given
+time, and other threads must wait to aquire the lock, or the lock holder
+executes \texttt{wait}.
+
+We want to lock objects so that we can achieve `correctness'. If two code blocks
+take a lock on the same object, one should complete before the other starts,
+which means two threads won't be mutating the same object at the same time, and
+the normal meaning of the code blocks is preserved.
+
+% TODO: Implement a bounded buffer like in the notes
+
+\textbf{Sequential Consistency} is when:
+\marginpar{This is a common interpretation of what it means to be `correct',
+but not the only one.}
+
+\begin{itemize}
+  \item Method calls should appear to happen one at a time in sequential order.
+  \item Method calls should appear to take effect in the order a thread performs
+  them.
+\end{itemize}
+
+Deadlocks can occur in cases where code tries to aquire more than one lock.
+`Lost WakeUp' can happen if one thread sends a \texttt{notify} message that is
+not properly received by other threads, one way to avoid this is by using
+\texttt{notifyAll} instead of \texttt{notify} in Java.
+
+The \textbf{granularity} of the lock depends on how big the chunk of code that
+depends on a lock is. If the chunk is large, then it's coarse grained and the
+parallelism is more limited, and if its too small, then its fine grained, and
+you may spend too much time obtaining and releasing locks.
+
+Java also has \texttt{java.util.concurrency.locks.Lock} for explicit locks,
+since there are situations where the implicit object locking is not adequate. An
+example of this is when doing `hand over hand' locking (e.g. lock one item,
+obtain the next, lock the newly obtained one, unlock the first etc). This is
+impossible using the implcit locks, since there is an implicit nesting structure
+(e.g. a synchronized call is either inside a synchronized block or in a
+synchronized method call, and you can only get out by exiting the whole block).
