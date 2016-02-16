@@ -167,7 +167,7 @@ To talk about lexical analysis, we should make some definitions:
   terminal productions of a CFG. 
 \end{itemize}
 
-We can use repeated substiturion to derive \textit{sentential forms}.
+We can use repeated substitution to derive \textit{sentinel forms}.
 % See notes for example
 
 Leftmost derivation is when the leftmost non-terminal symbol is expanded at each
@@ -192,7 +192,7 @@ some parts of languages are more complicated, such as identifiers and numbers.
 We want a notation that lets us go easily to an implementation.
 
 Regular expressions are a way of specifying a regular language; they are
-formulas that represent a possibly infinate set of strings. A Regular Expression
+formulas that represent a possibly infinite set of strings. A Regular Expression
 (RE) over the vocabulary $V$ is defined as:
 
 \begin{itemize}
@@ -200,11 +200,11 @@ formulas that represent a possibly infinate set of strings. A Regular Expression
   \item If $a \in V$ then $a$ denotes $\{a\}$.
   \item If $r_1$ and $r_2$ are RE's, then:
   \begin{itemize}
-    \item $r^{*}_1$ denotes zero or more occurances of $r_1$
+    \item $r^{*}_1$ denotes zero or more occurrences of $r_1$
     \item $r_1r_2$ denotes concatenation
     \item $r_1|r_2$ denotes either or.
   \end{itemize}
-  \item Shorthands include $[a-d]$ which expands to $[a|b|c|d]$, $r^+$ for
+  \item Short-hands include $[a-d]$ which expands to $[a|b|c|d]$, $r^+$ for
   $rr^*$ and $r?$ for $[r|\epsilon]$
 \end{itemize}
 
@@ -231,9 +231,9 @@ table (one way of encoding automata in computers) and (once we've figured out
 how to produce the table, which we'll soon find out) run through the input
 string in linear time.
 
-\subsection{Deriving a Determinstic Finite Automata from a Regular Expression}
+\subsection{Deriving a Deterministic Finite Automata from a Regular Expression}
 
-\marginpar{Remeber that a DFA is a special case of an NFA.}
+\marginpar{Remember that a DFA is a special case of an NFA.}
 
 Every regular expression can be converted to a deterministic finite automaton
 (DFA), and DFA's can automate lexical analysis.
@@ -324,3 +324,80 @@ This builds up a table (representing a DFA) by creating states representing all
 the states reachable with a specific symbol from a set of states within the NFA.
 
 %TODO: Example of NFA->DFA
+
+% Lecture 5
+
+\subsection{DFA minimisation; Hopcroft's algorithm}
+
+The main disadvantage of DFA's is that they can be rather large (when converting
+from an NFA to a DFA, the DFA could have worst case exponential number of
+states). As a result, Hopcroft's algorithm for minim sing the number of states in
+a DFA is good for our memory usage.
+
+The idea behind the algorithm is to find groups of states where for each input
+symbol, every state in the group will have transitions exclusively within the
+group.
+
+The algorithm is:
+
+\begin{verbatim}
+  while the groups are not stable {
+    for each group g {
+      for each input symbol I {
+        for each state s in g {
+          if s(g) not in g {
+            put s in its own group
+          }
+        }
+      }
+    }
+  }
+\end{verbatim}
+
+%TODO: Include example from slide 4 of lecture 5
+
+
+\subsection{Fast scanners}
+
+Now it is very easy to build a recogniser for the DFA, we can just get the
+transition table for the DFA, and read each character of the input,
+transitioning to the next state every time. Accepting and rejecting depends on
+whether we get to \texttt{eof} in a finishing state (accept )or we didn't/we
+made an invalid transition (reject).
+
+However, table recognisers aren't as fast as they could be; each character
+requires one memory access, which is not very efficient, especially if the
+transition table is big and won't fit in a cache. Some automatic code generation
+tools will output a series of \texttt{goto} or \texttt{case} statements instead,
+since then a transition table isn't needed (the states are hardcoded into the
+program).
+
+Poor language design can complicate analysis though. For example, in Fortran:
+
+\begin{verbatim}
+  DO5i=1,25
+    ...
+  5
+\end{verbatim}
+
+Is a for-loop from 1 to 25. However, the following is also valid:
+
+\begin{verbatim}
+  DO5i=1.25
+    ...
+  5
+\end{verbatim}
+
+\marginpar{This may not exactly be what happens, but it's the thought that
+counts.}
+
+The only difference is that there is a comma instead of a period, but now the
+compiler will have assigned the token \texttt{DO5i} a value of $1.25$, and the 5
+at the end will be a non-operation.
+
+Similarly, in C++ having types within types can be hard since
+\texttt{myType<myType2<int>>} includes the symbols \texttt{>>}, which is the
+operator for writing to an output stream.
+
+%Slide 10.. expand :P
+\texttt{lex} and \texttt{flex} are tools for generating lexical analysers.
