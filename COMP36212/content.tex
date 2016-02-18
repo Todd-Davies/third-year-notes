@@ -501,3 +501,128 @@ calculate $\delta$ for this then we get:
 Meaning all of our digits were rubbish!
 
 %TODO: Page 41 onwards for an example
+
+% Part two of the course!
+
+\section{Optimisation and nature inspired algorithms}
+
+To start, lets recap some stuff you should already know; a minima is a point of
+a function where all points in its vicinity have a higher value than itself,and
+a maxima is the opposite; a point where all points in its vicinity have a lower
+value than itself.
+
+Since we can invert a function by putting a minus in front of it, we don't
+really need to differentiate between maxima and minima, since we can always
+express on in terms of the other.
+
+Global optimums are the best values for the entire domain, while local optimums
+are best in some bounded region.
+
+One dimensional functions are easiest to visualise; they are just a graph, where
+the y value is the value of the function and the x value is the input. As the
+dimensionality increases, the functions get harder to visualise; 2d functions
+are visualised on a 2d graph, where the intensity of the colour in each square
+represents the value of the function at that coordinate. 
+
+% TODO: inequality/equality constraints?
+
+An optimisation problem is one where we attempt to maximise or minimise a
+function. This involves finding the input that will produce the largest or
+smallest value. Optimisation problems are really search problems; given a
+domain, find an input that produces the smallest output.
+
+If we know exactly what the function we're trying to optimise is (i.e. we have
+an equation), then it's an explicit problem, but if we just have some inputs and
+outputs, then it's a black box problem.
+
+Similarly, there are two different approaches to solving these problems:
+
+\begin{description}
+  \item \textbf{Single solution}:\\
+   This is where there is a single candidate solution that is incrementally 
+   improved by the algorithm throughout the procedure.
+  \item \textbf{Population based solution}:\\
+    This is where there is a set of candidate solutions (the population) and an
+    iterative operation combines the best ones to improve the quality of the 
+    population.
+\end{description}
+
+All of the optimisation methods follow a cycle:
+
+\begin{itemize}
+  \item Guess some parameters for the initial solution
+  \item While we're not satisfied:
+  \begin{itemize}
+    \item Evaluate how the current parameters perform
+    \item If we're satisfied, then we've finished
+    \item Otherwise, then determine new parameters based on the current ones
+      and their evaluation.
+  \end{itemize}
+\end{itemize}
+
+We can use derivatives to try and find maxima and minima in a function. If we do
+not have an explicit function for the derivative, then we can calculate them
+using \textbf{finite differences}:
+
+\begin{description}
+  \item \textit{Forward difference}:\\
+    \[
+      f'(x) \approx \frac{f(x + h) - f(x)}{h}
+    \]
+  \item \textit{Central difference}:\\
+    \[
+      f'(x) \approx \frac{f(x + h) - f(x - h)}{2h}
+    \]
+\end{description}
+
+Here, the $h$ parameter is the range over which we're calculating the
+differential.
+
+\subsection{Minimising univariate functions}
+
+For one dimensional functions, we can use two approaches:
+
+\begin{itemize}
+  \item Interval reduction, where we iteratively reduce the range of values that
+  we think the optimum is inside.
+  \item Interpolation, where we try to find an approximate function and use the
+  optimum of that function to iterate to find a better approximate function.
+\end{itemize}
+
+\subsubsection{Bisection algorithm}
+
+This is the easiest algorithm, we start with the full range in the domain, and
+then cut it in half based on the value of the differential at the midpoint at
+the range.
+
+\begin{verbatim}
+  bisection(f'(x), a, b, e) {
+    while (b - a >= e) {
+      c = (a + b) / 2;
+      if (f'(c) < 0) a = c;
+      else if(f'(c) > 0) b = c
+      else return c;
+    }
+  }
+\end{verbatim}
+
+\subsubsection{Quadratic interpolation algorithm}
+
+Here, we make a quadratic function that goes through three points $a, b$ and
+$c$, then we either drop $a$ or $b$ depending on which way we should move the
+quadratic function. Here, \textbf{we do not need the differential} which is good
+since we won't always have it!
+
+% TODO: Insert & explain psudo code
+
+\begin{verbatim}
+  Sudo insert psudo code
+\end{verbatim}
+
+\subsubsection{Stopping criteria}
+
+Eventually, we will have to stop our optimisation algorithms, but some of them
+will run indefinitely. We need criteria to make them stop after a sane amount of
+time. The simple approach is to stop after $n$ iterations, and is applicable to
+all iterative functions. The more clever approach is to only stop when we reach
+a certain threshold, i.e. when a method converges asymptotically on an optimum.
