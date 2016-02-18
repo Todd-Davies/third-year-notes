@@ -324,7 +324,7 @@ This means the profits are:
 It is very rare that both players in a two person Stackelberg game will have
 perfect information; in any case, it is in their interest to hide information
 from one-another. In a game of imperfect information, the follower is not
-affected; their job is the same (repond to whatever the leader does).
+affected; their job is the same (respond to whatever the leader does).
 
 However, this is a huge change for the leader. Without knowing the strategy
 space for the follower, or the follower's reaction function, they can't work out
@@ -342,7 +342,7 @@ We're interested in the ML solution, but the obvious solutions are:
   \item Find the best strategy for the worst scenario; that is to say we should
   find the best, worst strategy:
   \[
-    u_L = argmax_{u_L \in U_L}(min_{u_F \in U_F}J_L(u_L, u_F))
+    u_L = arg max_{u_L \in U_L}(min_{u_F \in U_F}J_L(u_L, u_F))
   \]
   Though this gives a lower bound on the payoff, it is also far too
   conservative. Imagine if you always planned for the worst and never considered
@@ -359,7 +359,7 @@ any chosen $u_L$.
 The approach we're going to use to do this is called linear regression. This
 involves finding a linear function that gives similar values to what the
 follower has done in the past. You could also use a polynomial function or a
-neural network (neural networks are called the \textit{universal approximator},
+neural network (neural networks are called the \textit{universal approximation},
 since they can mimic any function).
 
 So, if $y = R(x)$ be the unknown function, and imagine we have a set of $T$
@@ -417,3 +417,82 @@ Of course, we can use partial differentiation to do this (just like in
     T\sum^T_{t=1}x^2(t) - (\sum^T_t{=1}x(t))^2
   }
 \]
+
+% Lecture 5
+
+\section{Multivariable regression}
+
+Now we know how to solve a linear regression problem with one variable, but
+often, there isn't just one variable. If there are three fuels in a petrol
+station (diesel, unleaded, super unleaded), then there will be three variables,
+and we want to learn strategies for all of them.
+
+Here, the leader \& follower strategies will be:
+
+\[
+  u_L = (u^L_1, u^L_2, u^L_3)
+\]
+
+\[
+  u_R = (u^R_1, u^R_2, u^R_3)
+\]
+
+The follower's reaction function is:
+
+\[
+\hat{R}(u_L) = \hat{A} + \hat{B} u_L
+  \begin{bmatrix}
+    \hat{a}_1\\
+    \hat{a}_2\\
+    \dots\\
+    \hat{a}_f\\
+  \end{bmatrix}
+  +
+  \begin{bmatrix}
+    \hat{b}_{1,1}& \hat{b}_{1,2} & \dots & \hat{b}_{2,n_L}\\
+    \hat{b}_{2,2}& \hat{b}_{2,2} & \dots & \hat{b}_{2,n_L}\\
+    \dots & \dots & \dots & \dots\\
+    \hat{b}_{n_f,1} & \hat{b}_{n_f,2} & \dots & \hat{b}_{n_f,n_L}\\
+  \end{bmatrix}
+  \begin{bmatrix}
+    \hat{u}_1^L\\
+    \hat{u}_2^L\\
+    \dots\\
+    \hat{u}_{n_L}^L\\
+  \end{bmatrix}
+\]
+
+Given the leader's strategy ($u_L$), the follower will react using:
+
+\[
+  \hat{R}_i(u_L) = \hat{a}_i + \sum^{n_L}_{j=1}\hat{b}_{i,j}u^L_{j}
+\]
+
+In essence, we're trying to find the mathematical relationship between an output
+variable and several input variables. All of them take continuous values (if the
+dependent is discrete, then it's a classification problem). Such problems are
+widely used in prediction and forecasting.
+
+The idea is that we want to find values for $\theta$ that we can sub into
+$\hat{R}$, such that:
+
+\[
+  \begin{split}
+  \theta^* &= arg~min_\theta \sum^T_{t=1}\epsilon^2(t)\\
+           &= arg~min_\theta \sum^T_{t=1}(R[X(t)] - \hat{R}[X(t), \theta])^2\\
+           &= arg~min_\theta \sum^T_{t=1}(y(t) - \hat{R}[X(t), \theta])^2
+  \end{split}
+\]
+
+Since $\hat{R}(X, \theta) = (1, x_1 \dots, x_n) \left( \begin{smallmatrix}
+a_0\\ a_1\\ \dots \\ a_n \end{smallmatrix} \right) = a_0 + a_1x_1 + \dots +
+a_nx_n$, we just need to find a solution to:
+
+\[
+  \theta^* = arg~min_\theta \sum^T_{t=1}(y(t) - [a_0 + a_1x_1(t) + \dots +
+a_nx_n(t)])^2
+\]
+
+Where $\theta = (a_0, a_1, \dots, a_n)$.
+
+% Slide 16
