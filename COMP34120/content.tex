@@ -495,4 +495,35 @@ a_nx_n(t)])^2
 
 Where $\theta = (a_0, a_1, \dots, a_n)$.
 
-% Slide 16
+% Cont from slide 16, lecture 5
+
+% Lecture 6
+
+\section{Learining in games}
+
+There are two types of Stackelberg strategy generators; online and offline ones.
+In offline learning, the reaction function is regarded as a linear regression
+problem, and is solved by applying the least square method to the historical
+data. All the learning is done before the playing starts.
+
+In online learining, we aim to carry on learning even while the game is being
+played. The reaction strategy from the follower is updated as we play the game.
+We need to work out how to incorperate the follower's moves into our strategy.
+
+The reason why online methods are preferred, is that the environment in which
+the game is played is always changing; costs may change, share prices may change
+etc. The follower's reaction function will change over time to reflect this.
+
+There are two commonly used methods:
+
+\begin{description}
+  \item \textbf{Moving Window Approach}:\\
+    Here, we only consider $n$ historical points, and as new data comes in, we
+    discard old data.
+    %TODO: Expand that ^^
+    To make it better, we can add a parameter $\lambda$ to make old datapoints
+    mean less than new ones. The impact of the $n$th most recent datapoint is
+    $n \times \lambda ^{n-1}$, and $\lambda \approx 0.95-0.99$.
+  \item \textbf{Recursive Least Square Approach}:\\
+    
+\end{description}
