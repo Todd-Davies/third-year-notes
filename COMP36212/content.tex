@@ -419,7 +419,8 @@ If we use the following data:
   \end{tabular}
 \end{center}
 
-If we use formula one for the variance with these input numbers, then we get an answer of $1$, if we use formula two, then we get the answer to be $-1.667$
+If we use formula one for the variance with these input numbers, then we get an
+answer of $1$, if we use formula two, then we get the answer to be $-1.667$
 
 % TODO: Why???
 
@@ -626,3 +627,152 @@ will run indefinitely. We need criteria to make them stop after a sane amount of
 time. The simple approach is to stop after $n$ iterations, and is applicable to
 all iterative functions. The more clever approach is to only stop when we reach
 a certain threshold, i.e. when a method converges asymptotically on an optimum.
+
+\subsection{Minimisation of multivariate functions}
+
+There are two different classes of minimisation methods for multivariate
+functions:
+
+\begin{description}
+  \item \textbf{Based on derivatives}:\\
+    Moves are determined based on information from derivatives of the 
+    multivariate function.
+
+    A \textit{directional derivative} is a derivative indicating the rate of
+    change in a specific dimension:
+
+    % TODO: Give an example of this, since it's really quite vague.
+
+    \[
+      \Phi'_r = lim_{h \rightarrow 0}\frac{f(x + hr) - f(x)}{h}
+    \]
+
+    Where $r$ is the direction. If $\Phi'_r$ is positive, then the direction is
+    ascending, if it's negative, then the direction is descending and if it's
+    equal to zero, then there is no slope.
+
+    Finding the gradient of a vector of a multidimensional function $f(x)$ (and
+    hence the vector of all partial derivatives) is:
+
+    \[
+      \frac{\delta f}{\delta x_j} =
+        lim_{h \rightarrow 0} \frac{f(x + he_j) - f(x)}{h}
+    \]
+
+    $e_j$ is the unit vector in the direction of axis $j$, so to construct the 
+    whole gradient for the vector, we need to do:
+
+    \[
+      \Delta f(x) = \begin{bmatrix}
+        \frac{\delta f}{\delta x_1}(x) & \frac{\delta f}{\delta x_2}(x) & \dots,
+        \frac{\delta f}{\delta x_n}(x)
+      \end{bmatrix}^{T}
+    \]
+
+    The \textbf{Hessian} is the matrix containing the second order partial
+    derivatives, and is always of size $N \times N$:
+
+    \[
+      Hf(x) = \begin{bmatrix}
+        \frac{\delta^2 f}{\delta x_1 \delta x_1}(x) & \dots &
+          \frac{\delta^2 f}{\delta x_1 \delta x_n}(x)\\
+        \vdots & \ddots & \vdots\\
+        \frac{\delta^2 f}{\delta x_n \delta x_1}(x) & \dots &
+          \frac{\delta^2 f}{\delta x_n \delta x_n}(x)\\
+      \end{bmatrix}
+    \]
+
+    Most algorithms have some kind of \textit{parameter update scheme}, where
+    they will move in a given direction $r$ for a length of $\alpha$ every
+    iteration,  and $r, \alpha$ change based on the current position:
+
+    \[
+      x_{i+1} = x_i + r_i\alpha_i
+    \]
+
+    \subsubsection{The alternating variable method}
+
+    A conceptually easy method, you start from an arbitrary position $x$, and
+    then for each dimension $d$:
+
+    \begin{itemize}
+      \item Find the differential for that dimension
+      \item Find the minimum according to that differential
+      \item Move the value of $x_d$ to be equal to that minimum.
+    \end{itemize}
+
+    Then repeat for all dimensions until no progress is made.
+
+    %TODO: Insert picture
+
+    \subsubsection{Newton's method}
+
+    As soon as Newton invented calculus, he also started inventing methods for
+    finding minima. This method requires a function to be twice differentiable:
+
+    \[
+      x_{i+1} = x_i - \alpha\frac{\Delta f(x_i)}{Hf(x_i))}
+    \]
+
+    %TODO: Give an example of this...
+
+    The trouble with Newton's method is that it will only converge if the
+    initial point is close to the solution, and the memory requirements for the
+    Hessian matrix is $n^2$.
+
+  \item \textbf{Direct search}:\\
+    Moves are determined using methods other than derivatives, for example,
+    using geometric concepts.
+
+    \subsection{Simplex methods}
+
+    If you did Advanced Algorithms 1, you're either groaning now or you're
+    jumping for joy at being able to skip a section. However, these aren't the
+    simplex methods you learned about last semester.
+
+    For this, you construct a simplex (a shape of $n+1$ vertices in $n$
+    dimensions), and then observe that you can always form a new simplex from an
+    existing one by adding a new point.
+
+    The \textbf{Spendley, Hext and Himsworth method} is like so:
+
+    \begin{enumerate}
+      \item Create $n+1$ vectors for a regular simplex (where all sides are the
+      same length).
+      \item For each vector, the value of the objected point is calculated for
+      that point.
+      \item The vector with the highest point is removed and substituted by a 
+      new one.
+      \item If the worst vector is also the most recently introduced one, then
+      the next worst one is used.
+      \item The newly substituted vector is the mirror image of the old one
+      along the axis of the remaining vectors. %TODO: Equation
+      \item When the simplex simply rotates around a point, then
+      the vertex in the middle is the minimum.
+    \end{enumerate}
+
+    The maximum age of a vector is $1.65n + 0.05 n^2$, and if a vertex exceeds
+    age $a$, then the search stops, or is restarted using a smaller simplex.
+    If the search was restarted, then the initial (smaller) simplex is started
+    from the site of the rotating.
+
+    The \textbf{Nelder and Mead method} is similar, though the simplices are no
+    longer regular (though they can be). It involves having rules that either
+    expand, contract or reflect the simplex (or any combination of them), which
+    leads to quicker results and better approximations of the solution.
+
+    Where $y^{(r)}_0$ is the best value in the previous simplex, and
+    $y^{(r)}_{n-1}$ is the worst, the new simplex results from:
+
+    \begin{description}
+      \item $y^{(r)}_0 < y^{(r+1)}_{i} < y^{(r)}_{n-1}$:\\
+        The simplex is reflected like in the SHH method.
+      \item $y^{(r+1)}_{i} < y^{(r)}_{0}$:\\
+        The simplex is reflected and expanded.
+      \item $y^{(r+1)}_{i} > y^{(r)}_{n-1}$:\\
+        The simplex is reflected and contracted.
+    \end{description}
+
+\end{description}
+
+
