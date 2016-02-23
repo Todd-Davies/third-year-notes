@@ -407,7 +407,7 @@ responsible for part of the address space. Sometimes in multi-processor systems,
 the memory is not all in one place and is spread over multiple chips.
 
 Since chips with a directory based protocol are often heavily networked (inside
-the chip) in order to connect all the subcomponents, messages can take variable
+the chip) in order to connect all the sub-components, messages can take variable
 amounts of time to send, requiring handshake protocols. This means that the CPU
 can sometimes waste a significant number of cycles waiting for responses from
 messages.
@@ -431,7 +431,7 @@ whole answer before continuing). Take a look at
 Any object can be locked in Java by using as the target of a
 \texttt{synchronized} block, or calling an instance method that is declared as
 being \texttt{synchronized}. Only one thread can lock an object at any given
-time, and other threads must wait to aquire the lock, or the lock holder
+time, and other threads must wait to acquire the lock, or the lock holder
 executes \texttt{wait}.
 
 We want to lock objects so that we can achieve `correctness'. If two code blocks
@@ -451,7 +451,7 @@ but not the only one.}
   them.
 \end{itemize}
 
-Deadlocks can occur in cases where code tries to aquire more than one lock.
+Deadlocks can occur in cases where code tries to acquire more than one lock.
 `Lost WakeUp' can happen if one thread sends a \texttt{notify} message that is
 not properly received by other threads, one way to avoid this is by using
 \texttt{notifyAll} instead of \texttt{notify} in Java.
@@ -465,6 +465,128 @@ Java also has \texttt{java.util.concurrency.locks.Lock} for explicit locks,
 since there are situations where the implicit object locking is not adequate. An
 example of this is when doing `hand over hand' locking (e.g. lock one item,
 obtain the next, lock the newly obtained one, unlock the first etc). This is
-impossible using the implcit locks, since there is an implicit nesting structure
+impossible using the implicit locks, since there is an implicit nesting structure
 (e.g. a synchronized call is either inside a synchronized block or in a
 synchronized method call, and you can only get out by exiting the whole block).
+
+% Lecture 7 - Hardware support for synchronization
+
+\section{Hardware support for synchronization}
+
+Most shared memory parallel Programing models require that the programmer
+implements some sort of synchronization logic in order to control how threads
+access the shared memory. There are several different ways of doing this, all of
+which are closely related. Hardware support is usually required for shared
+memory multiprocessor systems.
+
+\subsection{Binary semaphores}
+
+A \textit{binary} semaphore is essentially a boolean indicating whether some
+resource is free; (\texttt{1} $\rightarrow$ free, \textit{0} $\rightarrow$ in
+use).
+
+There are two atomic operations that can be done on a semaphore;
+\texttt{wait(s)} and \texttt{signal(s)}. \texttt{wait} will block until
+\texttt{s} is equal to $1$ (i.e. wait until it's free), then set \texttt{s} to
+$0$. \texttt{signal} sets \texttt{s} to be equal to $1$. For example:
+
+% TODO Side by side example of two threads in a critical section (lec 7 p 4)
+
+A \textbf{broken} implementation of \texttt{wait} could be:
+
+\begin{verbatim}
+  # Move the address of the semaphore into R2
+  ADR   R2, semaphore
+
+  ...
+
+  wait:
+        PUSH LR
+        PUSH R1
+  loop: LDR R1, R2
+        CMP R1, #0
+        BEQ loop
+        STR #0, R2
+        POP R1
+        POP PC
+\end{verbatim}
+
+The reason why this wouldn't work, is that if another thread was to change the
+value of the memory address pointed to by \texttt{R2} while were were inside
+\texttt{loop}, then we could get unpredictable results.
+
+In order to prevent this from happening, we need to make sure that \texttt{wait}
+is indivisible, which requires special hardware instructions. Even then, if
+\texttt{semaphore} was cached, then even indivisible waiting methods might get
+confused, so we need coherence operations in the cache.
+
+A simple solution (often implemented in older processors) is to provide an
+instruction called \texttt{test and set}, which is atomic. This takes a pointer
+as an argument, and tests if the memory location is \texttt{0}. If it is, then
+the memory location is set to \texttt{1}, and if its not, then the processors
+zero flag is cleared. Now our wait function becomes:
+
+\begin{verbatim}
+  # Move the address of the semaphore into R2
+  ADR   R2, semaphore
+
+  ...
+
+  wait:
+        PUSH LR
+        PUSH R1
+  loop: TAS R2
+        BNZ loop # loop while *R2 != 0
+        POP R1
+        POP PC
+\end{verbatim}
+
+Note that this is the logical opposite of how we defined the semaphore before,
+but it doesn't matter. Furthermore, though it looks like we've reduced the
+number of instructions, the \texttt{TAS} operation will be slow since it must
+read and possibly write a value in memory, which requires that memory location
+to be locked.
+
+If \texttt{semaphore} is cached, (which is likely since its going to be a shared
+memory location), then we're going to be using a lot of bus bandwidth because
+the processor must lock the snoopy bus for every \texttt{TAS} operation since it
+cannot let other cores write to that memory location. If the value of the
+semaphore was $1$, then the lock was wasted.
+
+A simple solution is to sit in a loop reading the value of the semaphore until
+it seems to be free, then use a \texttt{TAS} operation to obtain the lock. If
+the \texttt{TAS} operation was successful, then return to the calling code, and
+if it wasn't, then another thread must have got there first and the current
+thread should continue looping:
+
+\begin{verbatim}
+  # Move the address of the semaphore into R2
+  ADR   R2, semaphore
+
+  ...
+
+  wait:
+        PUSH LR
+        PUSH R1
+  loop: LDR R1, R2
+        CMP R1, #1
+        BEQ loop
+        TAS R2
+        BNZ loop
+        POP R1
+        POP PC
+\end{verbatim}
+
+\subsection{Other synchronization primitives}
+
+There are other machine level primitives including \texttt{fetch and add} (get a
+memory location, add one and write back), and \texttt{compare and swap} (compare
+a memory location to a value and exchange it for another value if it was as
+expected). These are read-modify-write instructions and require the snoopy bus
+to be locked while they execute.
+
+The trouble with these operations, is that they are quite complicated (i.e. like
+CISC instructions, not RISC instructions), and as a consequence, they don't fit
+well with modern pipelined processors.
+
+%TODO Load linked & Spin locks L 7 S 15
