@@ -401,3 +401,80 @@ operator for writing to an output stream.
 
 %Slide 10.. expand :P
 \texttt{lex} and \texttt{flex} are tools for generating lexical analysers.
+
+% Lecture 7
+
+\section{Parsing languages}
+
+Not all languages can be described by regular expressions (as we have attempted
+to do so far). They cannot describe things like nested constructs (i.e. is the
+bracketing legal in a mathematical formula). Also, you can't use a terminal
+symbol in a regular expression before it has been fully defined (i.e. no
+recursion).
+
+Chomsky's hierachy of grammars tells us which grammars can describe other ones:
+
+\begin{description}
+  \item \textbf{Phase structured}: % TODO phase structured example
+  \item \textbf{Context sensitive}: % TODO CSG example
+  \item \textbf{Context free}: % TODO CFG example
+  \item \textbf{Regular}:\\
+    Only rules of the form $A \rightarrow \epsilon$, $A \rightarrow a$,
+    $A \rightarrow pB$ are allowed.  % TODO regex example
+\end{description}
+
+Context free syntax is expressed with a context free grammar, which is a 4-tuple
+$G = \{S,N,T,P\}$, where $S$ is the start symbol, $N$ are the non-terminal
+symbols, $T$ are the terminalsmbols and $P$ are the production rules. We re-
+write rules (starting from the initial rule) in order to make them closer to a
+sentence we're trying to obtain. A sequence of re-writes leading to some desired
+output is called a \textit{derivation}, and the process of finding a derivation
+for a sepcific sentence is called \textit{parsing}.
+
+A derivation is a sequence of steps from the initial rule to a parsed
+representation of the input. Different choices of steps can potentially lead to
+different derivations of the same input. Two derivations are of particular
+interest to us:
+
+\begin{description}
+  \item Leftmost derivation; at each step, replace the leftmost non-terminal.
+  \item Rightmost derivation; at each step, replace the rightmost non-terminal.
+\end{description}
+
+A parse tree is a graphical representation of a derivation that is independent
+of the order that the derivation rules were applied in. To construct a parse
+tree, start with the starting symbol (which is the root of the tree), then for
+each derivational step, add children nodes for each symbol on the right hand of
+the production rule to the node for the left side. After you've done this, the
+leaves of the tree will (should) read from left to right to form the input.
+
+If we're parsing something like a mathematical formula, then we need to build
+the notion of precedence into our derivational rules so that we get the correct
+parsing for an input. To do this, we force the parser to recognise the high-
+precedence subexpressions first.
+
+Grammars are ambigous if they can possibly produce more than one parse tree for
+a sentence. This is the case if a grammar has more than one leftmost or
+rightmost derivation for a single sentinal form. An example is:
+
+\begin{verbatim}
+  Stmt = if Expr then Stmt | if Expr then Stmt else Stmt | Expr
+  Expr = W | X | Y | Z
+\end{verbatim}
+
+This could match the following in two ways:
+
+\begin{verbatim}
+  if X then if Y then W else Z
+\end{verbatim}
+
+In order to eliminate ambiguity (and also deal with precidence), we need to re-
+write the grammar:
+
+%TODO: Lecture 7 S 8, does this even work?! HMMMMM
+\begin{verbatim}
+  Stmt = IfElse | IfNoElse
+  IfElse = if Expre then IfWithElse else IfWithElse
+  IfNoElse = if Expr then Stmt | if Expr then IfElse else IfNoElse
+  Expr = W | X | Y | Z
+\end{verbatim}
