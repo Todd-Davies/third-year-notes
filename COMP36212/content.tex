@@ -772,6 +772,174 @@ functions:
       \item $y^{(r+1)}_{i} > y^{(r)}_{n-1}$:\\
         The simplex is reflected and contracted.
     \end{description}
+\end{description}
+
+% Lecture 3 of part 2
+
+\subsection{Optimisation and nature inspired algorithms}
+
+As we have seen, a global optimum is the best set of admissible conditions to
+achieve an objective (i.e. minimising the function) under a set of constraints.
+
+Finding such an optimum is non-trivial, mainly because the search space is often
+continous, so there are an infinate number of parameters to test. The following
+algorithms try to find global optimums:
+
+\begin{description}
+  \item \textbf{Grid Search}:\\
+  We overlay a grid onto the search space (in as many dimensions as we need to),
+  and test each point on the grid. We can change the resolution of thegrid by
+  making the space between the grid lines larger or smaller. The algorithm
+  scales exponentially in the number of dimensions, but linearly in the number
+  of points tested (dependent on the grid resolution), therefore the runtime is
+  $O(n^d)$.
+
+  The quality of the solution depends on the density of the grid, but getting a
+  high quality solution is usually impractical, since the search space grows so
+  quickly (even in two dimensions, it is quadratic).
+
+  \item \textbf{Random search}:\\
+  Here, we simply generate $n$ random points and sample the objective function
+  at these points. The point that gives the best value for th eobjective
+  function is remembered for possible later use (since that's the optimum).
+  Obviously this algorithm runs in $O(n)$ time, and its quality depends on the
+  number of random points chosen. It is possible that the random search method
+  could outperform all the other methods if it got lucky, though this is
+  unlikely.
+
+  Due to its ease of implementation, random search is often used as a reference
+  for other methods.
+
+  \item \textbf{Multistart}:\\
+
+  Here, we guess $n$ random points again, but for each one, we find the local
+  minimum. This improves the quality (since there's more chance of finding the
+  global minimum, since it's definately a local minimum too), but it can degrade
+  performance.
+
+  This method often visits the same local minima multiple times (if
+  optimisations aren't made to avoid doing this) so it can be inefficient.
+
+  \item \textbf{Random walk}:\\
+  We can generate a single random start point, but then generate subsequent
+  points by choosing a random direction and length for a vector and adding that
+  to the current point.
+
+  \item \textbf{Using nature to help minimise}:\\
+  If a crystal is being formed, and it cools slowly, then the atoms in the
+  crystal will vibrate around until they are in a local minima, which results in
+  some cool shapes. We can use techniques to emulate this to find minima in our
+  functions.
+
+  Furthermore in genetics, non-optimal genes are `selected out' of the
+  population by natural selection and evolution, leading to a genotype that is
+  optimum for the environment.
+
+  The remaining algorithms use nature as inspiration:
+
+  \begin{description}
+    \item \textbf{Metropolis algorithm}:\\
+      This is an algorithm that emulates an ensemble of particles in equlibrium
+      at a certain temperature. It uses the Boltzmann probability density
+      function:
+
+      \[
+        p.d.f = e^{\frac{-E}{k_BT}}
+      \]
+
+      To give the probability that a certain particle configuration with an 
+      energy $E$ has a certain temperature $T$.
+
+      In nature, perfect crystals are formed by the cooling down from being
+      molten very slowly so that the material can reach an equlibrium at each
+      temperature. If the cooling is too fast, then an equlibrium will not be
+      reached at each temperature, and the crystal will have imperfections.
+
+      Local optimisation algorithms have parallels with letting crystals cool
+      too fast!
+
+      The algorithm is as follows:
+
+      \begin{itemize}
+        \item Start with a random position for an atom $x^0$
+        \item Create a small random displacement to obtain $x^1$ and calculate
+        the difference in energy $\Delta E = E^1 - E^0$.
+        \item If $\Delta E < 0$ accept the new position, otherwise accept it
+        with a probability of $P(\Delta E) = e^{\frac{-\Delta E}{k_BT}}$
+        \item Iterate a lot of times, simulating the thermal motion of particles 
+        in a heat bath of temperature $T$.
+      \end{itemize}
+
+      The Metropolis algorithm works because it lets the energy of the particle
+      increase even though that's a `step back' in terms of optimisation.
+      Sometimes the algorithm needs to get out of a local minima in order to
+      find the global optimum.
+    \item \textbf{Simulated Annealing}:\\
+      This takes advantage of the fact that we can see the energy of a particle
+      was similar to the value of an objective function we're trying to
+      maximise, and the coordinates that it is at as similar to the parameters
+      of the function we're finding an optimum for.
+
+      The only other variable is the temperature, which acts as a control
+      parameter with the same units as the objective function. Simulated
+      annealing starts by melting the objective function at a high temperature,
+      then using the Metropolis algorithm to calculate the equilibrium of the
+      objective function at temperature decreases. Here's the algorithm:
+
+      \begin{itemize}
+        \item Start with a high temperature $T^0$ at some random position
+        $x^{(0, T^0)}$.
+        \item Apply the Metropolis algorithm to determine the average 
+        equilibrium value of the objective function and parameter values
+        $x^{(Ex, T^0)}$.
+        \item keep reducing $T$ and repeating the previous step, and only stop
+        when the function freezes; you've reached the global minimum.
+      \end{itemize}
+
+      Note that the start position is irrelevant, since there are many
+      iterations required for each temperature, and an equilibrium is found for
+      each. The start temperature, $T^0$ is very important though; if its too
+      low, then a local minimum will be found, and if its too high, then the
+      algorithm will take too long.
+
+      \marginpar{Random and grid searches are also asymptotically complete, but
+      they converge at much slower rates.}
+
+      Simulated annealing can be reformulated computationally as a Markov Chain,
+      and a proof has been given that states the algorithm will converge to a
+      global optimum in infinite time, which makes simulated annealing
+      \textit{asymptotocally complete}.
+
+    \item \textbf{Press' mosification}:\\
+      In 1989, Press et al. suggested that each temperature cycle should last
+      for a predetermined number of iterations $N$. After each cycle, the
+      temperature should be reduced by a constant factor $p$:
+
+      \[
+        T^{n+1} = pT^n~~~< 0\leq p \leq 1
+      \]
+
+      If after a cycle has finished, there have been no successful moves, then
+      the algorithm stops. If we increase $N$, then the accuracy increases, but
+      the execution time increases faster too. Similarly if we increase $p$, the
+      solution will improve (and the reliability too), but the rate of cooling
+      drops so it takes longer.
+
+      There is also a slight modification to the displacement step; a single
+      parameter is changed to a random value within the boundaries of the
+      parameter.
+
+    \item \textbf{Corana's modification}:\\
+      Corana et al. suggested that the displacement step should be based off a
+      vector; each parameter is changed according to the same coordinate of a
+      vector $v_i$. After $N_s$ rounds, $v_i$ is changed so half the new
+      candidate parameters are changed. Just like Press' modification, after
+      $N_r$ rounds, the temperature is reduced.
+
+      As a result, the annealing will adapt to the shape of the function, but
+      it is also slower; $N$ in Press' algorithm is equal to $N_s \times N_r$ in
+      Corana's algorithm.
+  \end{description}
 
 \end{description}
 
