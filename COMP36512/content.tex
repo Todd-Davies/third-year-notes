@@ -412,7 +412,7 @@ bracketing legal in a mathematical formula). Also, you can't use a terminal
 symbol in a regular expression before it has been fully defined (i.e. no
 recursion).
 
-Chomsky's hierachy of grammars tells us which grammars can describe other ones:
+Chomsky's hierarchy of grammars tells us which grammars can describe other ones:
 
 \begin{description}
   \item \textbf{Phase structured}: % TODO phase structured example
@@ -425,11 +425,11 @@ Chomsky's hierachy of grammars tells us which grammars can describe other ones:
 
 Context free syntax is expressed with a context free grammar, which is a 4-tuple
 $G = \{S,N,T,P\}$, where $S$ is the start symbol, $N$ are the non-terminal
-symbols, $T$ are the terminalsmbols and $P$ are the production rules. We re-
+symbols, $T$ are the terminal symbols and $P$ are the production rules. We re-
 write rules (starting from the initial rule) in order to make them closer to a
 sentence we're trying to obtain. A sequence of re-writes leading to some desired
 output is called a \textit{derivation}, and the process of finding a derivation
-for a sepcific sentence is called \textit{parsing}.
+for a specific sentence is called \textit{parsing}.
 
 A derivation is a sequence of steps from the initial rule to a parsed
 representation of the input. Different choices of steps can potentially lead to
@@ -453,9 +453,9 @@ the notion of precedence into our derivational rules so that we get the correct
 parsing for an input. To do this, we force the parser to recognise the high-
 precedence subexpressions first.
 
-Grammars are ambigous if they can possibly produce more than one parse tree for
+Grammars are ambiguous if they can possibly produce more than one parse tree for
 a sentence. This is the case if a grammar has more than one leftmost or
-rightmost derivation for a single sentinal form. An example is:
+rightmost derivation for a single sentinel form. An example is:
 
 \begin{verbatim}
   Stmt = if Expr then Stmt | if Expr then Stmt else Stmt | Expr
@@ -468,7 +468,7 @@ This could match the following in two ways:
   if X then if Y then W else Z
 \end{verbatim}
 
-In order to eliminate ambiguity (and also deal with precidence), we need to re-
+In order to eliminate ambiguity (and also deal with precedence), we need to re-
 write the grammar:
 
 %TODO: Lecture 7 S 8, does this even work?! HMMMMM
@@ -478,3 +478,41 @@ write the grammar:
   IfNoElse = if Expr then Stmt | if Expr then IfElse else IfNoElse
   Expr = W | X | Y | Z
 \end{verbatim}
+
+So, if there is ambiguity, then we should try and resolve it in the CFG (after
+all, we only have to do this once, instead of resolving at runtime every time!).
+Overloading (when you give multiple things the same name or structure, such as
+method overloading in Java) can create ambiguity that you can only resolve using
+context. In general, to solve ambiguity:
+
+\begin{description}
+  \item If the issue is context free, then re-write the CFG so that there is no
+  ambiguity.
+  \item If the issue requires context to solve, then we need more information
+  in order to continue. This is really a problem with the design of the
+  language.
+\end{description}
+
+There are two broad classes of parsers; top down parsers and bottom up parsers:
+
+% TODO: Research these more
+\begin{description}
+  \item \textbf{Top-down parsers}:\\
+    \begin{itemize}
+      \item Construct the root of the tree first, then construct the rest in
+      pre-order, using a depth first search.
+      \item Pick a production, and try to match the input. If you fail then use
+      backtracking.
+      \item Try to find a leftmost derivation for the input string where we scan
+      from left to right.
+      \item Some grammars are backtrack-free (called predictive parsing)
+    \end{itemize}
+  \item \textbf{Bottom-up parsers}:\\
+    \begin{itemize}
+      \item Construct the tree for an input but start at the leaves and work up
+      towards the root.
+      \item Use a left-to-right scan and try to construct a rightmost derivation
+      in reverse.
+      \item Handles a large number of grammars.
+    \end{itemize}
+\end{description}
