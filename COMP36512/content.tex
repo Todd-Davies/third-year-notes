@@ -516,3 +516,112 @@ There are two broad classes of parsers; top down parsers and bottom up parsers:
       \item Handles a large number of grammars.
     \end{itemize}
 \end{description}
+
+% Lecture 8
+
+\subsection{Top Down Recursive Descent Parsing}
+
+This is where you:
+
+\begin{itemize}
+  \item Construct the root with the start symbol for the grammar
+  \item While the leaves of the parse tree don't match the input:
+  \begin{itemize}
+    \item Select a node in the tree labelled $A$.
+    \item Select a production rule for $A$ and construct a child for each symbol
+    on the right hand side of the rule.
+    \item When a terminal symbol is added to the fringe, but it doesn't match
+    the fringe, then backtrack.
+  \end{itemize}
+\end{itemize}
+
+If you choose the right production step at each stage, then this algorithm is
+fast, if you don't then the runtime will increase due to backtracking.
+
+A grammar is left-recursive if it has a non-terminal symbol $A$ such that there
+is a derivation $A \rightarrow Aa$ for some string $a$. Such a grammar can cause
+an infinite look for recursive-descent parsers since they may output an string
+of infinite $a$'s. To avoid this, we try to eliminate left recursion; i.e.
+replace $A \rightarrow Aa | b$ with $A \rightarrow bA$ $A' \rightarrow aA' |
+\epsilon$.
+
+The general algorithm for non-cyclic, non-$\epsilon$-productive grammars is:
+
+\begin{itemize}
+  \item Arrange the non-terminal symbols $A_1 \dots A_n$
+  \item For $i = 1 \dots n$:
+    \begin{itemize}
+      \item For $j = 1 \dots i-1$:
+      \begin{itemize}
+        \item Replace each production $A_i \rightarrow A_j \gamma$ with
+        $A_I \rightarrow \delta_1 \gamma | \dots | \delta_k\gamma$, where
+        $A_j \rightarrow \delta _1 | \dots | \delta_k$ are the current $A_j$
+        productions.
+        \item Eliminate the left recursion among $A_i$.
+      \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Predictive parsing}
+
+So now we can make a top-down parser which will find the correct matching in
+finite time, but it employs backtracking when it picks the wrong initial rule
+(which slows everything down). If we look ahead in the input, we can use context
+to influence our decisions about what production rules to try next so we can
+attempt to reduce the amount we have to backtrack.
+
+In general, we need an infinite amount of look-ahead to always make the right
+decision about what production rule to use next (but this is pretty much the
+same as parsing the rest of the string, right?). However, most context free
+grammars can be parsed with a limited look-ahead.
+
+The basic idea is for any production $A \rightarrow a | b$, we want to have a
+distinct way of choosing the correct production to expand (either $a$ or $b$).
+
+We can do this for some grammars by defining a set called \texttt{FIRST}. This
+is the set of the first terminal symbols for each string derived from $A$. A
+very simple example is:
+
+\[
+  A \rightarrow B | C
+\]
+
+\[
+  B \rightarrow x | y
+\]
+
+\[
+  C \rightarrow m | n
+\]
+
+\[
+  FIRST(B) = \{x, y\}
+\]
+
+\[
+  FIRST(C) = \{m, n\}
+\]
+
+% TODO: What's the LL property?
+
+If for a production rule $A \rightarrow X | Y$, $FIRST(X) \cap FIRST(Y) =
+\emptyset$, then we can implement the look-ahead with only one symbol. This is
+the LL property.
+
+If a grammar does not have the LL(1) property, we can sometimes transform it so
+that it does:
+
+\begin{itemize}
+  \item For each non-terminal $A$, find the longest prefix $a$ common to two or
+  more of its alternatives (e.g. $B$ and $C$ in $A \rightarrow B | C$).
+  \item If $a \neq \epsilon$ then replace all the $A$ productions
+  $A \rightarrow ab_1 | \dots | ab_n | \gamma$ (where $\gamma$ doesn't begin
+  with $a$) with $A \rightarrow aZ | \gamma, Z \rightarrow b_1 | \dots b_n$.
+  \item Repeat until we have no common prefixes.
+\end{itemize}
+
+% TODO: Give example
+
+Note that it is undecidable as to whether an LL(1) grammar exists for any CFG.
+It is also possible to parse non-recursively if we maintain a stack and
+determine what production rules to apply using a table.
