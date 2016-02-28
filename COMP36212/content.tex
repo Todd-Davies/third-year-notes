@@ -782,13 +782,13 @@ As we have seen, a global optimum is the best set of admissible conditions to
 achieve an objective (i.e. minimising the function) under a set of constraints.
 
 Finding such an optimum is non-trivial, mainly because the search space is often
-continous, so there are an infinate number of parameters to test. The following
+continuous, so there are an infinite number of parameters to test. The following
 algorithms try to find global optimums:
 
 \begin{description}
   \item \textbf{Grid Search}:\\
   We overlay a grid onto the search space (in as many dimensions as we need to),
-  and test each point on the grid. We can change the resolution of thegrid by
+  and test each point on the grid. We can change the resolution of the grid by
   making the space between the grid lines larger or smaller. The algorithm
   scales exponentially in the number of dimensions, but linearly in the number
   of points tested (dependent on the grid resolution), therefore the runtime is
@@ -800,7 +800,7 @@ algorithms try to find global optimums:
 
   \item \textbf{Random search}:\\
   Here, we simply generate $n$ random points and sample the objective function
-  at these points. The point that gives the best value for th eobjective
+  at these points. The point that gives the best value for th objective
   function is remembered for possible later use (since that's the optimum).
   Obviously this algorithm runs in $O(n)$ time, and its quality depends on the
   number of random points chosen. It is possible that the random search method
@@ -814,7 +814,7 @@ algorithms try to find global optimums:
 
   Here, we guess $n$ random points again, but for each one, we find the local
   minimum. This improves the quality (since there's more chance of finding the
-  global minimum, since it's definately a local minimum too), but it can degrade
+  global minimum, since it's definitely a local minimum too), but it can degrade
   performance.
 
   This method often visits the same local minima multiple times (if
@@ -839,7 +839,7 @@ algorithms try to find global optimums:
 
   \begin{description}
     \item \textbf{Metropolis algorithm}:\\
-      This is an algorithm that emulates an ensemble of particles in equlibrium
+      This is an algorithm that emulates an ensemble of particles in equilibrium
       at a certain temperature. It uses the Boltzmann probability density
       function:
 
@@ -851,8 +851,8 @@ algorithms try to find global optimums:
       energy $E$ has a certain temperature $T$.
 
       In nature, perfect crystals are formed by the cooling down from being
-      molten very slowly so that the material can reach an equlibrium at each
-      temperature. If the cooling is too fast, then an equlibrium will not be
+      molten very slowly so that the material can reach an equilibrium at each
+      temperature. If the cooling is too fast, then an equilibrium will not be
       reached at each temperature, and the crystal will have imperfections.
 
       Local optimisation algorithms have parallels with letting crystals cool
@@ -908,9 +908,9 @@ algorithms try to find global optimums:
       Simulated annealing can be reformulated computationally as a Markov Chain,
       and a proof has been given that states the algorithm will converge to a
       global optimum in infinite time, which makes simulated annealing
-      \textit{asymptotocally complete}.
+      \textit{asymptotically complete}.
 
-    \item \textbf{Press' mosification}:\\
+    \item \textbf{Press' modification}:\\
       In 1989, Press et al. suggested that each temperature cycle should last
       for a predetermined number of iterations $N$. After each cycle, the
       temperature should be reduced by a constant factor $p$:
@@ -943,4 +943,140 @@ algorithms try to find global optimums:
 
 \end{description}
 
+% Lecture 4 of part 2
+
+\subsection{Evolutionary algorithms}
+
+Natural populations evolve by having variation amongst the members of the
+population and having selection (or unfit members of the population dying before
+they get chance to reproduce). Evolutionary algorithms are a class of
+optimisation algorithms that evolve candidate solutions as a group (ensemble)
+rather than looking at one solution at a time.
+
+If you took a biology course at some point, then you may be able to figure this
+out, but there is a mapping from biology terminology to CS terminology:
+
+\begin{itemize}
+  \item Gene  - Parameter
+  \item Chromosome - All parameters
+  \item Individual - Candidate solution
+  \item Generation - One iteration
+  \item Fitness - Value of the objective function
+\end{itemize}
+
+Evolutionary algorithms evolve their populations. This means there will be $n$
+points in the parameter space, and each iteration will drop some of the points
+and create new ones (in hopefully better locations). Each individual in the 
+population is a single candidate solution, and is stored as a
+\textit{chromosome}. This is a sequence of bits, split into $m$ sections called
+\textit{genes}. As described above, each gene maps onto a parameter.
+
+% TODO: Insert image showing chromosome/genes = parameters
+
+Fogel's algorithm for evolutionary programming is as such:
+
+\begin{enumerate}
+  \item Generate a random initial population of $n$ individuals
+  \item Calculate the fitness of each individual in the population (using the
+  objective function)
+  \item Each individual from the current population generates and offspring by
+  copying its own genes
+  \item Mutate each gene for each chromosome in the offspring by a small 
+  variance.
+  \item Put the offspring in a new population, $2n$ large
+  \item Probabilistically select $n$ individuals as a function of fitness to be
+  removed (now we have a population of $n$ again).
+  \item Go back to step 2, or stop.
+\end{enumerate}
+
+% TODO: Can this be a negative number?
+
+In this algorithm, we described mutation (in step 4) and selection (in step 6).
+For mutation, we add a small random number to the original value of a gene.
+
+For selection, we want to select $n$ individuals, where better individuals have
+a greater chance of remaining in the population. A roulette wheel is a manual
+way of doing this, but stochastic ranking (e.g. a sort that has a chance of
+being wrong) or a tournament where each individual is compared against a small
+number of others and receives a score based off of its performance; the $n$
+lowest scoring individuals are pruned.
+
+Holland and DeJong's Genetic algorithm is as follows. It encodes parameters in
+binary, and genes are therefore strings of binary digits.
+
+\begin{enumerate}
+  \item Generate $n$ random individuals for the population
+  \item Calculate the fitness of each individual in the population
+  \item Choose two parent individuals from the current population as a 
+  probability of their fitness
+  \item Cross them over (see below) at a random locus to produce two offspring
+  \item Mutate each locus (gene) in the offspring with a small probability
+  \item Put the offspring in the new population
+  \item Go to step two, or stop.
+\end{enumerate}
+
+The mutation operation flips bits in a gene with a small probability. The cross
+over operator swaps the latter halves of two chromosomes at a random index.
+
+% TODO: Cross over image
+
+The differences in the two algorithms are as follows:
+
+\begin{center}
+  \begin{tabularx}{0.8\textwidth}{X|X}
+    \textbf{Evolutionary programming} & \textbf{Genetic algorithms}\\ \hline
+    Genes are encoded as floating point numbers & Genes are encoded in binary.\\
+    Mutation is addition of a random value & Mutation is bit flipping.\\
+    Asexual reproduction (two parent makes one child) & Sexual reproduction (two
+    parents make two children.)\\
+    No cross over & Cross over by swapping subsections of the chromosome.
+  \end{tabularx}
+\end{center}
+
+%TODO: What is the standard deviation gene?
+Rechenberger and Schwefel made another algorithm:
+
+\begin{enumerate}
+  \item Generate $n$ random individuals
+  \item Calculate the fitness of each
+  \item Randomly pair up individuals
+  \item Recombine them to create two offspring
+  \item Mutate each gene locus with a small probability
+  \item Put the offspring in the new population ($2n$ large)
+  \item Select the best $n$
+  \item Go back to step 2, or stop.
+\end{enumerate}
+
+% TODO: How is std. deviation incorperated in mutation & recombination
+
+I should figure out how std. deviation incorporates in here...
+
+It is important to note the differences between selection and variation so we
+can get the balance right:
+
+\begin{itemize}
+  \item Selection is responsible for keeping improvements in the population and
+  not discarding them
+  \item Very strong selection limits the variation and all individuals will be 
+  the same
+  \item Mutation and cross over are responsible for introducing variation and 
+  will make the parameters/gene pool change
+  \item Very strong variation results in good solutions, but they will be 
+  replaced by random ones and not retained.
+\end{itemize}
+
+Many genetic algorithms progress at very slow rates, but then have short bursts
+of very rapid progress. In general, it is not common for these algorithms to
+have proven convergence properties, but some of them do when applied to simple
+problems.
+
+%TODO: Split this uber sentence up
+
+Deciding when to stop a genetic algorithm isn't always simple; stopping after a
+predetermined number of generations requires lots of trial and error to get the
+number right, waiting until a desired fitness is reached is okay if you know
+what the optimal fitness is, but it may take an (infinitely) long amount of
+time, and waiting for the fitness variations from one population to the next to
+become stable isn't a good idea either because of the propensity for genetic
+algorithms to progress very slowly then have a burst of progress.
 
