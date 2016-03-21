@@ -8,11 +8,12 @@
 
 Even though we've been unable to increase the clock speed of processors since
 around 2005, we have seen the `power' of processors roughly double every 18-24
-months since then in line with Moore's Law. The reason why, is that we have been
-able to increase the amount of transistors in chips (due to the feature size
-decreasing), and use the extra ones to provide more processing cores, which are
-able to process data in parallel. The degree of parallelism is increasing as
-time progresses.
+months since then in line with Moore's Law\footnote{An observation that the
+number of transistors in processor chips doubles approximately every two years.}.
+The reason why, is that we have been able to increase the amount of transistors
+in chips (due to the feature size decreasing), and use the extra ones to provide
+more processing cores, which are able to process data in parallel. The degree of
+parallelism is increasing as time progresses.
 
 In an ideal world providing a greater degree of parallelism would merely entail
 chip designers copy and pasting multiple processor cores onto the silicon, and
@@ -26,19 +27,25 @@ switching speed is determined by $R*C$, where $R$ is the resistance and $C$ is
 the capacitance. When we reduce the area of the transistor, $C$ decreases, so in
 doing so, we make the circuit able to compute faster.
 
-This was fine until 2005, at which point we started to have problems with things
-like \textit{interconnect capacitance} (the capacitance between neighbouring
-wires). Also, the power density increased (smaller transistors means more per
-unit area), which has serious cooling implications. As we approach the
-theoretical limit of one atom per transistor, any impurity in the silicon
-becomes a major issue.
+This was fine until 2005, at which point we started to see three problems which
+stopped transistors from becoming smaller and faster:
+
+\begin{description}
+  \item \textbf{Interconnect capacitance}: the capacitance between neighbouring
+  wires).
+  \item \textbf{Power density}: As the power density increased, cooling became
+  a serious problem; each transistor produces heat as it switches and the number
+  of transistors per unit area dictates how much heat is produced.
+  \item \textbf{Impurities}: As we approach the theoretical limit of one atom
+  per transistor, any impurity in the silicon becomes a major issue.
+\end{description}
 
 We have tried using extra transistors to build more complex single core
 processors (using Instruction Level Parallelism (ILP)) and by adding bigger
 caches so that they exhibit lower miss rates, however both of these techniques
 suffer from diminishing returns. Control statements such as \texttt{branches}
 make us have to periodically throw away all the partially completed instructions
-in a pipeline, and caches already have hit-rates in the high $90$'s.
+in a pipeline, and caches already have hit-rate percentages in the high $90$'s.
 
 Though we might be able to increase the number of cores on a chip, how does a
 programmer utilise this extra power? It is relatively easy for an operating
@@ -57,34 +64,44 @@ parallel, meaning that fewer clock cycles are needed to execute the same number
 of instructions. This form of parallelism is very limited, and can only be used
 in certain situations. Vector parallelism is similar, and lets you do things
 like do four 8-bit additions in one instruction (by splitting a 32-bit word into
-four 8-bit parts).
+four 8-bit parts). In both cases, the end result of the execution is the same as
+if all the instructions were executed in order.
 
-In TLP, a program can be composed of separate threads, each
-being its own sequence of instructions. Many threads can be executing in
-parallel and since their instructions are independent of each other, can be
-interleaved on the processor (or run on multiple cores). The output of threaded
-programs must be deterministic, i.e. for all possible sequences of execution,
-the output must be the same.
+In TLP, a program can be composed of separate threads, each being its own
+sequence of instructions. Many threads can be executing in parallel and since
+their instructions are independent of each other, can be interleaved on the
+processor (or run on multiple cores). If it often desirable for the output of
+threaded programs to be deterministic, i.e. for all possible sequences of
+execution, the output must be the same.
 
 TLP is far more general purpose than ILP (and much more so than vector
 parallelism, which is only really useful in simple operations like array
-addition). However, it relies on the programmer finding a way to express an
-algorithm in a parallel manner.
+addition). While ILP is applied automatically to the instruction stream issued
+to the CPU\footnote{Either the compiler can make use of ILP (e.g. instruction
+reordering at compile time), or the CPU can do it automatically using a
+technique such as scoreboarding.}, whereas TLP relies on the programmer finding
+a way to express an algorithm in a parallel manner; something that is not always
+achievable for all programs.
 
 \subsection{Data and instruction parallelism}
 
-\textit{Flynn} classified parallelism as \textbf{instruction stream} and
-\textbf{data stream} parallelism.
+Flynn~\cite{flynn1972some} classified parallelism as \textbf{instruction stream}
+and \textbf{data stream} parallelism, both of which can come into effect at the
+same time.
 
-Data parallelism is when the same computation is carried out on multiple
+Data parallelism is when the same computation can be carried out on multiple
 elements of some dataset, usually an array. Vector parallelism is an example of
-this. Only certain problems amenable to this type of parallelism can be sped up
-in this manner.
+this. Only certain problems are amenable to data parallelism and can be sped up
+in this manner, but doing so is often very easy\footnote{E.g. vector addition
+can be easily parallelised by splitting the vector up into $n$ chunks and
+assigning each one to a thread, where you have $n$ threads.}.
 
 Instruction parallelism is when multiple instructions can be executed in
-parallel (with no side effects that cause problems to each other).
+parallel (with no side effects that cause problems to each other), this is often
+implemented automatically.
 
-Different combinations of these types of parallelism have different names:
+Flynn gave different combinations of these types of parallelism have different
+names:
 
 \begin{description}
   \item \textbf{SISD}: Single Instruction Single Data is like a normal program.
@@ -92,16 +109,29 @@ Different combinations of these types of parallelism have different names:
   time.
   \item \textbf{MIMD}: Multiple Instruction Multiple Data is the most parallel
   one, where there are multiple instruction streams and they can all operate on 
-  their own independent stream of data. This is most normal computer chips.
+  their own independent stream of data. This is what happens on most modern
+  computer chips, where the operating system will schedule processes on
+  different cores at the same time.
   \item \textbf{SIMD}: Single Instruction Multiple Data is stuff like when you 
   use instructions like \texttt{ADD8} to process multiple data elements at once 
-  with the same instruction, or a GPU processing lots of pixels at once with 
-  the same filter. If it's not a vector instruction, then it's one or more 
-  processors working in lockstep to process elements of an array or something.
-  \item \textit{SPMD}: Single Program Multiple Data is a generalisation of SIMD,
+  with the same instruction, or a GPU\footnote{GPU's often have upwards of
+  hundreds or even thousands of processing cores, and in order to manage the
+  complexity of assigning work to these cores, will use a combination of SIMD
+  and SPMD techniques. The same program usually runs on each core, but groups of
+  cores execute in lock-step on the same data.} processing lots of pixels at
+  once with the same filter. If it's not a vector instruction, then it's one or
+  more processors working in lockstep to process elements of an array or
+  something.
+  \item \textbf{SPMD}: Single Program Multiple Data is a generalisation of SIMD,
   where different processors execute the same code but don't need to be in 
   lockstep. This is most often how parallel programs are written for CPU's.
 \end{description}
+
+For any given problem, the complexity of parallelising it is proportional to how
+irregular the parallelism is, and how much data sharing there is between threads
+of execution (particularly if the threads are writing to the shared data).
+
+% Lecture 2
 
 \subsection{Connecting processors}
 
@@ -125,7 +155,7 @@ this, and the best way depends on the use case.
 
 There are, of course, more types of interconnects. Crossbars are where each node
 is connected to each other node (which has a complexity of $n(n-1)$), but the
-best ones are usually tree structures or hierarchical buses where the complexity
+best ones are usually tree structures or hierarchical busses where the complexity
 is logarithmic ($n log(n)$).
 
 \subsection{Shared and distributed memory}
@@ -420,7 +450,7 @@ messages.
 
 The idea of a barrier is that a number of threads should all meet up at the same
 point. When all threads reach the point, they can continue, but until then, they
-al wait. It's natural when threads are used to implement data parallelism.
+all wait. It's natural when threads are used to implement data parallelism.
 
 Barriers are often used when there are data dependence (we need to wait for the
 whole answer before continuing). Take a look at
@@ -473,7 +503,7 @@ synchronized method call, and you can only get out by exiting the whole block).
 
 \section{Hardware support for synchronization}
 
-Most shared memory parallel Programing models require that the programmer
+Most shared memory parallel Programming models require that the programmer
 implements some sort of synchronization logic in order to control how threads
 access the shared memory. There are several different ways of doing this, all of
 which are closely related. Hardware support is usually required for shared
@@ -590,3 +620,7 @@ CISC instructions, not RISC instructions), and as a consequence, they don't fit
 well with modern pipelined processors.
 
 %TODO Load linked & Spin locks L 7 S 15
+
+% Bibliography
+\bibliography{bib}{}
+\bibliographystyle{plain}

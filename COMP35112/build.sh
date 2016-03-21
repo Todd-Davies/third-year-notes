@@ -13,6 +13,20 @@ fastArgs=""
 logFile=output.log
 subl=0
 
+commitId=$(git log -n 1 --format=\"%H\")
+commitId="\def\commitId{"${commitId}"} "
+echo $commitId
+
+if [ -f buildId.txt ]; then
+  buildId=$(cat buildId.txt)
+else
+  buildId="0"
+fi
+buildId=`expr $buildId + 1`
+echo $buildId > buildId.txt
+buildId="\def\buildId{$buildId} "
+echo $buildId
+
 errors=0
 
 function usage
@@ -96,11 +110,15 @@ else
       done;
       cd ..
     done;
+    # Compile bib
+    echo "bibtex kindle" >> ../$preCompileCommands;
     # Compile the kindle notes if we're doing everything
-    echo "pdflatex -shell-escape $fastArgs\"\input{kindle.tex}\"" >> $commands;
+    echo "pdflatex -shell-escape \"$fastArgs$commitId$buildId \input{kindle.tex}\"" >> $commands;
   fi
+  # Compile bib
+  echo "bibtex notes" >> ../$preCompileCommands;
   # Compile the main notes file
-  echo "pdflatex -shell-escape $fastArgs\"\input{notes.tex}\"" >> $commands;
+  echo "pdflatex -shell-escape \"$fastArgs$commitId$buildId \input{notes.tex}\"" >> $commands;
   if [ $parallelCompile = 1 ]; then
     if [ -s $logFile ]; then 
       rm $logFile;
