@@ -41,15 +41,33 @@
 \newgeometry{left=1cm,
 			top=0.7cm,
 			right=1cm,
-			bottom=1.2cm,
+			bottom=2cm,
 			marginparwidth=0cm,
 			marginparsep=0mm}
 
 \maketitle
 
+% No page numbers!
+\pagenumbering{gobble}
+
+\fancypagestyle{test}{
+  \fancyhf{}
+  \fancyfoot[C]{
+    \commit\\
+    \build
+  }
+}
+\thispagestyle{test}
+
 % Get the course info
 \courseinfo
 \newpage
+
+% No page numbers!
+\pagenumbering{arabic}
+
+\cfoot{}
+\pagestyle{plain}
 
 % Enable multicol
 \multicolstrue

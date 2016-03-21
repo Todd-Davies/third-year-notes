@@ -62,6 +62,8 @@ things:
   \item Compile the code quickly
 \end{itemize}
 
+% Lecture 2
+
 \section{Parts of the compiler}
 
 In this section, we'll give a brief overview of all the bits inside a compiler.
@@ -134,7 +136,7 @@ In more detail, we code goes through the following steps inside the compiler:
   optimisation here, and machine code is the output.
 \end{description}
 
-% Lecutre 3
+% Lecture 3
 
 \section{Lexical Analysis}
 
@@ -230,6 +232,8 @@ state after the string has been run through it. We can produce a transition
 table (one way of encoding automata in computers) and (once we've figured out
 how to produce the table, which we'll soon find out) run through the input
 string in linear time.
+
+% Lecture 4
 
 \subsection{Deriving a Deterministic Finite Automata from a Regular Expression}
 
@@ -401,6 +405,10 @@ operator for writing to an output stream.
 
 %Slide 10.. expand :P
 \texttt{lex} and \texttt{flex} are tools for generating lexical analysers.
+
+% Lecture 6
+
+% No content; questions lecture
 
 % Lecture 7
 
@@ -625,3 +633,220 @@ that it does:
 Note that it is undecidable as to whether an LL(1) grammar exists for any CFG.
 It is also possible to parse non-recursively if we maintain a stack and
 determine what production rules to apply using a table.
+
+% Lecture 9
+
+\subsection{Bottom up parsing}
+
+The goal for bottom-up parsing is the same as that of top-down parsing;
+construct a parse tree for a string $s$ given some grammar $G$. Bottom-up
+parsing starts from the string and works back towards the start symbol of the
+grammar, whereas top-down goes the other way.
+
+Bottom-up parsing works by applying a sequence of reductions to the input
+string. A reduction corresponds directly to a rule in the input grammar, and
+takes the form $A \rightarrow b$.
+
+If we defined our grammar $G$ to be:
+
+\begin{center}
+  \begin{tabular}{r >{$}c<{$}}
+    1. & S \rightarrow LMR\\
+    2. & L \rightarrow c\\
+    3. & M \rightarrow Mo | o\\
+    4. & R \rightarrow mpilers
+  \end{tabular}
+\end{center}
+
+We could parse input like so:
+
+\begin{center}
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Sentential Form & Production & Position\\ \hline
+    cooooompilers   & 2          & 1\\
+    LMoooompilers   & 3          & 2\\
+    LMooompilers    & 3          & 3\\
+    LMoompilers     & 3          & 3\\
+    LMompilers      & 3          & 3\\
+    LMmpilers       & 3          & 9\\
+    LMR             & 4          & 3\\
+    S               & -          & -\\ \hline
+  \end{tabular}
+\end{center}
+
+To do the above, we needed to find some substring $s_1$ that could match the
+right side of a production that would occur in the rightmost
+derivation\footnote{As if we started from the start-state of the grammar and
+always expanded the rightmost non-terminal.} To be able to reason about this, we
+define a handle, which is a pair $(A \rightarrow b, k)$, where $A \rightarrow b
+\in G$ and $k$ is the position in the input string of the \textit{rightmost} symbol in
+$b$.
+
+This is efficient because since we're dealing with a right sentential form,
+anything to the right of the handle is a terminal symbol, meaning the compiler
+doesn't have to scan past the handle.
+
+\subsubsection{Shift reduce parsers}
+
+A basic bottom-up, shift reduce parser is stack based and has four operations:
+
+\begin{description}
+  \item \textbf{Shift}: The next input is shifted onto the top of the stack.
+  \item \textbf{Reduce}: The right end of the handle is on the top of the
+  stack. Locate the left end of the handle within the stack\footnote{You can
+  just keep popping until you reach the end of the handle}, pop the handle of
+  the stack and push the appropriate non-terminal symbol.
+  \item \textbf{Accept}: The string was parsed successfully.
+  \item \textbf{Error}: Handle the error somehow (implementation dependent).
+\end{description}
+
+Using the `cooooompilers' example again:
+
+% TODO: Check this
+\begin{center} 
+  \begin{tabular}{|l|r|c|c|}
+    \hline
+    Stack & Input         & Handle & Action\\ \hline
+    \$    & cooooompilers & None   & Shift\\
+    \$c   & ooooompilers  & 2, 1   & Reduce 2\\
+    \$L   & ooooompilers  & None   & Shift\\ 
+    \$Lo  & oooompilers   & 3, 2   & Reduce 3\\
+    \$LM  & oooompilers   & None   & Shift\\
+    \$LMo & ooompilers    & 3, 3   & Reduce 3\\
+    \$LM  & ooompilers    & None   & Shift\\
+    \$LMo & oompilers     & 3, 2   & Reduce 3\\
+    \$LM  & oompilers     & None   & Shift\\
+    \$LMo & ompilers      & 3, 2   & Reduce 3\\
+    \$LM  & ompilers      & None   & Shift\\
+    \$LMo & mpilers       & 3, 2   & Reduce 3\\
+    \$LMm & pilers        & None   & Shift\\
+    \$LMmp & ilers        & None   & Shift\\
+    \$LMmpi & lers        & None   & Shift\\
+    \$LMmpil & ers        & None   & Shift\\
+    \$LMmpile & rs        & None   & Shift\\
+    \$LMmpiler & s        & None   & Shift\\
+    \$LMmpilers &         & 4,9    & Reduce 4\\
+    \$LMR       &         & 4,9    & Reduce 4\\
+    \$G         &         & None   & Accept\\ \hline
+  \end{tabular}
+\end{center}
+
+There are two possible things that can go wrong here:
+
+\begin{description}
+  \item \textbf{Shift/Reduce conflict}: The parser can't decide whether to do 
+  a shift or a reduce. This is usually because of an ambiguous grammar. The 
+  solution is to make the grammar unambiguous or just always choose shift.
+  \item \textbf{Reduce/Reduce conflict}: The parser can't decide which (of 
+  several) reduction to make.
+\end{description}
+
+\subsubsection{LR parsers}
+
+If we want to avoid reduce/reduce conflicts, then we need to have a
+\texttt{LR(1)} grammar. This is a grammar where we can always choose the next
+reduction by looking one symbol beyond the end of the current handle, and we can
+always isolate the handle of any input string (at any stage of the parsing).
+Most context free programming language definitions can be expressed as an
+\texttt{LR(1)} grammar, and parsers for such grammars can be implemented in
+polynomial time ($O(|tokens| + |reductions|)$).
+
+LR parsing is slightly more complicated than shift reduce parsing in to ways; we
+need to store state information in the stack, and we need a table consisting of
+the following:
+
+\begin{description}
+  \item \textbf{Action}: Either a shift, reduce, accept or error as with the 
+  shift-reduce parser. The function of shift is slightly different here, in 
+  that the next symbol is pushed to the stack, as well as the current \textit{
+  state}.
+  \item \textbf{Goto}: The state that should be pushed onto the stack after a
+  reduction. If no goto is listed, no state should be pushed.
+\end{description}
+
+An example of parsing a string with a LR parser will be given here. The grammar
+is as follows:
+
+\begin{figure}[H]
+  \centering
+  \begin{tabular}{r >{$}c<{$}}
+    1. & G \rightarrow L\\
+    2. & L \rightarrow LP\\
+    3. & L \rightarrow P\\
+    4. & P \rightarrow ( P )\\
+    5. & P \rightarrow ()
+  \end{tabular}
+  \caption{A grammar for generating sequences of balanced brackets.}
+  \label{fig:grammar1}
+\end{figure}
+
+The parsing table and a worked example are shown in Tables~\ref{tbl:parsetable}
+and~\ref{tbl:parseexample} respectively.
+
+\begin{table}
+  \parbox{.45\linewidth}{
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|}
+      \hline
+      \multirow{2}{*}{\textbf{State}} & \multicolumn{3}{c|}{\textbf{Action}}
+        & \multicolumn{2}{c|}{\textbf{Goto}}\\ \cline{2-6}
+        & (  & )  & EOF    & L & P\\ \hline
+      0 & S3 &    &        & 1 & 2\\ \hline
+      1 & S3 &    & accept &   & 4\\ \hline
+      2 & R3 &    & R3     &   &  \\ \hline
+      3 & S6 & S7 &        &   & 5\\ \hline
+      4 & R2 &    & R2     &   &  \\ \hline
+      5 &    & S8 &        &   &  \\ \hline
+      6 & S6 & S10&        &   & 9\\ \hline
+      7 & R5 &    & R5     &   &  \\ \hline
+      8 & R4 &    & R4     &   &  \\ \hline
+      9 &    & S11&        &   &  \\ \hline
+      10&    & R5 &        &   &  \\ \hline
+      11&    & R4 &        &   &  \\ \hline
+    \end{tabular}
+    \caption{The parse table for the grammar shown in
+    Figure~\ref{fig:grammar1}.}
+    \label{tbl:parsetable}
+  }
+  \hfill
+  \parbox{.45\linewidth}{
+    \centering
+    \begin{tabular}{|>{$}l<{$}|r|c|}
+      \hline
+      \textbf{Stack}        & \textbf{Input} & \textbf{Action}\\ \hline
+      \$s_0                 & (())()\$       & Shift 3\\
+      \$s_0(s_3             & ())()\$        & Shift 6\\
+      \$s_0(s_3(s_6         & ))()\$         & Shift 10\\
+      \$s_0(s_3(s_6)s_{10}  & )()\$          & Reduce 5\\
+      \$s_0(s_3Ps_5         & )()\$          & Shift 8\\
+      \$s_0(s_3Ps_5)s_8     & ()\$           & Reduce 4\\
+      \$s_0Ps_2             & ()\$           & Reduce 3\\
+      \$s_0Ls_1             & ()\$           & Shift 3\\
+      \$s_0Ls_1(s_3         & )\$            & Shift 7\\
+      \$s_0Ls_1(s_3)s_7     & \$             & Reduce 5\\
+      \$s_0Ls_1Ps_4         & \$             & Reduce 2\\
+      \$s_0L                & \$             & Reduce 1\\
+      \$s_0Gs_1             & \$             & Accept\\ \hline
+    \end{tabular}
+    \caption{A parsing of the string `\texttt{(())()}'.}
+    \label{tbl:parseexample}
+  }
+\end{table}
+
+\subsubsection{Generating LR parser tables}
+
+The idea when generating the parser tables is to create a DFA from the grammar,
+then create the final action/goto table from the DFA. There are three algorithms
+for building the tables; \texttt{LR(1)}, \texttt{SLR(1)} and \texttt{LALR(1)}.
+The first one generates large tables and is slow, the second one generates the
+smallest tables and is fast, and the third is an in-between solution.
+\texttt{SLR(1)} used to be most popular when table size was very important, but
+now computers have lots of memory, \texttt{LALR(1)} is most commonly used.
+
+%TODO: Do we have to know from slide 18->27 in lecture 9?
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{diagrams/big-picture-1}
+  \caption{A diagram of the overall compiler system.}
+\end{figure}
