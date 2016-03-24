@@ -83,6 +83,8 @@ technique such as scoreboarding.}, whereas TLP relies on the programmer finding
 a way to express an algorithm in a parallel manner; something that is not always
 achievable for all programs.
 
+% Lecture 2
+
 \subsection{Data and instruction parallelism}
 
 Flynn~\cite{flynn1972some} classified parallelism as \textbf{instruction stream}
@@ -131,8 +133,6 @@ For any given problem, the complexity of parallelising it is proportional to how
 irregular the parallelism is, and how much data sharing there is between threads
 of execution (particularly if the threads are writing to the shared data).
 
-% Lecture 2
-
 \subsection{Connecting processors}
 
 In order to make them work in parallel, multiple cores of a processor need to be
@@ -150,13 +150,14 @@ this, and the best way depends on the use case.
   \item A bus can be used to connect multiple cores. The memory is usually
   situated on the bus, and all cores have access to it (though they may also
   have their own memory instead). Time slicing is used to give equal access to 
-  the bus, but can make the bus become a processing bottleneck.
+  the bus, but can make the bus become a processing bottleneck. All memory
+  accesses have equal access time so long as there isn't too much contrention.
 \end{description}
 
 There are, of course, more types of interconnects. Crossbars are where each node
 is connected to each other node (which has a complexity of $n(n-1)$), but the
-best ones are usually tree structures or hierarchical busses where the complexity
-is logarithmic ($n log(n)$).
+best ones are usually tree structures or hierarchical busses where the
+complexity is logarithmic ($n log(n)$).
 
 \subsection{Shared and distributed memory}
 
@@ -170,11 +171,17 @@ impose restrictions on shared memory so that parts are unavailable to certain
 components. Imposing a foreign memory layout onto the hardware comes at a
 performance penalty.
 
+More explicitly, \textbf{data sharing} is when a program with shared memory
+space facilitates inter-thread communication by having threads read and write to
+the shared memory. \textbf{Message passing} is when seperate parts of the
+program communicate by sharing messages (e.g. using a socket).
+
 Most supercomputers use distributed memory, since its easier to build, provides
 a higher total communication bandwidth and is more suited to many data-parallel
 problems. However, programs using data sharing (shared memory) are widely seen
 to be easier to code than programs using message passing (distributed memory),
-so there is an overhead involved with distributed memory.
+so there is an overhead involved with distributed memory; unfortunately, most
+`normal' computing problems are irregular and dynamic.
 
 % Lecture 3
 
