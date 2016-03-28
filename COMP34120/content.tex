@@ -168,7 +168,10 @@ function at a specific point. If $f'(x) > 0$, then the line slopes upwards, and
 if $f'(x) < 0$ then it's sloping down. Obviously if it is equal to zero, then
 the line is horizontal.
 
-%TODO: Is this finding derivitives linear time?
+%Q: Is this finding derivitives linear time?
+%A (from Todd): To find a derivative you parse the input function into an AST
+% (linear time) with an LL(1) grammar, then apply rules of derivation (probably
+% a small polynomial).
 
 \subsubsection{Calculating a derivative}
 
@@ -229,7 +232,7 @@ indicating that the point is a maxima.
 To find the largest maxima, we simply find the one that is largest value of
 $f(x)$.
 
-% See slide 15
+% Lecture 3
 
 \section{Solving Stackelberg game problems}
 
@@ -534,3 +537,5 @@ There are two commonly used methods:
   \item \textbf{Recursive Least Square Approach}:\\
     
 \end{description}
+
+% Lecture 7
