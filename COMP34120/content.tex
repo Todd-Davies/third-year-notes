@@ -499,16 +499,16 @@ Where $\theta = (a_0, a_1, \dots, a_n)$.
 
 % Lecture 6
 
-\section{Learining in games}
+\section{Learning in games}
 
 There are two types of Stackelberg strategy generators; online and offline ones.
 In offline learning, the reaction function is regarded as a linear regression
 problem, and is solved by applying the least square method to the historical
 data. All the learning is done before the playing starts.
 
-In online learining, we aim to carry on learning even while the game is being
+In online learning, we aim to carry on learning even while the game is being
 played. The reaction strategy from the follower is updated as we play the game.
-We need to work out how to incorperate the follower's moves into our strategy.
+We need to work out how to incorporate the follower's moves into our strategy.
 
 The reason why online methods are preferred, is that the environment in which
 the game is played is always changing; costs may change, share prices may change
@@ -527,3 +527,201 @@ There are two commonly used methods:
   \item \textbf{Recursive Least Square Approach}:\\
     
 \end{description}
+
+% Lecture 7
+
+% Lecture 8
+
+% Lecture 9
+
+\marginpar{Social surplus is essentially a measure of if the people who wanted
+the items most got the items in a bid. For example, if a musician who really 
+needed a car could only bid \textsterling 500 (though he may value the car at 
+more than this), but a millionaire wanted to buy lots of cars for his children
+to rally race in and outbid him, despite valuing the car at only \textsterling 
+501, then the social surplus would be low.}
+
+As we've seen, the design problem for single item auctions is to make a system
+where one item is sold, $n$ bidders submit a bit for the item (who all want to
+maximise their utility; value - price paid). We want to solicit the bids and
+choose the winner, while hopefully maximising the \textbf{social surplus}, i.e.
+the value of the winner.
+
+As we've seen, charging the winner the price of the second highest bid is the
+Vickrey auction, and is widely used. It's pretty good because it has strong
+incentives (DSIC), maximises the social surplus and is computationally
+efficient.
+
+However, it's also fairly constricted in what it can do; we want a more general
+solution.
+
+Single parameter auction games are where:
+
+\begin{itemize}
+  \item $k$ items for sale and each item consists of several units of a product or service $I_k = \{a_j\}, j = 1, \dots, k$.
+  \item $n$ bidders, and bidder $i$ has his private value per-unit $v_i$ of the 
+  product (called his unit valuation).
+  \marginpar{No, I don't know what `quasilinear' means either.}
+  \item The objective of bidder $i$ is to maximise his quasilinear utility:
+  \[
+    u_i = v_i \cdot x_i - p_i
+  \]
+  \begin{itemize}
+    \item $x_i$ is the number of the product gained if bidder $i$ wins the item,
+    0 otherwise.
+    \item $p_i$ is the price paid if bidder $i$ wins, 0 otherwise.
+  \end{itemize}
+\end{itemize}
+
+Situation for the seller (mechanism designer) is as follows:
+
+\begin{itemize}
+  \item The outcome space is $x = (x_1, \dots, x_n)$, where $x_i$ is the number
+  of units (for a given item) being allocated to bidder $i$.
+  \item The seller wants to maximise social surplus $F$:
+  \[
+    F(x_1, \dots, x_n) = \sum\limits^n_{i=1} v_ix_i
+  \]
+  \item In a single parameter environment, there is a constraint meaning that
+  one agent can be alocated at most one item( with $x_i$ units in it).
+\end{itemize}
+
+The problem is that we want to design a \textit{sealed bid auction}, and need
+to come up with implementations for the following three steps:
+
+\begin{itemize}
+  \item Collect the bids $b=(b_1, \dots, b_n)$
+  \item Allocate the number of units given to each bidder:
+  %TODO: Is this X as in the outcome space on slide 8?
+  \[
+    x(b) = (x_1(b), \dots, x_n(b)) \in X \subset R^n
+  \]
+  \item Choose how much each bider must pay:
+  \[
+    p(b) = (p_1(b), \dots, p_n(b)) \subset R^n
+  \]
+\end{itemize}
+
+\subsubsection{Case study: Sponsored search advertising auctions}
+
+In an auction selling search advertising, we want the mechanism to exhibit the
+following characteristics:
+
+\begin{itemize}
+  \item DSIC; Truthful bidding should always be the dominant strategy and never
+  lead to a negtive utility.
+  \item We want to maximise $\sum^n_{i=1}v_ix_i$ (social surplus).
+  \item Each bidder gets only one item, and each item can only be assigned to 
+  one bidder. This can be defined mathematically:
+  \begin{itemize}
+    \item[] There are $k$ items ($k>0$), amd $n$ bidders.
+    $x = (x_1, \dots, x_n)$ is the assignment of items to bidders, and $x_i$ is
+    either $0$ or $1$, representing whether bidder $i$ won an item. The 
+    following must hold:
+    \[
+      \sum\limits^n_{i=1}x_i \leq k
+    \]
+  \end{itemize}
+  \item We want the algorithm to run in polynomial time.
+\end{itemize}
+
+Each advertising slot has a Click Through Rate (CTR), which represents how often
+people who see the ad click on the ad. The higher the CTR for a slot, the more
+desirable it is. There are:
+
+\begin{itemize}
+  \item $k$ slots for sale, and slot $j$ includes $\alpha_j$ units, which is the
+  CTR for that slot.
+  \item $n$ bidders, where each bidder $i$ has his private value $v_i$, 
+  representing the value he gives to a single click. Thus, his valuation of a
+  slot $j$ is $v_i\alpha_j$.
+\end{itemize}
+
+The bidder's objective is to maximise his own utility of course. Each bidder $i$
+will do this by maximising:
+
+\[
+  u_i = v_i \cdot x_i - p_i
+\]
+
+Essentially the utility is the value he assigns to each click multiplied by the
+number of clicks he will get, minus the price the bidder will pay if he gets the
+slot.
+
+Remember, we're trying to find an algorithm similar to the Vickery method, one
+that is DSIC, maximises social surplus and has a polynomial running time. To
+design such an algorithm we can work in two steps:
+
+\begin{description}
+  \item \textit{Step 1}:\\
+    Assume that the bidders will bid truthfully (assume DSIC). Decide how to 
+    assign bidders to items as to maxmimse social surplus with a poly time
+    algorithm.
+  \item \textit{Step 2}:\\
+    Given our answer for step 1, decide how to set our selling prices so that
+    DSIC does indeed hold.
+\end{description}
+
+For step one, if we assume that we've got more bidders than items ($n \geq k$),
+and we know the value each bidder assigns to one click ($v_i$), then we can
+maximise social surplus by allocating the $i$th largest item to the bidder with
+the $i$th highest valuation.
+
+% TODO Example of allocations given bidders and items
+
+To do this, we can sort the valuations $v_1 \geq \dots \geq v_x$ in polynomial
+time, and then sort the items in order of CTR (again, polynomial). Then we can
+easily get an assignment $x^*$ since we simply match the bidders' valuations
+against the items; the bidder at valuation index $i$ gets the item at index $i$.
+If there are more bidders than items, then bidders at and index greater than the
+number of items get $0$.
+
+As the above allocation rule is a function of the bid (or the valuation of the
+CTR), then it is a \textbf{Monotone Allocation Rule}, meaning that bidding
+higher can only get you more stuff.
+
+Answering the step two is now possible since we have an allocation rule. We now
+need to determine how to set prices such that DSIC will hold. First we need to
+define an \textbf{Implementable Allocation Rule}:
+
+\begin{itemize}
+  \item[] An allocation rule $x(b)$ for a single parameter environment is 
+  implementable if there is a payment rule $p(b)$ that makes the sealed-bid 
+  auction $[x(b), p(b)]$ DSIC.
+\end{itemize}
+
+If an allocation rule is implementable, this means that you can \textit{always}
+define a payment rule that makes truthful bidding the dominant strategy for each
+bidder. This is \textbf{Myerson's Lemma}:
+
+\begin{itemize}
+  \item An allocation rule is implementable iff it is monotone.
+  \item If the allocation rule is monotone, then there is a payment rule that
+  makes the sealed bid mechanism DSIC.
+  \item This payment rule can be given by an explicit formula:
+  \begin{itemize}
+    \item Assume that the items for sale are sorted by the number of units they
+    represent.
+    \item Also assume that the bids are sorted.
+    \item The payment rule is therefore:
+    \[
+      \begin{split}
+        p_i(b) &= p_i(b_1, \dots, b_i, \dots, b_k, \dots, b_n)\\
+               &= \sum^k_{j=1}b_{j+1}(\alpha_j - \alpha_j+1)
+      \end{split}
+    \]
+  \end{itemize}
+\end{itemize}
+
+This pricing rule is DSIC because if the bidder sets $b_i = v_i$:
+
+\[
+  u_i(v_i, b_i) = v_i \times \alpha_i - p_i(b)
+\]
+
+This is basically that the utility of the bidder is the value they assign to on
+click multiplied by the CTR they won, minus the price for that bid. It can be
+calculated that bidding lower or higher than $v_i$ gives a lower value for the
+utility function, since if $b_i < v_i$ then the bidder may get a smaller item
+and lose profitable units, and if $b_i > v_i$ then the bidder may get a bigger
+item, but these additional units are not profitable.

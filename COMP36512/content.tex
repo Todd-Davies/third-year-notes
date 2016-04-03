@@ -625,3 +625,31 @@ that it does:
 Note that it is undecidable as to whether an LL(1) grammar exists for any CFG.
 It is also possible to parse non-recursively if we maintain a stack and
 determine what production rules to apply using a table.
+
+% Lecture 9
+
+\subsubsection{Bottom up parsing}
+
+%1
+
+In top down parsing, we start a the top of the tree and grow towards the leaves
+and we need to backtrack if bad choices are made.
+
+We can however, automate bottom up parsing (starting from the leaves and walking
+towards the start symbol); i.e. starting from the input sentence and
+manipulating it back towards the start symbol.
+
+%2
+
+We do this by applying reductions, that is replacing the right hand side of a
+rule with its corresponding left hand side.
+
+%3
+
+% TODO: Explain what a handle is
+
+%4 
+
+%8
+
+% Yellow ones require human intelligence
