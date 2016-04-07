@@ -118,7 +118,7 @@ first digit of their mantissa, and then we can get another digit of precision.
 % TODO: Ranges of floating point numbers slide 1
 
 Sixty-four bit floating point numbers have one sign bit, $11$ exponent bits and
-$52$ mantissa bits. This means their bias will be $2^11 = 2048$ and the range
+$52$ mantissa bits. This means their bias will be $2^{11} = 2048$ and the range
 will be $2 - 2^{52} \times 2^{2^{11}}$.
 
 The standard also has special values built in:
@@ -161,7 +161,7 @@ real number to by doing:
 \]
 
 
-However, the absolute error $e$ does not give us a very good description of the
+However, the absolute error $e$ does not give us a good description of the
 accuracy (if the error is $10^{-6}$ but the value is $10^{-7}$ then we're very,
 very inaccurate)! To rectify this, we have relative error:
 
@@ -302,7 +302,7 @@ $u = (x + y)z$:
   r^t_{u} = \frac{x}{x + y}r_x + \frac{y}{x + y}r_y + r_+ + r_z + r_*
 \]
 
-We can work out the unit round off errors somehow...
+We can work out the unit round off errors somehow\ldots
 
 %END TODO
 
@@ -317,7 +317,7 @@ equivalent is $x$ is:
 \marginpar{Z is the set of integers.}
 
 \[
-  l = Z(log_b\frac{|x|}{|\bar{x} - x|})
+  l = Z(\log_b\frac{|x|}{|\bar{x} - x|})
 \]
 
 If we rearrange this, the relative error is:
@@ -338,19 +338,19 @@ Also:
 
 \[
   |\sum^m_{i=1} x_i\frac{\delta f}{\delta x_i}b^{-l_i}|
-    \leq b^{-l_{min}}|\sum^m_{i=1} x_i\frac{\delta f}{\delta x_i}|
+    \leq b^{-l_{\min}}|\sum^m_{i=1} x_i\frac{\delta f}{\delta x_i}|
 \]
 
 The number of significant digits in the answer is:
 
 \[
-  l = l_{min} - \delta
+  l = l_{\min} - \delta
 \]
 
 Where $\delta$ is the loss of significant digits:
 
 \[
-  \delta = Z(log_b(
+  \delta = Z(\log_b(
     \frac{
       \sum^m_{i=1}|x_i\frac{\delta f}{\delta x_i}|
     }{
@@ -364,7 +364,7 @@ lots of significant digits. If we do $\sqrt{2.01} - \sqrt{2}$ (where both
 numbers are known to 9 significant digits), then we get:
 
 \[
-  \delta = Z(log_10(
+  \delta = Z(\log_{10}(
     \frac{
       |\sqrt{2.01}| + |\sqrt{2}|
     }{
@@ -496,7 +496,7 @@ Since if we do subtraction with very close numbers, the error is high. If we
 calculate $\delta$ for this then we get:
 
 \[
-  \delta = X(log_10\frac{|y_1| + |y_2|}{|y_1 - y_2|}) = 4
+  \delta = X(\log_10\frac{|y_1| + |y_2|}{|y_1 - y_2|}) = 4
 \]
 
 Meaning all of our digits were rubbish!
@@ -644,7 +644,7 @@ functions:
     % TODO: Give an example of this, since it's really quite vague.
 
     \[
-      \Phi'_r = lim_{h \rightarrow 0}\frac{f(x + hr) - f(x)}{h}
+      \Phi'_r = \lim_{h \rightarrow 0}\frac{f(x + hr) - f(x)}{h}
     \]
 
     Where $r$ is the direction. If $\Phi'_r$ is positive, then the direction is
@@ -656,7 +656,7 @@ functions:
 
     \[
       \frac{\delta f}{\delta x_j} =
-        lim_{h \rightarrow 0} \frac{f(x + he_j) - f(x)}{h}
+        \lim_{h \rightarrow 0} \frac{f(x + he_j) - f(x)}{h}
     \]
 
     $e_j$ is the unit vector in the direction of axis $j$, so to construct the 
@@ -966,7 +966,7 @@ out, but there is a mapping from biology terminology to CS terminology:
 
 Evolutionary algorithms evolve their populations. This means there will be $n$
 points in the parameter space, and each iteration will drop some of the points
-and create new ones (in hopefully better locations). Each individual in the 
+and create new ones (hopefully, in better locations). Each individual in the 
 population is a single candidate solution, and is stored as a
 \textit{chromosome}. This is a sequence of bits, split into $m$ sections called
 \textit{genes}. As described above, each gene maps onto a parameter.
@@ -1080,3 +1080,91 @@ time, and waiting for the fitness variations from one population to the next to
 become stable isn't a good idea either because of the propensity for genetic
 algorithms to progress very slowly then have a burst of progress.
 
+% Part 2 Lecture 5
+
+\subsubsection{Genetic programming}
+
+Most evolutionary algorithms try and optimise the parameters of a
+function to find a minima, however, genetic programming aims to change
+the function until it fits our purpose. If we view computer programs
+as mathematical functions (which they are at some level), then we can
+evolve computer programs in this way.
+
+Genetic programming evolves programs in two ways; generating new
+sections of code and combining or mutating existing code. This
+analogous to how a programmer works if you think about it!
+
+If you've taken the compilers course, you're most likely already
+comfortable with representing programs as trees. We can represent a
+program as a tree with nodes that are either \textit{functions} or
+\textit{terminals}. Terminals are either inputs, constants or
+programming statements without arguments, while functions are
+programming statements, arithmetic functions or operations.
+
+In order to generate a program using genetic programming, you must
+define both a function set and a terminal set. These are the sets of
+allowable nodes that you can have in your program tree. Examples
+include \texttt{XOR}, \texttt{READ}, \texttt{IF} etc for functions and
+named variables, random variables or constants for the terminals.
+
+% TODO: Insert a figure of a tree, preferable a side figure so it
+% doesn't interrupt the flow?
+
+Of course, every program tree must be semantically correct; function
+nodes should have the correct amount of children (one for each
+argument), they must be of the correct type. Furthermore, since we're
+aiming to generate these trees automatically, we need to account for
+when things go wrong. What if we pass $-1$ into a logarithmic
+function? We can either make functions that fail return a default
+value, or have them throw exceptions that reduce the overall program
+fitness.
+
+Cramer and Koza made the following genetic programming algorithm:
+
+\begin{enumerate}
+  \item Initialise a random population of $n$ individuals.
+  \item Calculate the fitness of each individual in the population
+    (i.e. how well the function represented by each individual
+    performs).
+  \item Select two parents at random proportionally to their fitness
+    and reproduce them, producing new children.
+  \item Apply cross-over and mutation with a certain probability.
+  \item Remove all the parents.
+  \item Go back to step 2 unless satisfied.
+\end{enumerate}
+
+Unfortunately, we're not finished yet. We need to have some checks on
+our trees to make sure that they don't become too large. First of all,
+we need to make sure that we generate sensible trees. We can do this
+in two ways:
+
+\begin{description}
+  \item \textbf{Full method}:
+    \begin{itemize}
+      \item Choose a random function node.
+      \item If the maximum depth has been reached, then fill the child
+        nodes with terminals.
+      \item Otherwise, recurse for the child nodes of the function.
+    \end{itemize}
+  \item \textbf{Grow method}:
+    \begin{itemize}
+      \item Choose a function or a terminal node at random.
+      \item If the maximum depth has been reached, then fill the child
+        nodes with terminals.
+      \item Otherwise, recurse for the child nodes of the function.
+    \end{itemize}
+\end{description}
+
+Essentially, the \textit{full} method generates trees that are always
+of a specific depth (and each subtree of every node is of the same
+depth, unless you allow nodes with no arguments in your functions
+set). The \textit{grow} method will give you a larger range of trees,
+some will be far smaller than those generated by the other method (a
+terminal node could be picked on the first iteration for example).
+
+Mutation is applied to single individuals, where a node is chosen at
+random, and replaced by a randomly generated sub-tree. The sub-tree
+could be the same depth as the removed node if you wanted to preserve
+the depth of the tree (though sometimes deeper, more complicated
+functions may be needed to encapsulate the intricacies of the
+reference function).
