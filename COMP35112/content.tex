@@ -151,7 +151,7 @@ this, and the best way depends on the use case.
   situated on the bus, and all cores have access to it (though they may also
   have their own memory instead). Time slicing is used to give equal access to 
   the bus, but can make the bus become a processing bottleneck. All memory
-  accesses have equal access time so long as there isn't too much contrention.
+  accesses have equal access time so long as there isn't too much contention.
 \end{description}
 
 There are, of course, more types of interconnects. Crossbars are where each node
@@ -173,7 +173,7 @@ performance penalty.
 
 More explicitly, \textbf{data sharing} is when a program with shared memory
 space facilitates inter-thread communication by having threads read and write to
-the shared memory. \textbf{Message passing} is when seperate parts of the
+the shared memory. \textbf{Message passing} is when separate parts of the
 program communicate by sharing messages (e.g. using a socket).
 
 Most supercomputers use distributed memory, since its easier to build, provides
@@ -627,6 +627,70 @@ CISC instructions, not RISC instructions), and as a consequence, they don't fit
 well with modern pipelined processors.
 
 %TODO Load linked & Spin locks L 7 S 15
+
+% Lecture 11 - Transactional Memory
+
+\section{Transactional Memory}
+
+Thread level Speculation (TLS) tries to guess if parallelism is
+possible and valid without help from the programmer. Transactional
+memory provides the programmer with transactions within a parallel
+sharing context. This means that the memory implements ACID:
+
+\begin{itemize}
+\item Atomicity; all or nothing
+\item Consistency; one valid state leads to another
+\item Isolation; each transaction is isolated from all others 
+\item Durability; once committed, the outcome is persistent
+\end{itemize}
+
+Only atomicity and isolation are relevant to TM.
+
+Transactions are indivisible, so that a transaction executes either
+completely, or not at all. While it is executing, none of the
+transaction's changes are visible outside the transaction.
+
+When it completes, the changes will all happen at the same time.
+
+Essentially, you can use transactions where you would previously have
+used locks:
+
+\begin{verbatim}
+  atomic {
+    i += 2;
+    j *= 5;
+  }
+\end{verbatim}
+
+Locks are fine if you're only using one, but if there are multiple,
+then the potential for deadlock is always there. Transactions do away
+with the potential for deadlock, since they are composable (where
+locks are not).
+
+The format of a transaction is as follows:
+
+\begin{itemize}
+\item The transaction starts
+\item Some shared variables are read
+\item Some writes are made
+\item The transaction tries to commit
+\item This will succeed if there's nothing wrong...
+\item ... or will abort if it cannot commit, and then the whole transaction must be repeated.
+\end{itemize}
+
+There are two reasons why the transaction may abort; either there has
+been a read-write clash, or a write-write clash. These clashes cannot
+be tolerated, since they would allow programs to get results that
+would violate either atomicity or consistency.
+
+To implement transactions, the the variables that have been read need
+to be kept track of (the readset) and the variables that have been
+written to need to be kept track of too (the writeset). These two set
+are used to determine clashes with other transactions.
+
+% TODO Routing - slide 11
+
+
 
 % Bibliography
 \bibliography{bib}{}

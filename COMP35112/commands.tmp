@@ -1,1 +1,1 @@
-pdflatex -shell-escape "\def\commitId{"727aad6d6b11f57add6fbd451b55c60cd80abb8d"} \def\buildId{35}  \input{notes.tex}"
+pdflatex -shell-escape "\def\commitId{"6643f61ca3a5d14c09ffdd772f0c009743ddef67"} \def\buildId{36}  \input{notes.tex}"
