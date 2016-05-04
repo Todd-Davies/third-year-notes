@@ -690,7 +690,38 @@ are used to determine clashes with other transactions.
 
 % TODO Routing - slide 11
 
+\subsection{Hardware support}
 
+There are implementations of transactional memory in Java and C (and
+probably other languages), but when there is lots of sharing, the
+performance isn't great. However, in situations where you really don't
+want to use barriers and locks, this might be an acceptable trade off.
+
+Implementing transactions in hardware could alleviate the performance
+penalties, and all of the big processor developers (Intel, AMD, ARM)
+are looking into it. The idea is that certain portions of the program
+would be declared to be atomic, and all memory accesses in that
+portion would be emulated using two sets; a \textit{readset} and
+a \textit{writeset}. If another thread writes to something in the
+readset, then abort the current transaction, and if the end of the
+transaction is successfully reached, then commit the writeset to
+memory.
+
+The load-linked an store-conditional commands are essensially a
+transaction, since the readset is the single memory location being
+read-modify-write accessed and bus snooping is used to detect if
+changes were made to the register during the transaction (clearing the
+load linked flag if so). The store-conditional operation `commits' the
+transaction if no conflict was detected, and otherwise, a jump
+instruction will be used to abort and restart.
+
+In order to extrapolate the approach to multiple memory locations, we
+can use the cache as a buffer to keep track of the readset and
+writeset. This requires extra cache flags to indicate the data was
+read or written inside an atomic block, and a modified writeback
+behavious (only write back if the transaction commits).
+
+% Slide 7 of lecture 12
 
 % Bibliography
 \bibliography{bib}{}
