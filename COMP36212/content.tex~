@@ -1080,37 +1080,3 @@ time, and waiting for the fitness variations from one population to the next to
 become stable isn't a good idea either because of the propensity for genetic
 algorithms to progress very slowly then have a burst of progress.
 
-%% \section{Complex Networks}
-
-%% A network is a set of nodes connected by links. They can be riughly divided into two categories; simple networks (those with identically repeating patterns) and complex networks (those with non-reglar structures). Complexity is derived from three factors:
-
-%% \begin{description}
-%%   \item \textbf{Structeral complexity}:\\ Characterised by
-%%   non-regular, non-trivial link structures and complex topological
-%%   features (such as heirarchies). The structure of complex networks
-%%   often evolves over time, and there is lots of diversity in the
-%%   components of the network (e.g. different edge
-%%   weights).
-
-%%   \item \textbf{Node dynamical complexity}:\\ Nodes can be
-%%   dynamic in their behaviour, and there are different kinds of nodes
-%%   (e.g. different servers on the internet have different
-%%   specifications).
-
-%%   \item \textbf{Mutual interactions among different complex
-%%   factors}:\\ A real world complex network is affected by both
-%%   internal and external fsactors. Relations between networks and
-%%   subnetworks are often observed.
-%% \end{description}
-
-%% One important thing to remember when working with comolex networks is
-%% that the whole is more than just the sum of the parts. Phenomona such
-%% as self organnisation, adaptive and evolving networks\footnote{That
-%% resist their components being removed, suxh as neurons dieing in the
-%% brain).}, decentralised systems, heavy tail properties\footnote{Small
-%% microscopic properies that trigger large macroscopic events.}, small
-%% world properties etc are often observed, exploited and studied.
-
-%The aim of studying the networks is to understand their structure and
-%their organising principles, as well as to model them and work out how
-%their topology changes their dynamical processes.
