@@ -663,7 +663,7 @@ We could parse input like so:
 \begin{center}
   \begin{tabular}{|c|c|c|}
     \hline
-    Sentential Form & Production & Position\\ \hline
+    Sentinel Form & Production & Position\\ \hline
     cooooompilers   & 2          & 1\\
     LMoooompilers   & 3          & 2\\
     LMooompilers    & 3          & 3\\
@@ -850,3 +850,207 @@ now computers have lots of memory, \texttt{LALR(1)} is most commonly used.
   \includegraphics[width=\textwidth]{diagrams/big-picture-1}
   \caption{A diagram of the overall compiler system.}
 \end{figure}
+
+% Lecture 15
+
+\section{Code generation \& instruction selection}
+
+Here, we want to map the IR to low level machine instructions. The
+compiler also needs to make sure that the generated program stays
+within the resource limits of the CPU; different processors have
+different amounts of registers for example. Accessing data in
+registers is of course far more efficient than having to access data
+in memory, so intelligent use of registers (register allocation) is
+important for efficiency.
+
+It is here that compilers apply tricks such as instruction reordering,
+where operations are re-ordered to hide latencies in other
+operations. Instruction selection, register allocation and instruction
+scheduling are all NP-complete problems that can be solved
+independently\footnote{For example, instruction reordering can happen
+at a higher level than register allocation, for example whole program
+statements (that compile down to hundreds of instructions) can be
+reordered, but there is no equivalent for register allocation.}.
+
+We are using a very simple instruction set; \texttt{LDR RX, ADDR/RY}
+(with direct \& indirect addressing), \texttt{MOV RX, RY}, \texttt{ADD
+RX, RY, RZ}, \texttt{SHR RX, RY, VAL}, \texttt{STORE RX}. However,
+instructions have different \textit{latencies}\footnote{The time (in
+cycles) between the instruction being issued and the time that the
+instruction results can be used.}, which the compiler needs to take
+into account.
+
+\subsection{Generating code for arithmetic expressions}
+
+% Slide 5
+
+We can simply walk the IR in postorder and generate code with a
+procedure like this:
+
+% TODO: Put in code generating procedure
+
+% TODO: Talk about choosing what operations to implement first (slide
+% 6)
+
+On most processors, the cost of multiplication might be several
+cycles, while shifting and adding is typically one or two cycles. In
+many instances, we can use shifting and addition instead of
+multiplications, so that we can multiply some constant integer with an
+unknown integer efficiently\footnote{Like in COMP27112}.
+
+\subsection{Trading register usage with performance}
+
+Often, if we load values into registers first and compute after, then
+we can hide some of the memory latency. However, doing this uses up
+registers, of which we have a finite limit.
+
+% TODO: Example from slide 8
+
+\subsection{Array references}
+
+The compiler must always use the same storage scheme for arrays;
+either row-major order, column-major order or indirection orders (each
+element is a pointer to the actual array value).
+
+% TODO: Talk about finding the correct offset for an index.
+
+\subsection{Boolean \& relational values}
+
+The compiler can use a treewalk generation like with arithmetic
+expressions...
+
+% TODO: Slide 10
+
+\subsection{Control flow statements}
+
+% TODO Slide 11
+
+% TODO Slide 12; conclusion
+
+% Lecture 18 (Instruction scheduling)
+
+\section{Instruction Scheduling}
+
+The problem of instruction scheduling is that given some target code,
+the latencies for each operation on the target machine, we need to
+reorder operations in order to minimise the execution time of the
+code. This is made more complicated by the fact that modern processors
+usually have multiple functional units.
+
+More specifically, we want to produce correct code (most importantly),
+minimise the number of wasted CPU cycles, avoid spilling registers and
+to operate efficiently (depending on your definition of efficiency).
+
+Many CPU instructions have some delay latencies for execution, memory
+operations in particular. Modern processors issue several operations
+per cycle, and the execution time of each is often order dependent. In
+order to minimise waiting for load operations, we can move them back
+so that their data becomes available when it is needed, but this
+increases register pressure. The general idea is to do things that are
+potentially costly as early as possible so that the result is likely
+to be ready for when it is needed.
+
+% We can put a motivating example here. (e.g. slide 3)
+
+\subsection{Instruction Scheduling - How To}
+
+% TODO: Check
+Instruction Scheduling is NP-Complete, so we use heuristics to do it as best as we can.
+
+\begin{itemize}
+        \item Build a precedence graph (of data dependencies)
+        \item Compute a priority function for the nod esof the graph
+        \item Use list scheduling to construct a schedule, one cycle at a time:
+        \begin{itemize}
+        \item Have a queue of ready operations
+        \item At each cycle, choose an operation from the queue and execute
+        it (and update the ready queue according to the dependencies in the precedence graph).
+        \end{itemize}
+\end{itemize}
+
+This is a greedy heuristic, and can (obviously) be modified. The
+priority function really determines what instructions are scheduled
+first among the ready instructions. One example priority function
+could be $p(node) = latency(node) + max(p(child\#1), p(child\#2),
+\dots, p(child\#n))$.
+
+% TODO: Example
+
+\subsection{List scheduling}
+
+% TODO: Add content from slide 5-9
+
+\begin{tabular}{lll}
+Ready & Scheduled & Active\\ \hline
+6,4,1,3 & 6 & 6\\ \hline
+1,4,3 & 1 & 6, 1\\ \hline
+2,4,3 & 2 & 6, 2\\ \hline
+4, 3 & 4 & 6,4\\ \hline
+3,7 & 7 & 7,4 \\ \hline
+% TODO fill in from slides
+\end{tabular}
+
+There are two distinct classes of list scheduling, forward list
+scheduling and backward list scheduling. Forward scheduling starts
+with the available operations and works forward in time, but backward
+scheduling starts with the leaves and works backwards in time (using
+latency to determine what is available). Often both are applied and
+whichever produces the best result is used.
+
+The priority function has many variations, including prioritising the
+critical path, prioritising nodes with many immediate successors or
+total number of descendants, ignoring latency etc
+
+\subsection{Multiple functional units}
+
+When we have multiple functional units, we just run the list
+scheduling algorithm as normal, but have it schedule multiple
+operations (as many as we have functional units) per cycle.
+
+% TODO: Give example w/ 2 functional units
+
+\subsection{Further issues}
+
+We want to identify highly used sections of code and spend more time
+optimising that (or schedule it as a single block). We can also
+schedule multiple loop iterations together (loop unrolling) so that we
+can reduce the overhead of the loop. Register allocation can restrict
+the choices for instruction scheduling (not enough registers), so
+optimising allocation to avoid spilling (loading and storing to
+memory) is beneficial. We also want to minimise the size of the code
+and the energy usage of the code.
+
+% Lecture 19 (last one!)
+
+\section{Code optimisation}
+
+Code optimisation is very hard and could be a course on its own. The
+end goal is to improve the performance of the program within some
+constraints, for example, to reduce the size of the code, improve the
+performance, reduce memory bandwidth, reduce power consumption etc.
+
+The issues are the legality (the meaning of the program must be
+preserved), benefit (we need to optimise for the average or common
+case, but determining what these cases are is often non-trivial) and
+compile time cost (there are a large number of possible optimisations,
+applying them all takes a long time).
+
+Optimising transformations can be applied at multiple levels of
+abstractions; at the source code level (choosing the right algorithm),
+at the IR level (machine independent) and at the target code level
+(machine-dependent). Typical transformations include discovering and
+propagating constant values, removing unreachable code or redundant
+computations, or encoding a computation in some particularly efficient
+form.
+
+We can classify optimisations by their scope (local (within a block),
+peephole (within a few blocks), loop level, global, inter-procedural
+(across a whole program or between procedures)), by machine
+information (such as machine dependent or independent operations) or
+by their effect on the structure of a program (e.g. re-ordering
+algebraic operations).
+
+% TODO: Give examples of optimisation (slide 5)
+
+% TODO: Loop optimisations
+
