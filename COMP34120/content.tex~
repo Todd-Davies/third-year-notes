@@ -149,7 +149,7 @@ problems. This is A-level maths, but we can recap it in the next bit.
 We want to find a point $x^* \in X$ that maximises $f(x)$ over $X$, such that
 $\forall x \in X, f(x^*) \geq f(x)$. Such a point is called the global maximum
 point of $f(x)$ on $X$. A local maximum point $y^*$ is the maximum value of
-$f(x)$ within the region $X$, such that $\forall x \in X, f(y^*) \geq f(x)$.
+$f(x)$ within the region $U$, such that $\forall x \in U, f(y^*) \geq f(x)$.
 
 \begin{figure}
   \centering
@@ -168,14 +168,14 @@ function at a specific point. If $f'(x) > 0$, then the line slopes upwards, and
 if $f'(x) < 0$ then it's sloping down. Obviously if it is equal to zero, then
 the line is horizontal.
 
-\marginpar{Question: Is this finding derivitives linear time? I think that you'd
-parse the input function into an AST\footnote{Abstract Syntax Tree}
-(linear time) with an LL(1) grammar, then repeatedly apply rules for
-finding the derivative (which is probably poly-time).}
+%Q: Is this finding derivitives linear time?
+%A (from Todd): To find a derivative you parse the input function into an AST
+% (linear time) with an LL(1) grammar, then apply rules of derivation (probably
+% a small polynomial).
 
 \subsubsection{Calculating a derivative}
 
-The most simple rule is:
+The most simple rule is: 
 
 \[
   f(x) = x^n \therefore f'(x) = nx^{n-1}
@@ -195,10 +195,6 @@ Here are three simple examples:
 
 \[
   f(x) = x^3 \therefore f'(x) = 3x^2
-\]
-
-\[
-  f(x) = 5 \therefore f'(x) = 0
 \]
 
 If a function is composed of other functions that are added together (of the
@@ -265,12 +261,9 @@ This is essentially the profit per unit (sale price minus cost) multiplied by
 the number of units sold in the sale. The sale function is given to you in exam
 questions and is a quadratic function over $u_L$ and $u_F$.
 
-We want to find the optimal values for $u_L$ and $u_F$. To do this, we
-first differentiate $J_F$., then we differentiate $J_L$ and sub in the
-value for $u_F$ we found in the first stage so we can get
-answers. Lets do an example; given the following situation, we want to
-find the follower's reaction function, and then an optimal values for
-$u_L$ to give us maximum profit:
+We want to find the values of $u_L$ and $u_F$. To do this, we first
+differentiate $J_F$., then we differentiate $J_L$ and sub in the value for $u_F$
+we found in the first stage so we can get answers. Here is an example:
 
 \[
   J_L(u_L, u_F) = (u_L - c_L) \times S_L(u_L, u_F)
@@ -305,7 +298,7 @@ To get the reaction function, we differentiate $J_F$:
 
 If we differentiate again, we see that this is a maxima ($-4 > 0$).
 
-We can rearrange it so that: $J_f'(U_L,U_F) = R(u_L) = \frac{u_L}{4} + 2$.
+We can rearrange it so that: $R(u_L) = \frac{u_L}{4} + 2$.
 
 Now we can sub in the value for $u_F$ into $J_L$:
 
@@ -322,9 +315,7 @@ And differentiate:
   \frac{d}{du_L}J_L(u_L, R(u_L)) = \frac{1}{4}(35 - 14u_L) = 0
 \]
 
-If we rearrange that, we get $u_L = \frac{35}{14}$, therefore $u_F =
-2.625$, which are the optimum values of $U_L$ and $U_F$ in terms of
-the leader profit.
+If we rearrange that, we get $u_L = \frac{35}{14}$, therefore $u_F = 2.625$.
 
 This means the profits are:
 
@@ -356,7 +347,8 @@ We're interested in the ML solution, but the obvious solutions are:
 \begin{itemize}
   \item Choose to be the follower. Then we don't have to decide on the first
   strategy, and can just choose a reaction. However, this isn't always possible
-  (sometimes you're forced to move first).
+  (sometimes you're forced to move first), and in some games, the follower may
+  always win.
   \item Find the best strategy for the worst scenario; that is to say we should
   find the best, worst strategy:
   \[
@@ -376,28 +368,28 @@ any chosen $u_L$.
 
 The approach we're going to use to do this is called linear regression. This
 involves finding a linear function that gives similar values to what the
-follower has done in the past. You could also use a polynomial function, a
+follower has done in the past. You could also use a polynomial function or a
 neural network (neural networks are called the \textit{universal approximation},
-since they can mimic any function), or many other different techniques.
+since they can mimic any function).
 
 So, if $y = R(x)$ be the unknown function, and imagine we have a set of $T$
 datapoints where we know the input $x$ and the value $y$. We want to make a new
 function $\hat{R}(x)$ that will approximate $R(x)$.
 
-We define $\epsilon(x) = R(x) - \hat{R}(x)$, and try to make
-$\epsilon$ as small as possible for all values of $x$. Unfortunately,
-since we don't know $R$, we can't work out $\epsilon$. However, we can
-work out the value of $\epsilon$ for all the datapoints we do
-have. Making the following function (called the least square
-criterion) as small as possible is the aim of the regression:
+We define $\epsilon(x) = R(x) - \hat{R}(x)$, and try to make $\epsilon$ as small
+as possible for all values of $x$. Unfortunately, since we don't know $R$, we
+can't work out $\epsilon$. However, we can work out the value of $\epsilon$ for
+all the datapoints we do have:
 
 \[
   \sum^T_{t=1}\epsilon^2[x(t)] = \sum^T_{t=1}\left(y(t) - \hat{R}(x(t))\right)^2
 \]
 
-Designing a function is problem dependent, but we know our reaction
-function will be linear (because we're not considering other functions
-in the course):
+Trying to make this value as small as possible is our goal. The value is called
+the least square criterion.
+
+Designing a function is problem dependent, but we know our reaction function
+will be linear:
 
 \[
   R(x) = a + bx
@@ -417,13 +409,15 @@ maximisation problem:
   max_{a,b} - \sum^T_{t=1}\left(y(t) - (a + b x(t)))\right)^2
 \]
 
-We can use partial differentiation to do this (just like in
-\texttt{COMP36212}), but it's tricky, so this is what you will eventually get:
+Of course, we can use partial differentiation to do this (just like in
+\texttt{COMP36212}), where you eventually get:
 
 \[
-  a = \frac{ \sum^T_{t=1}x^2(t)\sum^T_{t=1}y(t)
-    - \sum^T_{t=1}x(t)\sum^T_{t=1}x(t)y(t) }{ T\sum^T_{t=1}x^2(t) -
-    (\sum^T_t{=1}x(t))^2 }
+  a = \frac{
+    \sum^T_{t=1}x^2(t)\sum^T_{t=1}y(t) - \sum^T_{t=1}x(t)\sum^T_{t=1}x(t)y(t)
+  }{
+    T\sum^T_{t=1}x^2(t) - (\sum^T_t{=1}x(t))^2
+  }
 \]
 
 \[
