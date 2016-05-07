@@ -1052,48 +1052,5 @@ algebraic operations).
 
 % TODO: Give examples of optimisation (slide 5)
 
-Examples of transformations applied for optimisation purposes include:
-
-\begin{tabular}{>{\bfseries}p{0.2\textwidth}p{0.4\textwidth}p{0.4\textwidth}}
-Name & \textbf{Before} & \textbf{After}\\ \hline
-
-  Computing common subexpressions &
-  \texttt{A[i, i * 2 + 10] = B[i, i * 2 + 10] + 5} &
-  \texttt{tmp = i * 2 + 10}\newline
-  \texttt{A[i, tmp] = B[i, tmp] + 5}\\ \hline
-  
-  Copy propagaion &
-  \texttt{t = i * 4}\newline
-  \texttt{s = t}\newline
-  \texttt{a[s] = a[s]+5} &
-  \texttt{t = i * 4}\newline
-  \texttt{a[t] = a[t]+5}\\ \hline
-
-  Constant propagaion &
-  \texttt{N = 64}\newline
-  \texttt{c = 2}\newline
-  \texttt{for (i = 0; i < N; i++) }\newline
-  \texttt{a[i] = a[i] + c}\newline
-  \texttt{}&
-  \texttt{N = 64}\newline
-  \texttt{c = 2}\newline
-  \texttt{for (i = 0; i < 64; i++)}\newline
-  \texttt{a[i] = a[i] + 2}\newline
-  \texttt{}\\ \hline
-
-  Constant folding &
-  \texttt{tmp = 5 * 3 + 8 - 12 / 2} &
-  \texttt{tmp = 17}\\ \hline
-
-  Dead code elimination &
-  \texttt{if(3>7) {...}} &
-  \texttt{// Nothing}\\ \hline
-
-  Reduction in strength &
-  \texttt{y = x * 2 + x * 1024} &
-  \texttt{y = x + x + (x<<10)}\\ \hline
-
-\end{tabular}
-
 % TODO: Loop optimisations
 
