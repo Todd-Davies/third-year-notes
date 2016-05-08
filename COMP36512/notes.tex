@@ -59,9 +59,12 @@
 }
 \thispagestyle{test}
 
+% Enable multicol
+\multicolstrue
+
 % Get the course info
 \courseinfo
-\pagebreak
+%\pagebreak
 
 % No page numbers!
 \pagenumbering{arabic}
@@ -69,14 +72,11 @@
 \cfoot{}
 \pagestyle{plain}
 
-% Enable multicol
-\multicolstrue
-
 % Save pages in large documents by having a multicolumn table of contents!
 \begin{mymulticols}
   \tableofcontents
 \end{mymulticols}
-\pagebreak
+%\pagebreak
 
 % Restore the extra margin geometry
 \restoregeometry
