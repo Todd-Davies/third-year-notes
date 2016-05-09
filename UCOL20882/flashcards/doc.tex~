@@ -490,8 +490,6 @@
   proteins after division, so they have different gene expressions and
   more differences occur after each cell division onwards.}
 
-% TODO: How a beta insulin cell is made
-
 \card{Describe the cell lineage of insulin producing beta
   cells.}{Fertilised egg (zygote) $\rightarrow$ inner cell mass
   $\rightarrow$ endoderm $\rightarrow$ pancreas $\rightarrow$ endocrine
@@ -996,20 +994,27 @@
 	\end{tabular}
 }
 
-%TODO match
 \flashcard{
-	\begin{tabular}{lll}
-	Sense & Name\\ \hline Pressure &
-        \blank{Mechanoreceptor}\\ Temperature &
-        \blank{thermoreceptor}\\ Light &
-        \blank{Photoreceptor}\\ Smell/taste &
-        \blank{Chemoreceptor}\\ Pain/heat/tissue damage &
-        \blank{Nociceptor}
+	\begin{tabular}{ll}
+	  Sense & Name\\ \hline
+          Pressure & \blank{Mechanoreceptor}\\
+          Temperature & \blank{Thermoreceptor}\\
+          Light & \blank{Photoreceptor}\\
+          Smell/taste & \blank{Chemoreceptor}\\ 
+          Pain/heat/tissue damage & \blank{Nociceptor}\\
 	\end{tabular}	
 }
 
-%TODO Types of neuroglia & where they're found (see lecture podcast)
-\flashcard{TODO}
+\flashcard{
+  `Glia' means \blank{glue}. The job of the neuroglia is to \blank{hold the neurones together}. \blank{95} percent of the brain is neuroglia
+  \begin{tabularx}{\cardwidth}{llX}
+    Name & Where & Function\\ \hline
+    Schwann & \blank{PNS} & \blank{Create the myline sheath}\\
+    \blank{Muller} & Retina & \blank{Provide structural stability in retina}\\
+    Oligodendrocyte & \blank{CNS} & \blank{Create the myline sheath} and \blank{maintain homeostasis}\\
+    Astrocyte & \blank{Brain} & \blank{Phagocytose (eat debris)}
+  \end{tabularx}
+}
 
 \flashcard{Neuroglia are \blank{supporting cells} for the neurons.}
 
@@ -1031,26 +1036,34 @@
 \card{Define depolarisation}{The inside of the cell has gone from -ve
   to +ve.}
 
-%TODO: Action potential generation (slide 22)
-\flashcard{TODO}
+\flashcard{An action potential is \blank{an explosion of electrical
+    activity} created by \blank{a depolarising current}. It is an
+  \blank{all or nothing} event.}
 
-%TODO: Action potential graph
-\flashcard{TODO}
+\card{\includegraphics[width=\cardwidth]{images/ac-pot-bl}}{\includegraphics[width=\cardwidth]{images/ac-pot}}
 
-%TODO: Sensory pathways (3 neuron chains) + picture
-\flashcard{TODO}
+\flashcard{At rest, the neuron is at \blank{-70mV} and when an action
+  potential occurs, then the cell \blank{depolarises} and goes to
+  \blank{30mV}. A \blank{sodium potassium} pump gets rid of
+  \blank{sodium} in the cell to reset the charge
+  (\blank{repolarisation}.}
 
-%TODO: Presynaptic and postsynaptic neurones
-\flashcard{TODO}
+\flashcard{\blank{hyperpolarisation} is when a stimulus is applied to
+  neurone that causes it to go very negative.}
 
-%TODO: Synaptic cleft + picture
-\flashcard{TODO}
+\flashcard{Sensory pathways have \blank{three neurones} in them. They
+  are called \blank{first, second and third order} neurones
+  respectively.}
+
+\card{\includegraphics[width=\cardwidth]{images/synapse-bl}}{\includegraphics[width=\cardwidth]{images/synapse}}
 
 %TODO: Synapse transmission or whatever
-\flashcard{TODO}
-
-%TODO: Lock and key model of receptor + neurotransmitter/drugs/ions
-\flashcard{TODO}
+\flashcard{\blank{Action potential} reaches axon
+  terminal. \blank{Vesicles} fuse with the pre-synaptic
+  membrane. \blank{Neurotransmitters} are released from vesicles, they
+  travel in the \blank{synaptic cleft} to bind with receptors on
+  \blank{post-synaptic neuron}. This works using the \blank{Lock and
+    Key} model.}
 
 % Brain lecture 2
 
@@ -1100,9 +1113,13 @@
 
 % TODO : Rest of lecture
 
+% Lecture 3 Human Brain
+
 % Infectious diseases
 
-% Lecture 2
+% Lecture 1 Infectious Disease
+
+% Lecture 2 Infectious Disease
 
 \card{Are viruses life?}{No, since they have to be inside another cell
   to replicate.}
