@@ -1057,7 +1057,6 @@
 
 \card{\includegraphics[width=\cardwidth]{images/synapse-bl}}{\includegraphics[width=\cardwidth]{images/synapse}}
 
-%TODO: Synapse transmission or whatever
 \flashcard{\blank{Action potential} reaches axon
   terminal. \blank{Vesicles} fuse with the pre-synaptic
   membrane. \blank{Neurotransmitters} are released from vesicles, they
@@ -1067,43 +1066,63 @@
 
 % Brain lecture 2
 
-% <stuff I missed>
+\flashcard{A seizure is \blank{the same as a convlusion}, and is a
+  \blank{transient abnormal} event resulting from {discharge of
+    cerebral neurone}. Epilepsy is the \blank{continued tendancy} to
+  have such seisures.}
 
-% Explosion in the moddle of electroncephalogram is ``spike and wave'' -  ``Transient abnormal discharge''
+\flashcard{An \blank{electroencephalogram} that has \blank{an
+    explosion in the middle} is called \blank{spike and wave}, and
+  indicates \blank{transient abnormal discharge}.}
 
-% Types of seizure; generalised seizure, partial seizure & partial seizure w/ secondary generalization
-% Generalised seizures:
-  % Tonic clonic seizure is a movie style seizure; body jerk, froth at
-  % the mouth... then paralysis Absence seizure; go blank for a few
-  % seconds Myoclonic seizure; twitching of a muscle/muscle group
+\card{What are the three types of seisure?}{Generalised (all over the
+  brain), partial (one part of the brain), partial with secondary
+  generalisation (initially partial, then moves).}
 
-% Partial seizure
-% - Induced aura is when in some patients, they can tell when they're going to have a seizure
-% - Jacksonian seizure; motor cortex (frontal lobe). Twitching progresses from one part of
-%   the body to another, stopping inbetween.
-% - Todd's paralysis; limpness after a seizure.
+\flashcard{A tonic clonic seizure (\blank{grand mal}) is a
+  \blank{movie style seizure where the body jerks, the mouth froths
+    etc}, before \blank{muscle paralysis occurs}}
 
-% Symptoms depend on site of seizure
+\flashcard{An absence seizure (\blank{petit mal}) is
+  \blank{when the patient goes blank for a few seconds}.}
 
-% Causes of seizure:
-% - Trauma on the brain:
-%  + Penetrating brain injury
-%  + Bruised brain (cerebral contusion)
-%  + Dural tear (clingfilm-like lining of brain is damaged)
-% - Cerebrovascular:
-%  + Following death of part of the brain (stroke - cerebral infarction, burst blood vessel)
-% - Alcohol induced:
-%  + Hypoglycaemia (low blood sugar -> coma)
-% - High Fever (pyrexia)
-% - Brain tumors
+\flashcard{A myoclonic seizure is
+  \blank{when a muscle or muscle group twitches}.}
 
-% Diagnosis & treatment:
-% Rule out other causes; get an eyewitness 
-% Do not come into as little harm; don't restrain them
-% Immediate medication; diazepam (muscle relactant) for long seizure, check glucose levels
-% Long term; anti-epileptic medication
+\flashcard{Types of generalised seizures include \blank{tonic clonic},
+  \blank{absence} and \blank{myoclonic} seizures}.
 
-% Diazepam is a muscle supressant; too much can inhibit breathing
+\flashcard{Partial seizures include \blank{induced aura},
+  \blank{jacksonian seizure} (\blank{motor cortex}) and \blank{Todd's
+    paralysis}.}
+
+\flashcard{Induced Aura is when \blank{in some patients, they can tell
+    if they're going to have a seizure}.}
+
+\flashcard{Jacksonian seizure is in the \blank{motor cortex}
+  (\blank{frontal lobe}), \blank{twitching} progresses from \blank{one
+    part of the body} to \blank{another, stopping inbetween}}.
+
+\flashcard{Todd's paralysis is \blank{limpness} after a seizure.}
+
+\flashcard{Causes of seizues include \blank{trauma to the brain} such
+  as \blank{penetrating brain injury}, \blank{bruised brain}
+  (\blank{cerebral contusion}) or a \blank{dural tear} (where the
+  clingfilm-like lining of the brain is damaged). Cerebrovascular
+  causes can also contribute such as when \blank{part of the brain
+    dies due to stroke}. Other causes include \blank{alcohol},
+  \blank{hypoglycaemia}, \blank{high fever} and \blank{brain tumors}.}
+
+\card{How is a seizure diagnosed and treated?}{Diagnoses wise,
+  alternate causes are ruled out with eyewitness accounts and an EEG
+  is taken. Treatement wise, patients should not be restrained since
+  they could hurt themselves/others, and medication such as diazepam
+  could be taken.}
+
+\card{What is diazepam}{A muscle supressant given to fitting
+  people. Too much can inhibit breathing.}
+
+% TODO: Carry on brain lecture 2 from here.
 
 % Epileptic people must be fit free for ten years to drive trucks, planes, be a sea captain etc.
 
