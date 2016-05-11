@@ -1164,9 +1164,22 @@
 
 % Lecture 3 Human Brain
 
-% Infectious diseases
-
 % Lecture 1 Infectious Disease
+
+\flashcard{Viruses are \blank{genetic elements} that \blank{replicate
+    inside cells}. They are often referred to as \blank{sub-cellular
+    parasites}, and consist of \blank{nucleic acid} surrounded by
+  \blank{protein}. They are classified by the type of \blank{nucleic
+    acid}, how they \blank{replicate} and if they are \blank{single}
+  or \blank{double stranded}.}
+
+\flashcard{Bacteria are \blank{prokaryotic} microorganisms, since they
+  have a \blank{cell wall} and no \blank{distinct nucleus}.}
+
+\flashcard{Fungi are \blank{eukaryotic} microorganisms with
+  \blank{rigid cell walls}, and are sized at anywhere from micrometers
+  to cenitmeters. Some are \blank{unicellular} and others are
+  \blank{filamentous} (i.e. shrooms).}
 
 % Lecture 2 Infectious Disease
 
