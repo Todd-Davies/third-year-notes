@@ -1050,7 +1050,105 @@ information (such as machine dependent or independent operations) or
 by their effect on the structure of a program (e.g. re-ordering
 algebraic operations).
 
-% TODO: Give examples of optimisation (slide 5)
+Examples of transformations applied for optimisation purposes include:
 
-% TODO: Loop optimisations
+\begin{tabular}{>{\bfseries}p{0.2\textwidth}p{0.4\textwidth}p{0.4\textwidth}}
+Name & \textbf{Before} & \textbf{After}\\ \hline
+
+  Computing common subexpressions &
+  \texttt{A[i, i * 2 + 10] = B[i, i * 2 + 10] + 5} &
+  \texttt{tmp = i * 2 + 10}\newline
+  \texttt{A[i, tmp] = B[i, tmp] + 5}\\ \hline
+  
+  Copy propagation &
+  \texttt{t = i * 4}\newline
+  \texttt{s = t}\newline
+  \texttt{a[s] = a[s]+5} &
+  \texttt{t = i * 4}\newline
+  \texttt{a[t] = a[t]+5}\\ \hline
+
+  Constant propagation &
+  \texttt{N = 64}\newline
+  \texttt{c = 2}\newline
+  \texttt{for (i = 0; i < N; i++) }\newline
+  \texttt{a[i] = a[i] + c}\newline
+  \texttt{}&
+  \texttt{N = 64}\newline
+  \texttt{c = 2}\newline
+  \texttt{for (i = 0; i < 64; i++)}\newline
+  \texttt{a[i] = a[i] + 2}\newline
+  \texttt{}\\ \hline
+
+  Constant folding &
+  \texttt{tmp = 5 * 3 + 8 - 12 / 2} &
+  \texttt{tmp = 17}\\ \hline
+
+  Dead code elimination &
+  \texttt{if(3>7) {...}} &
+  \texttt{// Nothing}\\ \hline
+
+  Reduction in strength &
+  \texttt{y = x * 2 + x * 1024} &
+  \texttt{y = x + x + (x<<10)}\\ \hline
+
+\end{tabular}
+
+\subsection{Loop optimisation}
+
+Loops are an important target for optimisation, mainly because much of
+the complexity inherent in programs is derived from looping control
+structures. Three optimisations are mentioned in the course:
+
+\begin{description}
+  \item \textbf{Loop-invariant code-motion}:\\ If a constant
+    expression is computed inside a loop, move the computation outside
+    the loop so that it is only done once.
+    
+  \item \textbf{Loop interchange}:\\ Swap the variables that are being
+  altered in two nested loops so that the order of access matches the
+  order that the data items are in memory. The course notes describe
+  the aim as being to achieve `unit stride' accesses, i.e. so that
+  each access is one sequential array stride from the last.
+
+  \item \textbf{Strip mining}:\\
+  % TODO: Fill in when Rizos replies
+
+  \item \textbf{Loop unrolling}:\\ The idea behind loop unrolling is
+  to process multiple iterations of the loop inside one iteration to
+  reduce the overhead of looping and perhaps make better use of SIMD
+  instructions or to make scheduling easier. For example:
+  
+  \begin{verbatim}
+    for (int i = 0; i < 12; i++) x[i] += 1;
+  \end{verbatim}
+
+  Could go to:
+
+  \begin{verbatim}
+    for (int i = 0; i < 12; i+=4) {
+      x[i] += 1
+      x[i+1] += 1
+      x[i+2] += 1
+      x[i+3] += 1
+    }
+  \end{verbatim}
+
+  Or even:
+
+  \begin{verbatim}
+    // Add8 does four 8-bit add operations in one instruction
+    for (int i = 0; i < 12; i+=4) add8(x[i], 1);
+  \end{verbatim}
+
+  If the number of loop items is not divisible by the unroll length
+  (four in our case), then an additional loop may be added after the
+  main loop to complete the last few iterations.
+\end{description}
+
+Asserting that these optimisations are legal is a hard problem. A
+model is often used to represent the loop control logic, by which
+logical conclusions can be drawn. The main issue is data dependence;
+in order to do things like switching an inner and outer loop, we need
+to ensure that the end result is the same if the loops interact with
+each other.
 

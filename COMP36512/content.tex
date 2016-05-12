@@ -4,6 +4,8 @@
   pdfauthor = {\Author}
 }
 
+% Lecture 1
+
 \section{Intro}
 
 A compiler is a program that reads another program written in one language and
@@ -851,6 +853,52 @@ now computers have lots of memory, \texttt{LALR(1)} is most commonly used.
   \caption{A diagram of the overall compiler system.}
 \end{figure}
 
+% Lecture 10
+
+% Questions lecture, no content
+
+% Lecture 11
+
+\section{Context sensivive analysis}
+
+Lexical and syntactical analysis ensure that the input program is a
+valid sentence in the source language, yet though we have a parse tree
+of the input program, there are still classes of errors that could be
+present in the program. Since syntax analysis is context-free, any
+semantic errors\footnote{These could include type errors, array index
+out of bound errors (that can be detected at compile time), undeclared
+variable errors etc} would not have been checked for, and would still
+exist in the IR.
+
+\subsection{Type Systems}
+
+We can use a type system to detect many semantic errors in the
+program. This involves using a \textit{type checker} to assign or
+infer types for expressions and check that they are legal within
+context in which they are used.
+
+Type systems consist of a number of built in types (primatives such
+as \texttt{int}, \texttt{boolean} etc, and language types such as
+Java's \texttt{String}), and rules to construct new types, determine
+if types are equivalent, infer\footnote{If a language requires
+variables to be declared with a type before use (e.g. Java) then
+inferrence isn't difficult. It's only when variables can be declared
+as needed like in Python that it is really hard.} the type of some
+expression etc. The extent of which type checking is performed varies
+by language; some langauges such as Java employ static type checking
+at compile time, while others such as Python employ dynamic run-time
+checking.
+
+% TODO: From slide 5 of lecture 10
+
+% Lecture 12
+
+% Lecture 13
+
+% Lecture 14
+
+% Questions lecture, no content
+
 % Lecture 15
 
 \section{Code generation \& instruction selection}
@@ -926,6 +974,10 @@ expressions...
 % TODO Slide 11
 
 % TODO Slide 12; conclusion
+
+% Lecture 16
+
+% Lecture 17
 
 % Lecture 18 (Instruction scheduling)
 
@@ -1110,8 +1162,12 @@ structures. Three optimisations are mentioned in the course:
   the aim as being to achieve `unit stride' accesses, i.e. so that
   each access is one sequential array stride from the last.
 
-  \item \textbf{Strip mining}:\\
-  % TODO: Fill in when Rizos replies
+  \item \textbf{Strip mining}:\\ Strip mining transforms a singly
+  nested loop into a double nested one. The outer loop steps through
+  the index in blocks of some size, and the inner loop steps through
+  each block. The block size of the outer loop is determined by some
+  characteristic of the target machine, such as the vector register
+  length or the size of one cache line.
 
   \item \textbf{Loop unrolling}:\\ The idea behind loop unrolling is
   to process multiple iterations of the loop inside one iteration to
