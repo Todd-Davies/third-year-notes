@@ -859,7 +859,7 @@ now computers have lots of memory, \texttt{LALR(1)} is most commonly used.
 
 % Lecture 11
 
-\section{Context sensivive analysis}
+\section{Context sensitive analysis}
 
 Lexical and syntactical analysis ensure that the input program is a
 valid sentence in the source language, yet though we have a parse tree
@@ -877,19 +877,76 @@ program. This involves using a \textit{type checker} to assign or
 infer types for expressions and check that they are legal within
 context in which they are used.
 
-Type systems consist of a number of built in types (primatives such
+Type systems consist of a number of built in types (primitives such
 as \texttt{int}, \texttt{boolean} etc, and language types such as
 Java's \texttt{String}), and rules to construct new types, determine
 if types are equivalent, infer\footnote{If a language requires
 variables to be declared with a type before use (e.g. Java) then
-inferrence isn't difficult. It's only when variables can be declared
+inference isn't difficult. It's only when variables can be declared
 as needed like in Python that it is really hard.} the type of some
 expression etc. The extent of which type checking is performed varies
-by language; some langauges such as Java employ static type checking
+by language; some languages such as Java employ static type checking
 at compile time, while others such as Python employ dynamic run-time
 checking.
 
-% TODO: From slide 5 of lecture 10
+A compiler designer must consider that types affect each other; for
+example, if a double is added to an int, then the result in most
+programming languages would be a double.
+
+In order to perform context-sensitive analysis, formal methods such as
+grammars can be employed, ad-hoc methods are most effective (symbol
+tables, syntax directed translation with attribute grammars, etc).
+
+\subsubsection{Attribute Grammars}
+
+Knuth had the idea to annotate each symbol in a grammar with a set of
+attributes, and associate semantic rules with each production rule in
+the CFG to define each attribute in terms of other attributes. We can
+associate commands/actions with each rule, like so:
+
+\begin{center}
+  \begin{tabular}{>{$}l<{$} >{$}l<{$}}
+    G \rightarrow E & print(E.val)\\
+    E \rightarrow E_1 + T & E.val = E_1.val + T.var\\
+    \phantom{E \rightarrow}~| T & E.val = T.val\\
+    T \rightarrow T_1 * F & T.val = T_1.val * F.val\\
+    \phantom{T \rightarrow}~| F & T = F.val\\
+    F \rightarrow integer & F.val = integer.lexval
+  \end{tabular}
+\end{center}
+
+% TODO: Add diagram (tree from slide 7, lecture 11) when can be arsed.
+
+There are two types of dependencies between attributes, synthesised
+dependencies and inherited dependencies. The former derive their value
+from constants and their children and grammars consisting of only
+synthesised dependencies can be parsed in a single bottom up pass. The
+latter are inherited dependencies, and these derive their value from
+their parents, siblings and constants.
+
+An example of an inherited dependency would be parsing the
+expression \texttt{int i;}, since the variable $i$ derives its type
+from the symbol $int$, which would be a sibling in the parse tree.
+
+% TODO: Look at example on page 10 on bigger screen
+
+In order to evaluate the attributes of a parse tree, a dependence
+graph must be created. Nodes represent attributes, and edges represent
+the flow of the attribute values. The graph can be built as the parse
+tree is built, so this isn't too expensive (and the graph is
+proportional to the size of the tree too). A topological sort (nodes
+are visited such that edges go from earlier to later nodes) can be
+used to find independent values and use them to calculate other
+values, though cyclic graphs mean that this doesn't work.
+
+Generic attribute are rarely used in practice because lots of
+supporting rules are needed. They have seen use in things like XML
+editors though. Instead, a simplified idea is used; S-grammars (only
+use synthesised attributes) or L-grammars (limit the use of inherited
+attributes).
+
+% TODO Read Dragon book & show an example of an S-attribute and
+% L-attribute grammar.
 
 % Lecture 12
 
