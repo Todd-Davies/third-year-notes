@@ -950,6 +950,94 @@ attributes).
 
 % Lecture 12
 
+\section{Intermediate Representation}
+
+The intermediate representation (IR) encodes the knowledge about the
+program that the compiler has derived. The purpose of an IR is to
+enable retargeting for different machines (you don't have to re-write
+the front end of the compiler every time), and to let machine
+independent optimisations be implemented.
+
+Things that are hard to 'get right' with IR's include the level of
+abstraction that they exist on and how easy they are to manipulate and
+generate. Common IR choices include a directed acyclic graph (DAG),
+trees, or linear code (such pseudo code for an abstract machine). It
+is emphasised in the notes that there is no unversally good choice,
+and the goals of the compiler dictate what choice is best.
+
+We can use an abstract syntax tree as an IR, and as such we want to
+convert a parse tree (from the front end of the compiler) to an AST. A
+parse tree contains lots of information that is not needed by the back
+end of the compiler, such as that of the terminal symbols from the
+CFG. The conversion involves traversing the parse tree in a post order
+manner, and matching each action (in the output) with a grammar rule.
+
+% TODO: See Aho1 pp.288-289; Aho2, 5.3.1 here
+
+Essensially what we end up with, is the parse tree with all
+non-terminal symbols removed. This is a near-source-level
+representation. In fact, to generate something similar to the original
+source code, then an in-order walk can be performed on the
+tree. Disadvantages of AST's like this are that they're very pointer
+intensive and often have multiple ways of being encoded for the same
+tree.
+
+A DAG can be used instead of an AST. These are often more powerful
+than AST's, but are also harder to transform and are not useful for
+showing control flow. To construct a DAG, do the same as you would for
+an AST (post-order traversal \& generate nodes for each action), but
+nodes can have multiple parents according to what other nodes make use
+of their result.
+
+Other graph representations include control flow graphs (each node is
+a block of code, edges transfer control between them), data dependence
+graphs (nodes are program statements, edges join nodes if they one
+uses another's results), and call graphs which show the dependencies
+between different procedures.
+
+% TODO: Data dependence graph, control flow graph, call graph examples
+
+\subsection{Linear Representations}
+
+Three address code is similar to assembly, where each line is an
+instruction followed by up to three operands. The code is compact,
+resembles that produced as target code on many machines, and makes
+intermediate values created within a computation explicit.
+
+Each instruction in two address code only takes two operands is more
+compact than three address code, but one address code (also called
+stack machine code, and used by Java bytecode) is the most
+compact. Each operation takes only one operand, and if more operands
+are required for an instruction, then they can be popped off a stack.
+
+\section{Back-end Datastructures}
+
+Representing the source code as a graph/tree/stack machine translation
+is useful, but we still need to encode much of the contextual
+information we derived about the program. This usually includes a
+symbol table (among other things), which contain a piece of code for
+every production rule that is ran when the production rule is
+applied. Examples of code could be to type check an assignment, or
+check that a variable has been declared before it it used. Symbol
+tables are retained between multiple compilations (and also during
+debugging) so that they do not have to be re-constructed each time.
+
+Things that go inside a symbol table include variable names,
+constants, function names, strings, text labels, and temporary
+variables for the compiler. The actual information stored about each
+entity varies according to what the entity actually is. Quick access
+is important, since the symbol table is frequently accessed by the
+compiler.
+
+Obviously you could implement a symbol table in a variety of ways, but
+a hash table is most commonly used due to its $O(1)$ lookup time
+(linked lists or binary trees are worse alternatives). In the course
+notes, bucket hashing is mentioned to resolve hash collisions, where a
+linked list is maintained for each hash value to store items with that
+hash key. Open addressing is also given, which is where the hash value
+is recalculated with an added constant each time there is a collision
+until a free space is found.
+
 % Lecture 13
 
 % Lecture 14
