@@ -1126,9 +1126,10 @@ known, but the size of the heap and stack varies. As such, the address
 space is organised like so:
 
 \begin{figure}[H]
-\begin{center}
+\centering
 \includegraphics[width=\textwidth]{diagrams/memory-layout}
-\caption{\label{fig:memory-layout}The memory layout of a program. The heap and stack grow towards each other.}
+\caption{\label{fig:memory-layout}The memory layout of a program. The
+heap and stack grow towards each other.}
 \end{figure}
 
 Variables are stored in the AR using offsets, but must be put on the
@@ -1241,6 +1242,79 @@ expressions...
 % TODO Slide 12; conclusion
 
 % Lecture 16
+
+\section{Register allocation}
+
+The compiler must choose what registers to store data in while the
+program is executing. We assume that a three-address code has been
+generated, which uses an unlimited abount of \textit{virtual
+registers}, but we want to map that onto the \textit{phyiscal
+registers} in the machine.
+
+Henceforth, the task is to produce correct code that uses at most $k$
+registers, and minimises the number of loads and stores to memory
+(i.e. minimise register spilling). Ideally, we don't use backtracking
+so the compiler is fast.
+
+\marginpar{It is important to remember that real processors have many
+different register types, and real compilers must factor this in when
+allocating.}A \textit{basic block} is a segment of branch-free,
+straight line code. Local register allocation is within a basic block,
+and global allocation is within an entire
+procedure. \textit{Allocation} is choosing what values to keep within
+registers, but \textit{assignment} is choosing which specific
+registers get the values.
+
+To determine how many registers we need in a given basic block, we
+must compute a set of \textit{live ranges}, where the value of a
+variable is live between its definition and its last use. We must
+define a value \texttt{maxlive} to be the maximum number of live
+variables we can have in registers, and if the number of live ranges
+active at any point is greater than this value, then the registers
+must spill to memory.
+
+A common top-down method of register allocation is
+the \textit{frequency count algorithm}, where $f$ registers are
+reserved for use when loading and saving values to memory, and so
+$k-f$ registers are used for the program. The compiler looks at the
+$k-f$ most commonly used values and stores them in registers, while
+using the $f$ registers to spill the other values to memory.
+
+Bottom up register allocation uses \textit{Best's algorithm}, which is
+given as:
+
+\begin{verbatim}
+for (op, vr3, vr2, vr1) in operations
+  ensure vr1 in r1
+  ensure vr2 in r2
+  if r1 not needed after this instruction
+    free(r1)
+  endif
+  if r2 not needed after this instruction
+    free(r2)
+  endif
+  allocate r3 for vr3
+  emit op r3, r2, r1
+\end{verbatim}
+
+This relies on two operations; \textit{ensure}
+and \textit{allocate}. The former assigns a virtual register to an
+actual register and ensures all occurances of that virtual register
+are tied to the real one. The latter allocates a free physical
+register, or finds the register that is being used farthest in the
+future, stores its value and returns it.
+
+In practice, we often have multiple basic blocks being executed one
+after the other, and there are often opportunities for optimisation
+between them (e.g. some basic blocks use values already in the
+registers of others). If the control path between the basic blocks is
+nonlinear, then this may not be easy.
+
+Rather than looking at local blocks of code in isolation, some
+approaches take the global program into account, and use generalised
+frequency counts as well as avoiding load and store operations between
+different basic blocks. Graph colouring can be used to assign
+registers if each colour is mapped onto a register.
 
 % Lecture 17
 
