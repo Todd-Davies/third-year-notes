@@ -1040,6 +1040,126 @@ until a free space is found.
 
 % Lecture 13
 
+\section{The Procedure Abstraction}
+
+The front end of the compiler is well understood and theoretically
+sound, while the second half is a more hotch-potch affair; it is here
+that clever engineering must by used to solve NP-hard problems and
+choose between diffucult trade offs.
+
+Programming is all about abstraction, and one of the main tools in a
+programmer's abstraction toolbox is the procedure. Procedures let
+programmers define entry and exit points to a block of code, work
+within a set context, and have a clean external interface that can be
+used to call the code. However, there must be an agreement between
+different parts of the system as to how procedures are to work; how is
+memory laid out (and protected), how are arguments passed, where are
+procedures stored, etc. These concerns transcend those of the
+compiler, the Operating System, and to an extent, the architecture of
+the machine must all be designed with this in mind.
+
+Sometimes each procedure is compiled individually, meaning that the
+compile time can be reduced (less code in each procedure means less
+complexity for the compiler, and recompilation needs only to concern
+the procedures that have been edited).
+
+\subsection{Linkage}
+
+Since procedures have such well defined control flow behaviour, a
+protocol exists for passing values and control at procedure calls and
+returns. This is called the linkage convention, and it ensures that
+procedures inherit a valid run-time environment and that they restore
+one for their parents.
+
+The code to make a linkage happen is generated at compile time, but
+generated at runtime. To do this, the compiler must consider that
+local variables require storage during procedure execution, and it
+must set asside a region of memory for this (and other things) called
+an activation record (AR)\footnote{They are called activation records
+in the notes, but are referred to as stack frames in most places I've
+seen.}. Things stored within the AR include:
+
+\begin{itemize}
+\item Parameters to the function
+\item Register save area
+\item Return value
+\item Return address
+\item Access link (helps with non-local access)
+\item Caller's access link (to return to parent once complete)
+\item Temporary variables and local variables
+\end{itemize}
+
+This is how the whole process happens, and what each part is responsible for:
+
+\begin{itemize}
+\item Caller (pre call)
+\begin{itemize}
+\item Allocate the AR
+\item Store the parameters in the AR
+\item Store the return address
+\item Jump to the child
+\end{itemize}
+\item Callee (prologue)
+\begin{itemize}
+\item Save the caller's registers
+\item Extend the AR for local data
+\item Init local variables
+\item Start execution
+\end{itemize}
+\item Callee (epilogue)
+\begin{itemize}
+\item Store the return value
+\item Restore registers
+\item Unextend the AR frame
+\item Jump to return address
+\end{itemize}
+\item Caller (post return)
+\begin{itemize}
+\item Copy the return value
+\item Deallocate the caller's AR
+\item Restore the parameters
+\end{itemize}
+\end{itemize}
+
+At runtime, the size of the code and static/global variables are
+known, but the size of the heap and stack varies. As such, the address
+space is organised like so:
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=\textwidth]{diagrams/memory-layout}
+\caption{\label{fig:memory-layout}The memory layout of a program. The heap and stack grow towards each other.}
+\end{figure}
+
+Variables are stored in the AR using offsets, but must be put on the
+heap if the variables themselves are of variable length. The
+activation records themselves will either be on the heap or the stack;
+if the procedure makes no calls, then the AR can be allocated
+statically, if it has a normal return value, then it can simply go on
+the stack as normal (which is good, because we don't need to worry
+much about deallocation), but if it may need to be active after exit
+(e.g. it returns a pointer pointing to a local variable), then it
+should be on the heap. The heap is least efficient, the stack is more
+efficient, but static allocation is most efficient.
+
+Most variables are allocated at runtime, but static and global
+variables are usually allocated at compile time since their memory
+requirements are known inadvance. Variables can either be put on the
+stack or on the heap, and are done so according to whether they need
+to be preserved across procedures and if they have fixed sizes.
+
+% TODO: Bit about addressing variables missed out (slides 10->13 in slides)
+
+The compiler must consider things like storing variables at the start
+of word boundaries and re-ordering variables to maximise memory usage
+efficiency. The proximity and ordering of variables can also affect
+cache performance (they are likely to be fetched in the same cache
+load). The compiler can also avoid some problems/overheads relating to
+procedure calling/linkage by inlining procedures (copying their code
+into another procedure with no call), though this is not possible in
+all cases due to register consumption, code size (too many inline
+functions means lots of repeated code), cache trashing etc.
+
 % Lecture 14
 
 % Questions lecture, no content
