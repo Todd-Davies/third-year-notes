@@ -4,6 +4,8 @@
   pdfauthor = {\Author}
 }
 
+% Lecture 1
+
 \section{The need for parallelism}
 
 Even though we've been unable to increase the clock speed of processors since
@@ -231,6 +233,8 @@ limited. Computers do automatic parallelisation to an extent (e.g. instruction
 reordering), but must be $100\%$ sure that an operation is safe to parallelise,
 and the results will be correct.
 
+% Lecture 4
+
 \section{Caches in shared memory multiprocessors}
 
 Obviously caches are vital to the efficient functioning of processors. Without
@@ -296,7 +300,7 @@ valid).
 
 % TODO: Talk about state transitions
 
-% Slide 22 onwards
+% TODO: Slide 22 onwards
 
 There are two types of messages between cores; read requests for a cache line
 (one core hopes that another core's cache has the cache line so that it doesn't
@@ -317,6 +321,8 @@ propagate, and the clock will have to be reduced).
 The impact from this is that the consistency protocol is the biggest limitation
 when trying to add more cores to a processor. The protocol we have described is
 called the \texttt{MSI protocol} (modified, shared, invalid).
+
+% Lecture 5
 
 \subsection{Other cache coherence protocols}
 
@@ -628,6 +634,39 @@ well with modern pipelined processors.
 
 %TODO Load linked & Spin locks L 7 S 15
 
+% Lecture 8 - Lock free datastructures
+
+\section{Lock-free datastructures}
+
+We have seen datastrucutres that employ locks, barriers and other
+synchronisation primatives in order to serialize multithreaded access
+to them, but instructions such as \texttt{compare and set} can be used
+to make sure that updates to datastructures happen in a serial manner,
+while removing the need for locks.
+
+Let us take the example of an unbounded queue, implemented using a
+linked list. A locking implementation might use two locks; one for
+pushing and one for popping (though these locks must be aware of each
+other when the queue is empty); implementation details are covered in
+the lecture notes (but not here). Only one thread can push and one pop
+from the queue at the same time, which obviously becomes a bottleneck
+when multiple threads are accessing the queue.
+
+With Java's \texttt{java.util.concurrent.atomic.AtomicReference}
+and \texttt{compareAndSet} features, we can make the same
+datastructure with no locks. Though there is still an overhead
+associated with multiple threads accessing the queue, they are held in
+busy-loop style constructs made from RMW\footnote{Read, Modify, Write}
+instructions such as Compare and Set. Though an awareness of lock-free
+datastructures is required for the course, understanding an
+implementation is not.
+
+% Lecture 9 - OpenMP & MPI
+
+\section{OpenMP \& MPI}
+
+% Lecture 10 - Speculation
+
 % Lecture 11 - Transactional Memory
 
 \section{Transactional Memory}
@@ -779,7 +818,10 @@ there is a high chance that theu will by fulfilled entirely in
 hardware (and a low probability of conflict), but overflow to software
 if required.
 
-% Lecture 13
+% Lecture 12 - HW support for transactions
+
+% Lecture 13 - Memory consistency
+
 \section{Memory consistency}
 
 Cache coherency is something required of multi-core CPU's, but we want
@@ -818,6 +860,10 @@ read \texttt{A} and \texttt{B} and receive a value of \texttt{B} that
 is newer than \tezttt{A} (which would not be expected).
 
 % Slide 13
+
+% Lecture 14 - GPU's and CUDEA
+
+% Lecture 15 - FP & Dataflow principles
 
 % Bibliography
 \bibliography{bib}{}
