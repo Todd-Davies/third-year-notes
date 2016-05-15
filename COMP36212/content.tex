@@ -4,6 +4,8 @@
   pdfauthor = {\Author}
 }
 
+% Part One
+
 \section{Finite precision computation}
 
 Unfortunately, the world is not solely restricted to integers, and computers
@@ -503,7 +505,7 @@ Meaning all of our digits were rubbish!
 
 %TODO: Page 41 onwards for an example
 
-% Part two of the course!
+% Part Two
 
 \section{Optimisation and nature inspired algorithms}
 
@@ -1080,37 +1082,117 @@ time, and waiting for the fitness variations from one population to the next to
 become stable isn't a good idea either because of the propensity for genetic
 algorithms to progress very slowly then have a burst of progress.
 
-%% \section{Complex Networks}
+% Lecture 5
 
-%% A network is a set of nodes connected by links. They can be riughly divided into two categories; simple networks (those with identically repeating patterns) and complex networks (those with non-reglar structures). Complexity is derived from three factors:
+\subsection{Genetic Programming}
 
-%% \begin{description}
-%%   \item \textbf{Structeral complexity}:\\ Characterised by
-%%   non-regular, non-trivial link structures and complex topological
-%%   features (such as heirarchies). The structure of complex networks
-%%   often evolves over time, and there is lots of diversity in the
-%%   components of the network (e.g. different edge
-%%   weights).
+With evolutionary programming, we optimised the parameters of the
+input function in order to find the ones that produce the best
+solution. On the other hand, genetic programming optimises the
+function until it fits our purpose. This may seem like a strange
+approach, but when you consider that any computer program is just a
+big mathematical function, then genetic programming just becomes
+automatic computer programming.
 
-%%   \item \textbf{Node dynamical complexity}:\\ Nodes can be
-%%   dynamic in their behaviour, and there are different kinds of nodes
-%%   (e.g. different servers on the internet have different
-%%   specifications).
+In this sense, programs evolve to become better at solving the problem
+they are being evaluated against. If you think about it, programmers
+have two `phrases' when to producing code; developing new code, and
+editing existing code. This maps cleanly onto genetic programming,
+since the algorithms first generate entirely new pseudo-random code,
+and then mutate/cross it over with other code.
 
-%%   \item \textbf{Mutual interactions among different complex
-%%   factors}:\\ A real world complex network is affected by both
-%%   internal and external fsactors. Relations between networks and
-%%   subnetworks are often observed.
-%% \end{description}
+We can represent programs as trees, where internal nodes are functions
+(which includes arithmetic/logical operations) with arguments, and
+where leaf nodes correspond to constant values, functions with no
+arguments, or inputs to the program.
 
-%% One important thing to remember when working with comolex networks is
-%% that the whole is more than just the sum of the parts. Phenomona such
-%% as self organnisation, adaptive and evolving networks\footnote{That
-%% resist their components being removed, suxh as neurons dieing in the
-%% brain).}, decentralised systems, heavy tail properties\footnote{Small
-%% microscopic properies that trigger large macroscopic events.}, small
-%% world properties etc are often observed, exploited and studied.
+The genetic algorithm must be given a set of functions and a set of
+terminals that it can use to generate the tree. Example functions
+include:
 
-%The aim of studying the networks is to understand their structure and
-%their organising principles, as well as to model them and work out how
-%their topology changes their dynamical processes.
+\begin{itemize}
+\item Boolean functions (\texttt{AND}, \texttt{OR},\dots)
+\item Arithmetic functions ($+$,$\%$,\dots)
+\item Transcendental\footnote{A transcendental function is one that
+cannot be described with a finite sequence of algebraic operations;
+i.e. it transcends algebra.} functions (sin, cos, log,\dots)
+\item Conditional statements (if, switch, etc)
+\item Loops (while, for, etc)
+\item Variable manipulation (set, etc)
+\item Subroutines\footnote{Think of these like library calls. The
+evolutionary algorithm is really just trying to string these
+together.} (http-request, read-sensor, etc)
+\end{itemize}
+
+The set of terminal nodes is smaller, and can include
+constants\footnote{Random constants are determined at the start of the
+program (i.e. once per run).}, functions such as \texttt{rand()},
+variables etc.
+
+In order to create valid programs, the genetic algorithm should
+implement some type checking to ensure that only valid inputs are
+given to functions. This may include automatic type conversions to
+increase the number of valid trees that can be generated.
+
+The algorithm must also attempt to stop things
+like \texttt{RuntimeException} occuring; i.e. the program must produce
+some usable output. This can be done by having functions return a
+default value if they fail with invalid inputs\footnote{Type checking
+can't catch everything (though some functional languages have type
+systems that integrate proof systems and can check all kinds of funky
+stuff; Google for `dependent types'), divide by zero is an example of
+this.}, or by making functions that fail score very low when they are
+evaluated (so that they are selected out of the population).
+
+\subsection{Cramer \& Koza's Genetic Programming}
+
+As previously stated, the program is encoded as a tree, using
+functions and terminals. Cramer and Koza's algorithm is as follows:
+
+\begin{enumerate}
+\item Initialise a random population of $n$ individuals
+\item Calculate the fitness of each individual
+\item Select two parents at random proportionally to their fitness and
+reproduce them together, producing two children
+\item Apply cross over with a certain probability
+\item Apply mutation with a certain probability
+\item Remove the parents
+\item Loop back to step 2 unless satisfied.
+\end{enumerate}
+
+While the algorithm may seem well specified, there are a few
+additional things we need to clear up; namely initialisation and
+mutation/cross over.
+
+Initialisation is done using one of two methods:
+
+\begin{description}
+\item \textbf{Full method}:\\ Choose a function node at random, and
+either fill its children with terminal nodes if we have reached the
+required depth, or loop and choose more function nodes.
+\item \textbf{Grow method}:\\ Choose a function or a terminal node at
+random, and fill its children with child nodes if the maximum depth
+has been reached, or loop back and choose child or function nodes.
+\end{description}
+
+Both of these methods generate trees of up to a specified depth,
+though the full method always generates a tree where all branches are
+that depth, while the grow method generates branches \textit{up to}
+that depth.
+
+Mutation is applied to single individuals; a node is chosen at random
+and is substituted with a randomly generated sub-tree. Different
+implementations generate the sub-tree differently, some will maintain
+the depth of the tree to avoid it growing too big or generate a tree
+that can be used as input for the parent node (to avoid creating an
+invalid tree post-mutation), while others have no such constraints.
+
+% TODO: Insert mutation diagram
+
+% Lecture 6
+
+% Part Three
+
+\section{Complex Networks}
+
+Eva's notes and lectures are really very good, use her notes, not mine :)
