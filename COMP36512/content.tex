@@ -962,7 +962,7 @@ Things that are hard to 'get right' with IR's include the level of
 abstraction that they exist on and how easy they are to manipulate and
 generate. Common IR choices include a directed acyclic graph (DAG),
 trees, or linear code (such pseudo code for an abstract machine). It
-is emphasised in the notes that there is no unversally good choice,
+is emphasised in the notes that there is no universally good choice,
 and the goals of the compiler dictate what choice is best.
 
 We can use an abstract syntax tree as an IR, and as such we want to
@@ -974,7 +974,7 @@ manner, and matching each action (in the output) with a grammar rule.
 
 % TODO: See Aho1 pp.288-289; Aho2, 5.3.1 here
 
-Essensially what we end up with, is the parse tree with all
+Essentially what we end up with, is the parse tree with all
 non-terminal symbols removed. This is a near-source-level
 representation. In fact, to generate something similar to the original
 source code, then an in-order walk can be performed on the
@@ -1045,7 +1045,7 @@ until a free space is found.
 The front end of the compiler is well understood and theoretically
 sound, while the second half is a more hotch-potch affair; it is here
 that clever engineering must by used to solve NP-hard problems and
-choose between diffucult trade offs.
+choose between difficult trade offs.
 
 Programming is all about abstraction, and one of the main tools in a
 programmer's abstraction toolbox is the procedure. Procedures let
@@ -1074,7 +1074,7 @@ one for their parents.
 The code to make a linkage happen is generated at compile time, but
 generated at runtime. To do this, the compiler must consider that
 local variables require storage during procedure execution, and it
-must set asside a region of memory for this (and other things) called
+must set aside a region of memory for this (and other things) called
 an activation record (AR)\footnote{They are called activation records
 in the notes, but are referred to as stack frames in most places I've
 seen.}. Things stored within the AR include:
@@ -1145,7 +1145,7 @@ efficient, but static allocation is most efficient.
 
 Most variables are allocated at runtime, but static and global
 variables are usually allocated at compile time since their memory
-requirements are known inadvance. Variables can either be put on the
+requirements are known in advance. Variables can either be put on the
 stack or on the heap, and are done so according to whether they need
 to be preserved across procedures and if they have fixed sizes.
 
@@ -1247,8 +1247,8 @@ expressions...
 
 The compiler must choose what registers to store data in while the
 program is executing. We assume that a three-address code has been
-generated, which uses an unlimited abount of \textit{virtual
-registers}, but we want to map that onto the \textit{phyiscal
+generated, which uses an unlimited amount of \textit{virtual
+registers}, but we want to map that onto the \textit{physical
 registers} in the machine.
 
 Henceforth, the task is to produce correct code that uses at most $k$
@@ -1299,7 +1299,7 @@ for (op, vr3, vr2, vr1) in operations
 
 This relies on two operations; \textit{ensure}
 and \textit{allocate}. The former assigns a virtual register to an
-actual register and ensures all occurances of that virtual register
+actual register and ensures all occurrences of that virtual register
 are tied to the real one. The latter allocates a free physical
 register, or finds the register that is being used farthest in the
 future, stores its value and returns it.
@@ -1310,13 +1310,79 @@ between them (e.g. some basic blocks use values already in the
 registers of others). If the control path between the basic blocks is
 nonlinear, then this may not be easy.
 
+% Lecture 17
+
+\subsection{Register allocation with graph colouring}
+
 Rather than looking at local blocks of code in isolation, some
 approaches take the global program into account, and use generalised
 frequency counts as well as avoiding load and store operations between
 different basic blocks. Graph colouring can be used to assign
 registers if each colour is mapped onto a register.
 
-% Lecture 17
+This works by first constructing the live ranges, and then building an
+inference graph\footnote{This is a graph where each available register
+is a node, and the nodes are connected if there exists at least one
+operation where both nodes are simultaneously live.} from them, before
+trying to construct a k-colouring of the graph.If the construction is
+unsuccessful, then some of the values must be spilled to memory, which
+removes them from the graph. Since the graph is now smaller, another
+k-colouring is attempted, until one is found. At this point, the
+colours are mapped onto physical registers.
+
+In my Advanced Algorithms I notes, I described graph colouring like
+so:
+
+\begin{quote}
+ Graph colouring is a problem where we want to assign colours to nodes
+ in a graph, but no adjacent node can have the same
+ colour. A \textit{k-colouring} of a graph $G$ is a function $f :
+ V \rightarrow \{ 0, 1, \dots, k - 1 \}$ such that for any edge $(u,
+ v) \in E, f(u) \neq f(v)$, and the output from $f$ is each node's
+ colour.
+
+ For some graphs, there is no valid colouring with $k$ colours. A
+ graph is \textit{k-colourable} if there exists a \textit{k-colouring}
+ for that graph.
+\end{quote}
+
+Which is all well and good, but how do we go about actually choosing
+the colours? A top down colouring ranks each node according to the
+number of neighbours (more is a higher ranking) and spill cost. Each
+node is then visited in the order of the ranking and they are given a
+colour that is different from its neighbours. If a node cannot be
+coloured, then it is simply spilled, or the live range is split.
+
+Bottom up colouring (aka Chaitin's algorithm) involves picking nodes
+at random where the node degree is less than $k$, placing them on a
+stack and removing all edges from that node. This is done until all
+nodes have a degree of greater than $k$, or the graph is empty. If the
+graph is non-empty, then use a heuristic to spill a live range (by
+removing the corresponding node), and then loop back to remove nodes
+with a degree less than $k$. When this is done, then the nodes are
+successively popped off the stack and coloured using a colour not used
+by a neighbour.
+
+\subsubsection{Global register allocation with graph colouring}
+
+It is also possible to construct global live ranges, and construct an
+inference graph for the whole procedure and the graph colouring can then
+be run on the whole graph. Constructing the graph requires two
+functions \texttt{livein(b)} and \texttt{liveout(b)} to detect what
+values are live at the start and end of a basic block $b$.
+
+\texttt{liveout(b)} is equal to the union of \texttt{livein(s)} for
+each successor block of $b$. A value is in \texttt{livein(b)} if it is
+used before it is defined in $b$, or if it is not used, not defined
+but in \texttt{liveout(b)}.
+
+\subsubsection{Spill cost estimation}
+
+Factors affecting the cost of spilling a value to memory include the
+computation required to get the address (pointer + offset), the memory
+operation itself (is the value likely to be still cached when it is
+loaded again?) and the estimated execution frequency (it's better to
+spill in an outer loop than in an inner loop).
 
 % Lecture 18 (Instruction scheduling)
 
