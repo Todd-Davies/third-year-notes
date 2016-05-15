@@ -472,8 +472,8 @@ whole answer before continuing). Take a look at
 \subsection{Locks}
 
 Any object can be locked in Java by using as the target of a
-\texttt{synchronized} block, or calling an instance method that is declared as
-being \texttt{synchronized}. Only one thread can lock an object at any given
+\texttt{synchronised} block, or calling an instance method that is declared as
+being \texttt{synchronised}. Only one thread can lock an object at any given
 time, and other threads must wait to acquire the lock, or the lock holder
 executes \texttt{wait}.
 
@@ -509,15 +509,15 @@ since there are situations where the implicit object locking is not adequate. An
 example of this is when doing `hand over hand' locking (e.g. lock one item,
 obtain the next, lock the newly obtained one, unlock the first etc). This is
 impossible using the implicit locks, since there is an implicit nesting structure
-(e.g. a synchronized call is either inside a synchronized block or in a
-synchronized method call, and you can only get out by exiting the whole block).
+(e.g. a synchronised call is either inside a synchronised block or in a
+synchronised method call, and you can only get out by exiting the whole block).
 
 % Lecture 7 - Hardware support for synchronization
 
-\section{Hardware support for synchronization}
+\section{Hardware support for synchronisation}
 
 Most shared memory parallel Programming models require that the programmer
-implements some sort of synchronization logic in order to control how threads
+implements some sort of synchronisation logic in order to control how threads
 access the shared memory. There are several different ways of doing this, all of
 which are closely related. Hardware support is usually required for shared
 memory multiprocessor systems.
@@ -620,7 +620,7 @@ thread should continue looping:
         POP PC
 \end{verbatim}
 
-\subsection{Other synchronization primitives}
+\subsection{Other synchronisation primitives}
 
 There are other machine level primitives including \texttt{fetch and add} (get a
 memory location, add one and write back), and \texttt{compare and swap} (compare
@@ -639,7 +639,7 @@ well with modern pipelined processors.
 \section{Lock-free datastructures}
 
 We have seen datastrucutres that employ locks, barriers and other
-synchronisation primatives in order to serialize multithreaded access
+synchronisation primitives in order to serialise multithreaded access
 to them, but instructions such as \texttt{compare and set} can be used
 to make sure that updates to datastructures happen in a serial manner,
 while removing the need for locks.
@@ -746,7 +746,7 @@ readset, then abort the current transaction, and if the end of the
 transaction is successfully reached, then commit the writeset to
 memory.
 
-The load-linked an store-conditional commands are essensially a
+The load-linked an store-conditional commands are essential a
 transaction, since the readset is the single memory location being
 read-modify-write accessed and bus snooping is used to detect if
 changes were made to the register during the transaction (clearing the
@@ -766,7 +766,7 @@ variable is written, the invalidate message is broadcast as usual, but
 if another core receives an invalidate message that matches a location
 in the readset, then it must invalidate the transaction. When the
 transaction terminates, the writeset is flushed to main memory. This
-latter stage may require synchronization since the operation must be
+latter stage may require synchronisation since the operation must be
 atomic.
 
 Obviously, if we're using the cache to store or readsets and
@@ -774,11 +774,11 @@ writesets, then the size of each is limited by the size of the
 cache. Furthermore, we must make sure that cache entries that are part
 of transactions are not evicted since otherwise the data will be lost
 (since it cannot yet be written back to memory). Livelock can occur if
-three or more transactions cause eachother to abort in a cycle.j
+three or more transactions cause each other to abort in a cycle.j
 
 Instead of using a cache-based implementation, we could use a snooping
 bus (which doesn't handle large numbers of cores well) or do away with
-cache coherence and make all accesses to mmemory transactional.
+cache coherence and make all accesses to memory transactional.
 
 \subsubsection{Transactional Coherence and Consistency}
 
@@ -788,11 +788,11 @@ optimisations, but as of yet, no implementations.
 
 The idea is to have a local cache for each core that stores the
 readset (as well as other cached data), but the writes are stored in a
-seperate buffer (such as in RAM). Writes to shared data can only occur
+separate buffer (such as in RAM). Writes to shared data can only occur
 in transactions, and are therefore locally buffered, meaning
 invalidations are not broadcast. It is only when the transaction
 completes that its writeset is written back to memory, and to do this,
-the addersses of its writeset are broadcast to other cores (in a
+the addresses of its writeset are broadcast to other cores (in a
 single packet), and if other cores detect a conflict, the detecting
 core should restart its transaction.
 
@@ -805,8 +805,8 @@ The advantages of TCC are:
 \begin{itemize}
 \item Lazy conflict detection.
 \item Livelock is impossible since one of the conflicting transactions always completes.
-\item Inter-core synchronization only occurs at commit time.
-\item Instantaneous communiccation is not required.
+\item Inter-core synchronisation only occurs at commit time.
+\item Instantaneous communication is not required.
 \item Less communication between cores (in many cases), meaning more cores could be supported.
 \end{itemize}
 
@@ -814,7 +814,7 @@ The advantages of TCC are:
 
 The limited size caches and buffers are of limited size, so the
 current best practice is to keep transactions as small as possible so
-there is a high chance that theu will by fulfilled entirely in
+there is a high chance that they will by fulfilled entirely in
 hardware (and a low probability of conflict), but overflow to software
 if required.
 
@@ -857,9 +857,55 @@ but \texttt{STR B} completes first (on a different memory bank to the
 first store), and \texttt{STR A} is still in a buffer. This is a
 problem if there are multiple cores, since another core could
 read \texttt{A} and \texttt{B} and receive a value of \texttt{B} that
-is newer than \tezttt{A} (which would not be expected).
+is newer than \texttt{A} (which would not be expected).
 
-% Slide 13
+In a real CPU, memory accesses would appear out of order due to a
+combination of factors, such as a multi-banked cache, and out of order
+execution. It is the simultaneous use of multiple apparently safe
+optimisations that cause inconsistencies to happen.
+
+Though multi-threaded writes having a very slightly inconsistent view
+of memory may initially seem like a small issue, when a CPU is running
+at $3\si{\giga\hertz}$, there are lots of opportunities for slight
+inconsistencies to mess things up. Locking is an example of it being
+vital that a consistent view of memory is obtained; if one thread
+holds a lock while it writes to memory and another thread is waiting
+for the lock to read the written data then the correctness of the
+computation relies on both threads having a consistent view of the
+lock. If the first thread takes the lock, but the second thread only
+`sees' this part way through reading the data, then partially written
+data could be read.
+
+\subsection{Consistency models}
+
+A consistency model is a definition of how the system maintains the
+same view of memory between different threads, and what the threads
+know the system will guarantee.
+
+\textbf{Sequential consistency} is the same as if the operations
+of all the processors were executed in some sequential order, and the
+operations of each individual processor appear in this sequence in the
+order specified by its program. This basically stops any out of order
+memory accesses, which is too restrictive.
+
+\textbf{Release consistency} is when access to shared data is
+protected by a synchronisation mechanism which ensures atomicity of
+critical sections. Writes within the critical section can complete in
+any order, however they must all have completed before the
+synchronisation is finished. This allows for more flexibility and
+thus optimisation, especially then the critical sections are large.
+
+\marginpar{Note that consistence is ensuring that the overall memory
+state is as desired when the instructions are executed concurrently,
+while coherence is ensuring that all cores have the same view of
+memory at all times.}
+
+Memory fence instructions are used to provide release consistency, and
+though they vary between instructions and architectures, the idea is
+that all loads and stores before the memory fence must complete before
+any of the loads and stores after it. This means that a fence can be
+placed before a lock is released so that all the writes that took
+place inside the locked region are visible when the lock is released.
 
 % Lecture 14 - GPU's and CUDEA
 
