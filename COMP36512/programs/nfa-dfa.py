@@ -1,24 +1,20 @@
+#!/bin/python2.7
+
 """
 Basic implementation of Thompson's NFA -> DFA algorithm
 """
 
+from functools import reduce
 from pprint import pprint
 
 nfa = {
-  0 : {"": {1,7}},
-  1 : {"": {2,4}},
-  4 : {"b": {5}},
-  2 : {"a": {3}},
-  3 : {"": {6}},
-  5 : {"": {6}},
-  6 : {"": {7,1}},
-  7 : {"a": {8}},
-  8 : {"b": {9}},
-  9 : {"b": {10}},
-  10: {}
+  0 : {"" : {1}},
+  1 : {"a": {0,2}, "b" : {0}},
+  2 : {"a": {3}, "b":{3}},
+  3 : {}
 }
 
-accepting = {10}
+accepting = {3}
 
 def accept_nfa(nfa, acceptingStates, inputStr, currentState=0):
   if inputStr == None or len(inputStr) == 0:
@@ -34,13 +30,15 @@ def accept_nfa(nfa, acceptingStates, inputStr, currentState=0):
       return True
   return False
 
-def e_closure(nfa, states):
+def e_closure(nfa, states, seen = []):
+  if str(states) in seen:
+    return set()
   out = set(states)
   for state in states:
     immediateClosure = nfa[state][""] if "" in nfa[state] else set()
     neighbourClosures = set()
     for s in immediateClosure:
-      neighbourClosures = neighbourClosures.union(e_closure(nfa, [s]))
+      neighbourClosures = neighbourClosures.union(e_closure(nfa, [s], seen + [str(states)]))
     out = out.union(immediateClosure.union(neighbourClosures))
   return out
 
@@ -53,7 +51,7 @@ def move(nfa, states, transition):
 
 def mapping(input_set, names):
   if repr(input_set) not in names:
-    current = max(names.values() + [-1]) + 1
+    current = max(list(names.values()) + [-1]) + 1
     names[repr(input_set)] = current
   return chr(ord('a') + names[repr(input_set)])
 
@@ -61,7 +59,7 @@ def nfa_subset(nfa, initial):
   names = {}
   output = {}
   input_symbols = map(lambda x: nfa[x].keys(), nfa.keys())
-  input_symbols = set(reduce(lambda x, y: x+y, input_symbols))
+  input_symbols = set(reduce(lambda x, y: set(x).union(set(y)), input_symbols))
   input_symbols.remove("")
   DStates = [e_closure(nfa, initial)]
   marked = []
@@ -79,6 +77,8 @@ def nfa_subset(nfa, initial):
         else:
           output[mapping(t, names)] = {symbol:mapping(u, names)}
     unmarked = filter(lambda x: x not in marked, DStates)
+  print names
+  print map(lambda x: (x, chr(ord('a') + x)), names.values())
   return output
 
 pprint(nfa_subset(nfa, [0]))
