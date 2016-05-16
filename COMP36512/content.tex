@@ -962,7 +962,7 @@ Things that are hard to 'get right' with IR's include the level of
 abstraction that they exist on and how easy they are to manipulate and
 generate. Common IR choices include a directed acyclic graph (DAG),
 trees, or linear code (such pseudo code for an abstract machine). It
-is emphasised in the notes that there is no unversally good choice,
+is emphasised in the notes that there is no universally good choice,
 and the goals of the compiler dictate what choice is best.
 
 We can use an abstract syntax tree as an IR, and as such we want to
@@ -974,7 +974,7 @@ manner, and matching each action (in the output) with a grammar rule.
 
 % TODO: See Aho1 pp.288-289; Aho2, 5.3.1 here
 
-Essensially what we end up with, is the parse tree with all
+Essentially what we end up with, is the parse tree with all
 non-terminal symbols removed. This is a near-source-level
 representation. In fact, to generate something similar to the original
 source code, then an in-order walk can be performed on the
@@ -1039,6 +1039,127 @@ is recalculated with an added constant each time there is a collision
 until a free space is found.
 
 % Lecture 13
+
+\section{The Procedure Abstraction}
+
+The front end of the compiler is well understood and theoretically
+sound, while the second half is a more hotch-potch affair; it is here
+that clever engineering must by used to solve NP-hard problems and
+choose between difficult trade offs.
+
+Programming is all about abstraction, and one of the main tools in a
+programmer's abstraction toolbox is the procedure. Procedures let
+programmers define entry and exit points to a block of code, work
+within a set context, and have a clean external interface that can be
+used to call the code. However, there must be an agreement between
+different parts of the system as to how procedures are to work; how is
+memory laid out (and protected), how are arguments passed, where are
+procedures stored, etc. These concerns transcend those of the
+compiler, the Operating System, and to an extent, the architecture of
+the machine must all be designed with this in mind.
+
+Sometimes each procedure is compiled individually, meaning that the
+compile time can be reduced (less code in each procedure means less
+complexity for the compiler, and recompilation needs only to concern
+the procedures that have been edited).
+
+\subsection{Linkage}
+
+Since procedures have such well defined control flow behaviour, a
+protocol exists for passing values and control at procedure calls and
+returns. This is called the linkage convention, and it ensures that
+procedures inherit a valid run-time environment and that they restore
+one for their parents.
+
+The code to make a linkage happen is generated at compile time, but
+generated at runtime. To do this, the compiler must consider that
+local variables require storage during procedure execution, and it
+must set aside a region of memory for this (and other things) called
+an activation record (AR)\footnote{They are called activation records
+in the notes, but are referred to as stack frames in most places I've
+seen.}. Things stored within the AR include:
+
+\begin{itemize}
+\item Parameters to the function
+\item Register save area
+\item Return value
+\item Return address
+\item Access link (helps with non-local access)
+\item Caller's access link (to return to parent once complete)
+\item Temporary variables and local variables
+\end{itemize}
+
+This is how the whole process happens, and what each part is responsible for:
+
+\begin{itemize}
+\item Caller (pre call)
+\begin{itemize}
+\item Allocate the AR
+\item Store the parameters in the AR
+\item Store the return address
+\item Jump to the child
+\end{itemize}
+\item Callee (prologue)
+\begin{itemize}
+\item Save the caller's registers
+\item Extend the AR for local data
+\item Init local variables
+\item Start execution
+\end{itemize}
+\item Callee (epilogue)
+\begin{itemize}
+\item Store the return value
+\item Restore registers
+\item Unextend the AR frame
+\item Jump to return address
+\end{itemize}
+\item Caller (post return)
+\begin{itemize}
+\item Copy the return value
+\item Deallocate the caller's AR
+\item Restore the parameters
+\end{itemize}
+\end{itemize}
+
+At runtime, the size of the code and static/global variables are
+known, but the size of the heap and stack varies. As such, the address
+space is organised like so:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{diagrams/memory-layout}
+\caption{\label{fig:memory-layout}The memory layout of a program. The
+heap and stack grow towards each other.}
+\end{figure}
+
+Variables are stored in the AR using offsets, but must be put on the
+heap if the variables themselves are of variable length. The
+activation records themselves will either be on the heap or the stack;
+if the procedure makes no calls, then the AR can be allocated
+statically, if it has a normal return value, then it can simply go on
+the stack as normal (which is good, because we don't need to worry
+much about deallocation), but if it may need to be active after exit
+(e.g. it returns a pointer pointing to a local variable), then it
+should be on the heap. The heap is least efficient, the stack is more
+efficient, but static allocation is most efficient.
+
+Most variables are allocated at runtime, but static and global
+variables are usually allocated at compile time since their memory
+requirements are known in advance. Variables can either be put on the
+stack or on the heap, and are done so according to whether they need
+to be preserved across procedures and if they have fixed sizes.
+
+% TODO: Bit about addressing variables missed out (slides 10->13 in slides)
+
+The compiler must consider things like storing variables at the start
+of word boundaries and re-ordering variables to maximise memory usage
+efficiency. The proximity and ordering of variables can also affect
+cache performance (they are likely to be fetched in the same cache
+load). The compiler can also avoid some problems/overheads relating to
+procedure calling/linkage by inlining procedures (copying their code
+into another procedure with no call), though this is not possible in
+all cases due to register consumption, code size (too many inline
+functions means lots of repeated code), cache trashing etc.
 
 % Lecture 14
 
@@ -1122,7 +1243,146 @@ expressions...
 
 % Lecture 16
 
+\section{Register allocation}
+
+The compiler must choose what registers to store data in while the
+program is executing. We assume that a three-address code has been
+generated, which uses an unlimited amount of \textit{virtual
+registers}, but we want to map that onto the \textit{physical
+registers} in the machine.
+
+Henceforth, the task is to produce correct code that uses at most $k$
+registers, and minimises the number of loads and stores to memory
+(i.e. minimise register spilling). Ideally, we don't use backtracking
+so the compiler is fast.
+
+\marginpar{It is important to remember that real processors have many
+different register types, and real compilers must factor this in when
+allocating.}A \textit{basic block} is a segment of branch-free,
+straight line code. Local register allocation is within a basic block,
+and global allocation is within an entire
+procedure. \textit{Allocation} is choosing what values to keep within
+registers, but \textit{assignment} is choosing which specific
+registers get the values.
+
+To determine how many registers we need in a given basic block, we
+must compute a set of \textit{live ranges}, where the value of a
+variable is live between its definition and its last use. We must
+define a value \texttt{maxlive} to be the maximum number of live
+variables we can have in registers, and if the number of live ranges
+active at any point is greater than this value, then the registers
+must spill to memory.
+
+A common top-down method of register allocation is
+the \textit{frequency count algorithm}, where $f$ registers are
+reserved for use when loading and saving values to memory, and so
+$k-f$ registers are used for the program. The compiler looks at the
+$k-f$ most commonly used values and stores them in registers, while
+using the $f$ registers to spill the other values to memory.
+
+Bottom up register allocation uses \textit{Best's algorithm}, which is
+given as:
+
+\begin{verbatim}
+for (op, vr3, vr2, vr1) in operations
+  ensure vr1 in r1
+  ensure vr2 in r2
+  if r1 not needed after this instruction
+    free(r1)
+  endif
+  if r2 not needed after this instruction
+    free(r2)
+  endif
+  allocate r3 for vr3
+  emit op r3, r2, r1
+\end{verbatim}
+
+This relies on two operations; \textit{ensure}
+and \textit{allocate}. The former assigns a virtual register to an
+actual register and ensures all occurrences of that virtual register
+are tied to the real one. The latter allocates a free physical
+register, or finds the register that is being used farthest in the
+future, stores its value and returns it.
+
+In practice, we often have multiple basic blocks being executed one
+after the other, and there are often opportunities for optimisation
+between them (e.g. some basic blocks use values already in the
+registers of others). If the control path between the basic blocks is
+nonlinear, then this may not be easy.
+
 % Lecture 17
+
+\subsection{Register allocation with graph colouring}
+
+Rather than looking at local blocks of code in isolation, some
+approaches take the global program into account, and use generalised
+frequency counts as well as avoiding load and store operations between
+different basic blocks. Graph colouring can be used to assign
+registers if each colour is mapped onto a register.
+
+This works by first constructing the live ranges, and then building an
+inference graph\footnote{This is a graph where each available register
+is a node, and the nodes are connected if there exists at least one
+operation where both nodes are simultaneously live.} from them, before
+trying to construct a k-colouring of the graph.If the construction is
+unsuccessful, then some of the values must be spilled to memory, which
+removes them from the graph. Since the graph is now smaller, another
+k-colouring is attempted, until one is found. At this point, the
+colours are mapped onto physical registers.
+
+In my Advanced Algorithms I notes, I described graph colouring like
+so:
+
+\begin{quote}
+ Graph colouring is a problem where we want to assign colours to nodes
+ in a graph, but no adjacent node can have the same
+ colour. A \textit{k-colouring} of a graph $G$ is a function $f :
+ V \rightarrow \{ 0, 1, \dots, k - 1 \}$ such that for any edge $(u,
+ v) \in E, f(u) \neq f(v)$, and the output from $f$ is each node's
+ colour.
+
+ For some graphs, there is no valid colouring with $k$ colours. A
+ graph is \textit{k-colourable} if there exists a \textit{k-colouring}
+ for that graph.
+\end{quote}
+
+Which is all well and good, but how do we go about actually choosing
+the colours? A top down colouring ranks each node according to the
+number of neighbours (more is a higher ranking) and spill cost. Each
+node is then visited in the order of the ranking and they are given a
+colour that is different from its neighbours. If a node cannot be
+coloured, then it is simply spilled, or the live range is split.
+
+Bottom up colouring (aka Chaitin's algorithm) involves picking nodes
+at random where the node degree is less than $k$, placing them on a
+stack and removing all edges from that node. This is done until all
+nodes have a degree of greater than $k$, or the graph is empty. If the
+graph is non-empty, then use a heuristic to spill a live range (by
+removing the corresponding node), and then loop back to remove nodes
+with a degree less than $k$. When this is done, then the nodes are
+successively popped off the stack and coloured using a colour not used
+by a neighbour.
+
+\subsubsection{Global register allocation with graph colouring}
+
+It is also possible to construct global live ranges, and construct an
+inference graph for the whole procedure and the graph colouring can then
+be run on the whole graph. Constructing the graph requires two
+functions \texttt{livein(b)} and \texttt{liveout(b)} to detect what
+values are live at the start and end of a basic block $b$.
+
+\texttt{liveout(b)} is equal to the union of \texttt{livein(s)} for
+each successor block of $b$. A value is in \texttt{livein(b)} if it is
+used before it is defined in $b$, or if it is not used, not defined
+but in \texttt{liveout(b)}.
+
+\subsubsection{Spill cost estimation}
+
+Factors affecting the cost of spilling a value to memory include the
+computation required to get the address (pointer + offset), the memory
+operation itself (is the value likely to be still cached when it is
+loaded again?) and the estimated execution frequency (it's better to
+spill in an outer loop than in an inner loop).
 
 % Lecture 18 (Instruction scheduling)
 
