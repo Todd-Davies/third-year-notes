@@ -665,7 +665,128 @@ implementation is not.
 
 \section{OpenMP \& MPI}
 
+OpenMP and MPI\footnote{Message Passing Interface} are two common ways
+of parallelising programs, usually with C, C++ or Fortran.
+
+\subsection{OpenMP}
+
+OpenMP is a set of compiler directives and library functions that let
+the programmer give hints to the compiler and OpenMP framework about
+how to parallelise the program. OpenMP has a fork-join model of
+threading, and tries to provide sequential equivalence\footnote{The
+result of the program should be the same running in parallel as it
+would be running on a single thread.} and incremental
+parallelism\footnote{Incremental parallelism is where you write the
+program as normal, and then gradually parallelise more and more of
+it.}.
+
+Parallelising with OpenMP is really quite easy, only one compiler
+directive is needed to parallelise a code block, for example:
+
+\begin{verbatim}
+  int i = ...;
+  #pragma omp parallel num_threads 3
+  for (i = 0; i < n; i++) {
+    loop_body;
+  }
+\end{verbatim}
+
+As is usually the case with C/C++, and variables declared inside the
+parallel block are private are scoped solely within the block, but
+since the block is initialised on many threads, these variables are
+private to each thread too. Variables declared before the parallel
+block are shared. All code blocks parallelised with directives must
+have a single start and end point, and an implicit thread barrier is
+used at the end to ensure that all threads have finished before the
+program moves on from the block.
+
+\subsubsection{Worksharing}
+
+\marginpar{N.b. If you have each thread returning a result (maybe
+you're adding a number to a sum on each iteration), then you should
+store these results in an array and then combine them (e.g. do the
+summation) once the parallelised loop has finished. Writing to the
+same memory locations in a parallel block will cause memory
+consistency problems.}
+
+Running a program with multiple threads is pointless if all the
+threads do the same thing; instead, we want to split the total work as
+evenly as possible between them. An easy way to do this is by
+using \textit{loop splitting}, where a time consuming loop is
+restructured to make each iteration independent of each other, and
+then all the iterations are split between all of the available threads.
+
+Many loops will have some kind of updating happen on each iteration of
+the loop, such as an addition or finding the minimum of the results of
+the iterations. Many of these updates are associative; i.e. they can
+be applied in any order, and as such, OpenMP has directives to apply
+them in a thread-safe manner (called a reduction clause). If we wanted
+to sum an array we could do:
+
+\begin{verbatim}
+  int[] myArray = ...
+  int sum = 0;
+  #pragma omp parallel for private(x) reduction(+:sum)
+  for (int i = 0; i < n; i++) {
+    sum += myArray[i];
+  }
+\end{verbatim}
+
+OpenMP has other synchronisation constructs too, such
+as \texttt{flush} which ensures memory consistency between
+threads, \texttt{critical} which indicates a critical
+section, \texttt{barrier} which is an explicit barrier for the
+threads, and more.
+
+\subsubsection{Loop Scheduling}
+
+Loop scheduling is deciding which iterations should be run on which
+threads. For efficiency reasons such as maximising cache usage, it is
+usually desirable to allocate iterations in chunks, however this can
+be done at runtime (dynamically), or at compile time
+(statically).
+
+Static loop scheduling has three common methods:
+
+\begin{itemize}
+\item Block schedule is when the iterations are split into chunks of
+approximately equal size.
+\item A Cyclic schedule is when one iteration is given to threads in
+turn until all the iterations are assigned.
+\item A block-cyclic schedule is the same as a cyclic schedule, but
+$n$ iterations are assigned to each thread each time. This is more
+cache friendly.
+\end{itemize}
+
+\subsection{MPI}
+
+MPI (message passing interface) can be used to program a wider variety of architectures than
+OpenMP since it is able to distribute work between multiple computers
+(distributed memory systems). Like OpenMP, it is a library for C,
+Fortran and other programming languages.
+
+MPI works by sending message between processes; each message is
+identified by a triple \texttt{<send\_proc\_id, recv\_proc\_id,
+tag>}. MPI has a concept of \textit{communicator contexts} which are
+initialised to facilitate message passing between processes. The same
+message tag can be used between different contexts, but only once
+within a single context.
+
+Perhaps the easiest to understand MPI commands are its blocking send
+and receive commands\footnote{These are listed in the course notes
+along with MPI examples, but I can't see much benefit to listing them
+here too.}, but MPI also has barriers, broadcast, scatter, gather and
+reduce constructs. As a result of having these more complex, higher
+level commands, many programs don't use `send' and `reduce' very much.
+
+MPI also supports asynchronous commands, which do not block the
+sending/receiving thread, as well as persistent communication (i.e. the
+same connection is kept open to send multiple messages in a stream
+like fashion).
+
 % Lecture 10 - Speculation
+
+% TODO: Lecture 10
 
 % Lecture 11 - Transactional Memory
 
@@ -820,6 +941,8 @@ if required.
 
 % Lecture 12 - HW support for transactions
 
+% TODO: Lecture 12
+
 % Lecture 13 - Memory consistency
 
 \section{Memory consistency}
@@ -909,7 +1032,11 @@ place inside the locked region are visible when the lock is released.
 
 % Lecture 14 - GPU's and CUDEA
 
+% TODO: Lecture 14
+
 % Lecture 15 - FP & Dataflow principles
+
+% TODO: Lecture 15
 
 % Bibliography
 \bibliography{bib}{}
