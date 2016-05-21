@@ -667,6 +667,40 @@ implementation is not.
 
 % Lecture 10 - Speculation
 
+\section{Speculation}
+
+Speculation is when a processor isn't sure whether an execution needs
+to be executed (i.e. the result of a branch or conditional operation
+isn't yet known), but since there are functional units free on the
+processor, the result can be computed speculatively and discarded if
+it is not needed. This assumes the `recovery' cost of a wrong decision
+of what to speculatively execute isn't too high.
+
+The only resource that is wasted by speculative execution is power,
+since the resources would otherwise be idle.
+
+Sometimes, it is advantageous to speculatively parallelise
+programs. If we're not sure if a program can be safely parallelised,
+we could pararallelise it anyway, and see if the result is still valid
+afterwards. Thread Level Speculation is a technique for doing this;
+the idea is to divide single threaded code into seperate treads, run
+them in parallel and detect (with a view to resolving) any problems at
+runtime.
+
+As you will know if you took the Compilers course, you'll know that
+loops can be trivially parallelised\footnote{Simply assign iterations
+of the loop to different threads.} if there are no dependencies
+between iterations of the loop. Simple dependencies can be recognised
+and in some cases (usually when there is a nested loop, and the
+dependency is in the inner loop), the code can be optimised so some
+operations can be parallelised.
+
+However, if the loop is complex (usually when we don't know the index
+of an array access until runtime), then we could do loop based thread
+level speculation.
+
+% TODO: Rest of TLS and rest of lecture 10
+
 % Lecture 11 - Transactional Memory
 
 \section{Transactional Memory}
