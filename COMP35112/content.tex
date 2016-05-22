@@ -818,7 +818,94 @@ However, if the loop is complex (usually when we don't know the index
 of an array access until runtime), then we could do loop based thread
 level speculation.
 
-% TODO: Rest of TLS and rest of lecture 10
+If the index of the array $j$ we're accessing in the loop is less than
+the iteration count $i$, then we use a value that we've already
+computed. If the $j$ is greater than $i$, we must use the value that
+was in the array before we started the computation. This is an issue
+because if multiple threads are updating the same array (and they
+could be updating any index in the array), then we will probably end
+up corrupting memory.
+
+Lets say we have the following loop:
+
+\begin{verbatim}
+for (int i = 0; i < N; i++) {
+  A[i] = A[g(i)] + 1
+}
+\end{verbatim}
+
+Here, we set the array value at $i$ to the value of the index
+designated by the function $g$ plus one. In order to parallelise this,
+we could have a single thread for each iteration, but only let the
+first thread ($i=0$) update the original array. All the other threads
+must maintain their own copies of the array.
+
+Each thread then maintains a tag on each of its array indexes, which
+can be in one of four states:
+
+\begin{itemize}
+\item Not accessed (N)
+\item Modified (M)
+\item Speculatively loaded (S)
+\item Speculatively loaded and later modified (M)
+\end{itemize}
+
+This information is usually held in a seperate datastructure from the
+array itself which is visible to all threads. All threads write to
+their own data and mark the data item as `M' (or `SM' if it was
+already marked `S'). Any thread reads its own data if the state is not
+`N' (i.e. untouched), otherwise it looks at the tag that the threads
+`below it' (iteration wise) for a value that is not `N' (or until it
+reaches 0) and then reads the value into its own copy of the array,
+marking it `S'.
+
+Any write can cause a conflict, and if a higher numbered thread has
+the state of the written index as `S' or `SM' then they have
+specutiavely read a thread before it was ready. The most simple
+solution to this is to abort all the threads above the offending
+thread and restart them.
+
+At some point, the data from all of the speculative threads must be
+reconciled, which is done every time a thread completes, the thread
+after it becomes non-speculative and writes its modified values back
+to the main array. Eventually, all the threads will terminate and
+commit their data.
+
+% TODO: Commit images
+
+Of course, this all introduces an overhead on each memory access as
+well as the overhead of running multiple threads, yet with the right
+sort of programs, the speed up can be 2x faster on four cores or 3x
+faster on 8 cores.
+
+In theory, we could make hardware support for this by using the cache
+for the speculative buffers. However since the cache size is very
+limited, this would only work for small buffers, and/or small numbers
+of threads. By modifying the cache protocols to make sure data is not
+written to memory too early, and to use snooping buffers to detect
+conflicts, this could be implemented efficiently.
+
+\subsection{Procedure based TLS}
+
+If we limited ourselves to parallelising only loops, then we would
+only speed up a small portion of code. If we could parallelise
+functions/procedures, then we could potentially gain a lot of
+speed. This would work by executing the code serially, but splitting
+the execution into two threads when there is a procedure call. It is
+the \textbf{code after the procedure call} that is run in a new thread
+(and the body of the procedure is run in the main thread), since then
+it can be easily abandoned if required. Validation is typically done
+at the end of the procedure call (to check if the threads had
+conflicting memory accesses). If the validation passes, then the
+speculative thread continues as the main thread.
+
+\subsection{Sharing resources}
+
+We can also use speculation to allow multiple threads to access a
+resource. Clasically, we would need to use a lock to make sure the
+threads access the resource in a mutually exclusive manner, but much
+of the time (e.g. writing to different parts of a file), the writes
+would not conflict.
 
 % Lecture 11 - Transactional Memory
 
