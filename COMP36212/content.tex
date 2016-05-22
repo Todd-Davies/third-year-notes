@@ -802,7 +802,7 @@ algorithms try to find global optimums:
 
   \item \textbf{Random search}:\\
   Here, we simply generate $n$ random points and sample the objective function
-  at these points. The point that gives the best value for th objective
+  at these points. The point that gives the best value for the objective
   function is remembered for possible later use (since that's the optimum).
   Obviously this algorithm runs in $O(n)$ time, and its quality depends on the
   number of random points chosen. It is possible that the random search method
@@ -1190,6 +1190,62 @@ invalid tree post-mutation), while others have no such constraints.
 % TODO: Insert mutation diagram
 
 % Lecture 6
+
+Cross over is when children inherit information from both their
+parents. For our purposes, this involves making a tree with a sub-tree
+from one parent and a sub-tree from another parent. The node within
+each parent to cross over at is chosen at random (meaning that there
+could be a case when most of the tree is inherited from one parent and
+little of it is inherited from another.).
+
+% TODO: Cross over example
+
+\subsection{Bloat}
+
+Bloat is when programs created by genetic algorithms get larger and
+larger trees without significant improvement to the fitness of the
+program for the function it is trying to perform. This is undesirable,
+since more memory is used, the expressions are evaluated slower and
+the population evolves more slowly.
+
+Bloat is caused by a variety of sources, such as when cross over is
+very unbalanced, and through random mutations. Bloat often `survives'
+and accumulates because it is neutral to fitness; many bloated
+sub-trees will have no effect on the fitness (these are celled
+introns).
+
+Examples of introns include expressions like $x-x$,
+$x~\&\&~\mathrm{true}$ etc (basically the identity functions).
+
+Controlling bloat is hard; but we can do so in a few different ways:
+\begin{itemize}
+\item Enforce tree size and depth limits, maybe by returning a parent
+of a tree if its child violates a limit.
+\item Anti bloat operations could be implemented such as making sure
+that the second subtree in cross over is small enough to not violate
+size constraints, or by making sure that a mutated tree is of the same
+size as the original one was.
+\item Selection can be used to reduce bloat; the fitness of trees can
+be reduced proportional to their size (parsimony pressure), or the
+fitness of trees violating the size constraints could simply be set to
+zero (the tarpeian method).
+\end{itemize}
+
+All evolutionary algorithms have a requirement for diversity and
+variability in their population in order to evolve. When all
+individuals in a population are similar, cross-over won't effect much
+change and mutation is unlikely to move individuals far in the
+`solution space'. Unfortunately, due to selection, populations tend to
+evolve to be relatively uniform.
+
+There are attempts to make evolutionary algorithms more similar to
+nature in the sense that there can be multiple populations of the same
+species in different areas with little mixing between them. Algorithms
+mimicking this effect are called \textit{Distributed EA's}, and evolve
+multiple populations in near-isolation (some mixing will occur) in
+order to try and get heterogeneous sets of effective genes. Some swarm
+algorithms are an example of this (multiple swarms can be present in
+the solution space).
 
 % Part Three
 
