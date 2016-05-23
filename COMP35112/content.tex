@@ -800,9 +800,9 @@ since the resources would otherwise be idle.
 
 Sometimes, it is advantageous to speculatively parallelise
 programs. If we're not sure if a program can be safely parallelised,
-we could pararallelise it anyway, and see if the result is still valid
+we could parallelise it anyway, and see if the result is still valid
 afterwards. Thread Level Speculation is a technique for doing this;
-the idea is to divide single threaded code into seperate treads, run
+the idea is to divide single threaded code into separate treads, run
 them in parallel and detect (with a view to resolving) any problems at
 runtime.
 
@@ -850,7 +850,7 @@ can be in one of four states:
 \item Speculatively loaded and later modified (M)
 \end{itemize}
 
-This information is usually held in a seperate datastructure from the
+This information is usually held in a separate datastructure from the
 array itself which is visible to all threads. All threads write to
 their own data and mark the data item as `M' (or `SM' if it was
 already marked `S'). Any thread reads its own data if the state is not
@@ -861,7 +861,7 @@ marking it `S'.
 
 Any write can cause a conflict, and if a higher numbered thread has
 the state of the written index as `S' or `SM' then they have
-specutiavely read a thread before it was ready. The most simple
+speculatively read a thread before it was ready. The most simple
 solution to this is to abort all the threads above the offending
 thread and restart them.
 
@@ -902,7 +902,7 @@ speculative thread continues as the main thread.
 \subsection{Sharing resources}
 
 We can also use speculation to allow multiple threads to access a
-resource. Clasically, we would need to use a lock to make sure the
+resource. Classically, we would need to use a lock to make sure the
 threads access the resource in a mutually exclusive manner, but much
 of the time (e.g. writing to different parts of a file), the writes
 would not conflict.
@@ -1060,7 +1060,126 @@ if required.
 
 % Lecture 12 - HW support for transactions
 
-% TODO: Lecture 12
+\subsection{Hardware support for Transactional Memory}
+
+Since transactional memory could significantly simplify the
+programming model, there is interest in a hardware implementation
+rather than emulation support with software (which becomes non-optimal
+for programs that do significant amounts of data sharing). Multiple
+hardware manufacturers are working on hardware TM.
+
+The idea is to declare sections of code as atomic, probably using a
+special instruction, and then keep note of all the addresses loaded
+from (the readset) and buffer all the writes (the writeset) for the
+duration of the atomic section. If another thread writes to something
+in the readset of our atomic section, then the transaction must be
+aborted (simply get rid of the buffered writes) and restarted. If, on
+the other hand, the transaction successfully completes with no
+conflicts, then the writeset can be written back to memory
+(committed).
+
+In fact, load-linked and store-conditional instructions are
+transactions, which is why they appear atomic. The readset is a single
+variable being RMW accessed, and the address is stored in a
+load-linked register. Bus snooping detects any writes to this address,
+and the load-linked flag is cleared if a conflict is detected (which
+causes the store-conditional operation to fail, and the program flow
+to be redirected to try the transaction again).
+
+However, unlike using load-linked registers, complex transactions
+involve a significant number of variables to be read and written. We
+can regard the CPU cache as a buffer to store both the readset and the
+writeset. This requires the following:
+
+\begin{itemize}
+\item Adding extra tags to the cache entries to
+indicate whether data was accessed inside an atomic block.
+\item Needing a modified writeback protocol to make sure that transactional
+data is only written back to memory if the transaction commits.
+\item Modifying the snooping protocol so that when an invalidate is
+received by a core, if the memory location was in the transaction's
+readset, then the transaction must be aborted and restarted.
+\item When the transaction terminates, it can commit its writeset to
+main memory. This may require synchronisation since the commit must be
+atomic.
+\end{itemize}
+
+It's not `just that simple though'; these changes bring about some
+hard to solve problems in the real world. For instance, the cache size
+is limited, which means that there is a hard upper bound on the size
+of the readset and writeset. Furthermore, cache eviction must be
+careful not to evict transaction data, and there is always a risk of
+livelock:
+
+\begin{verbatim}
+B causes A to restart
+C causes B to restart
+A causes C to restart
+\end{verbatim}
+
+If the hardware implementation uses a snooping bus, then they are
+likely to have similar extensibility problems to those found in
+software TM implementations and multiprocessor cache-coherency. Some
+people advocate dropping cache coherence all together and making all
+shared memory access transactional. If this were the case, then memory
+could be modified as to overcome the extensibility restrictions of
+multiple processors.
+
+\subsubsection{Transactional Coherence and Consistency (TCC)}
+
+TCC was developed at Stanford, and its original proposal is very
+simple\footnote{Though the large amount of possible optimisations can
+increase its complexity.}. It has been simulated with encouraging
+results, but no practical implementation has been produced as of yet.
+
+Each core has a local cache which stores its readset (along with the
+normal other tags), however the writeset is stored in a separate
+buffer (in a simple implementation, this could be a RAM based
+queue). Since writes to shared data only occur in transactions, and
+are buffered locally and there is no need for broadcast invalidations.
+
+When a transaction is about to commit, it broadcasts all of the
+addresses in its write buffer to other cores in a single packet, and
+if the other cores have transactions that have at least one conflict,
+they will restart their transaction.
+
+% I wonder if it would be possible to split the cores up into groups
+% where each group has a central commit lock. There could be nested
+% groups too and different processes on a multiprocess system could be
+% distributed over these groups according to their address space.
+
+One significant bottleneck is that there must be a central resource
+that ensures only one commit occurs at once. If we know in advance
+that certain transactions will not overlap in terms of memory accesses
+(e.g. they are different processes and don't share an address space)
+then we wouldn't need to check whether the transactions conflict and
+they can occur concurrently.
+
+The properties of TCC include:
+
+\begin{itemize}
+\item Lazy conflict detection
+\item No transaction aborts until another one is about to commit (no livelock)
+\item Less synchronisation is required since inter-core communication
+happens only at commit time.
+\item No cache coherence is required.
+\item Perhaps looser communication can be facilitated between cores.
+\end{itemize}
+
+\subsubsection{Hybrid Transactional Memory}
+
+Even TCC relies on caches and buffers which are always a fixed
+size. Though the consensus is that readsets and writesets should be
+kept small because it means there is less chance of conflict and less
+overhead related to conflict detection, it is not always easy to bound
+their size\footnote{Does the compiler do this? The programmer? The OS
+or the CPU?}.
+
+Instead, hardware support can be integrated for small readsets and
+writesets, but for larger instances, then software can be used
+instead. This approach is taken by AMD's Advanced Synchronisation
+Facility, which only guarantees hardware support for up to four
+(i.e. not many) transactional cache lines.
 
 % Lecture 13 - Memory consistency
 
