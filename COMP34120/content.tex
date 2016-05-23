@@ -545,3 +545,132 @@ There are two commonly used methods:
 \end{description}
 
 % Lecture 7
+
+\section{Mechanism Design}
+
+Mechanism design involves taking an engineering approach to designing
+economic mechanisms or incentives in order to steer the outcome of
+events/transactions/games etc towards a desired objective. As with the
+Nash games in semester one, and the Stackleberg games in the first
+part of semester two, it is always assumed that the players will act
+rationally. Since we start from the desired outcomes, and design a
+game to produce these outcomes, mechanism design is also known as
+\textit{reverse game theory}.
+
+\subsection{A toy example}
+
+A simple example is that of a mother dividing a cake for her two
+children, with a view to them both getting exactly half since
+otherwise they will complain. If the mother cuts the cake as equally
+as she can, then there is a risk that one or both of the children will
+have a different view on the size of the pieces to her, and will want
+a specific piece.
+
+\marginpar{Think about how this would work for $n$ children.}
+
+The solution is to have one child cut the cake into two pieces, but
+then let the other child have first pick of the pieces. Then, no
+matter if the first child cuts the cake evenly or not, the second
+child will take whichever one that they think is biggest, and since
+the first child cut the cake in the first place, they shouldn't (in
+theory) contest the choice.
+
+\subsection{A real example}
+
+There are lots of more interesting examples of mechanism design, such
+as the government assigning licences to mobile operators. If we view
+the government as one player, and the different mobile operators as
+$n$ different players, then it is easy to see their differing aims.
+The government wants to allocate a licence to whoever values it the
+most highly since an operator who highly values the licence is likely
+to use it best for their customers and maximise \textit{social
+surplus}. The goal of mobile operators is to maximise their own profit
+(i.e. to minimise the price they actually pay for the licence).
+
+If the government could simply ask for an honest reccommendation of
+each mobile operator's valuation of the licence, then they could
+simply give the licence to the highest valuing operator. However,
+since the government does not know the \textit{true} valuation (as
+opposed to whatever the operator may tell the government) of the
+licence by each operator, they cannot really know who to give it to.
+
+Other than asking for the valuation, the government could also require
+the operators to pay their valuation when they submit it (so that they
+don't overstate their valuation), but then they would likely
+understate their valuation to save money. The solution is to allocate
+the licence to the operator with the highest valuation, but have them
+pay the \textit{second highest} valuation.
+
+If this is done, then the operator would not report a higher valuation
+than their true valuation as it would not be profitable (since they
+would only pay the second highest), if they bid lower than their true
+valuation they might lose the chance of winning, and the operators
+would be willing to participate in the first place (and bid their true
+valuation) since it is profitable if the win, and they don't lose if
+they don't win.
+
+% NOTE: I skipped all the history of mechanism design bits.
+
+\subsection{Defining `Mechanism Design'}
+
+From the lecture notes:
+
+\begin{quote}
+  Mechanism design is the sub-field of microeconomics and game theory
+  that considers how to implement good system-wide solutions to
+  problems that involve multiple self-interested agents, each with
+  private information about their preferences.
+\end{quote}
+
+Overall, there are $n$ players (aka agents), and each player has some
+private information and will try to maximise their own payoff (aka
+utility) function\footnote{Note that the strategy space over which the
+payoff function is defined is not itself defined until the mechanism
+has been designed.}.
+
+There is a mechanism designer such as the government in the mobile
+operator's spectrum example above. The designer does not know the
+private information of each agent, but wants to achieve some desired
+outcome such as maximising the social welfare (e.g. a governemnt) or
+their own profit (e.g. a private seller).
+
+So, we need to design the rules of the game in order to coerce a
+desirable outcome based on agent strategies.
+
+\subsubsection{A Mathematical Definition}
+
+The outcome is the set $\Omega$, and the players are $i \in I$ where
+$I$ is the set of players and $|I| = N$. The private information of
+each player is $\theta_i \in Theta_i$.
+
+The utility function for each player is $u(o,\theta_i)$ for the
+player's information set $\theta_i$ and the outcome $o \in \Omega$.
+
+A mechanism is a pair $M = (S,g)$ where $S$ is the strategy space $S^N
+= S_1 \times \dots \times S_N$ where player $I$ chooses a strategy
+$s_i(\theta_i) \in S_i$ and $s_i$ maps the set of information sets
+onto the set of strategies available to the player
+$s_i: \Theta_i \rightarrow S_i$. The outcome function is $g:
+S^N \rightarrow \Omega$.
+
+Finally, a game is the utility to player $i$ from their strategy
+profile; $u_i(g(s(\theta)), \theta_i)$.
+
+We want to make a mechanism $M = (S,g)$ where
+$g(s_1(\theta_1)), \dots, s_N(\theta_N)) =
+f(\theta), \forall \theta \in \Theta^N$, such that $(s_1,\dots,s_N)$
+is an equilibria.
+
+\subsection{Implementing Mechanisms}
+
+There is always a danger that if there are multiple equlibria in a
+mechanism, then the participants of the game may end up stuck in some
+sub-optimal equlibria. We want to create a mechanism where all of its
+equlibria are optimal to avoid this conundrum, which can only be done
+if the mechanism is a maskin monotonicity.
+
+% TODO Make sure to explain somewhere what a masikn monotonicity is.
+
+% Lecture 8
+
+% Mention Pareto Efficiency
