@@ -1270,7 +1270,86 @@ place inside the locked region are visible when the lock is released.
 
 % Lecture 14 - GPU's and CUDEA
 
-% TODO: Lecture 14
+\section{GPGPU's and CUDA}
+
+% TODO: Insert link to dissertation
+
+I did my third year project on parallelising text mining applications,
+with an emphasis on GPGPU (General Purpose GPU) computation. My
+dissertation covers lots of this part of the course (some in more
+detail, some in less) in Chapter 3.
+
+Basically, modern GPU's are very powerful processors in their own
+right, since they have lots (thousands) of relatively simple
+processing cores and are able to perform computations in a `massively
+parallel' manner.
+
+Their original motivation was to reduce the load on the CPU caused by
+having to draw images to the screen many times per second. As such,
+their architecture is obviously optimised for graphics applications,
+which involves lots of parallelism, good floating point performance
+and a high memory bandwidth.
+
+In the eighties and nineties, if you wanted to perform general purpose
+(as opposed to graphics) computations on the GPU, you had to
+essentially map the computation onto a set of image transformations
+which could then be performed by the GPU. In the early 2000's, the GPU
+instruction sets were opened up and API's released so that you could
+run arbitrary code on them.
+
+% SLide 5 - I don't think this is important (Old GPU computation)
+% TODO: Ask John.
+
+The first architecture of these later GPU's was the Tesla
+architecture, which featured\footnote{More recent GPU's have different
+numbers of processors etc, but the idea is the same.} multiple
+independent processor clusters, with each cluster having two Streaming
+Multiprocessors (SM's) and each SM having 8 Streaming Processors
+(SP's/cores). Data is re-circulated around the device to allow for
+variable length pipelines (and therefore the implementation of
+algorithms), and processing clusters are allocated dynamically to
+different processing tasks.
+
+\subsection{CUDA}
+
+CUDA (Compute Unified Device Architecture) is an extension to the C
+programming language that provides the ability to compile code for
+execution on the GPU. A distinction is made between the host device
+(the CPU, main memory etc) and the GPU device (and its associated
+memory). The compiler seperates the code to be run on each
+architecture.
+
+The GPU `device' code is run on data-parallel \textit{kernels} that
+are instansiated on many (thousands to millions) threads at
+once. These threads are very lightweight, and implement zero-overhead
+context switching. Typically, all of the set-up is done on the CPU,
+then the data is copied to the GPU before the kernel(s) are
+started. When the kernels finish, then the CPU copies the results back
+to main memory and carries on processing.
+
+% TODO: CUDA Example
+INSERT CUDA EXAMPLE HERE
+
+Note that each CUDA function is prefixed by
+either \texttt{\_\_device\_\_}, \texttt{\_\_global\_\_}
+or \texttt{\_\_host\_\_} according to where it is ran. If the function
+is global, then it will be callable (i.e. in memory on) on both the
+CPU and the GPU, and the compiler will generate a seperate function
+for each.
+
+When the kernel is launched, it is executed on a grid of parallel
+threads, and the host controls the size of the grid (and therefore how
+many threads are launched).
+
+% TODO: CUDA Launch Code
+
+\subsection{OpenCL and OpenAAC}
+
+OpenCL and OpenACC are standardised languages for GPGPU computation
+and are cross platform. The former is heavily related to CUDA and the
+latter is a brand new design that is inspired by OpenMP's pragmas
+aimed at satisfying a broader range of GPGPU and other coprocessor
+architectures.
 
 % Lecture 15 - FP & Dataflow principles
 
