@@ -1316,32 +1316,68 @@ CUDA (Compute Unified Device Architecture) is an extension to the C
 programming language that provides the ability to compile code for
 execution on the GPU. A distinction is made between the host device
 (the CPU, main memory etc) and the GPU device (and its associated
-memory). The compiler seperates the code to be run on each
+memory). The compiler separates the code to be run on each
 architecture.
 
 The GPU `device' code is run on data-parallel \textit{kernels} that
-are instansiated on many (thousands to millions) threads at
+are instantiated on many (thousands to millions) threads at
 once. These threads are very lightweight, and implement zero-overhead
 context switching. Typically, all of the set-up is done on the CPU,
 then the data is copied to the GPU before the kernel(s) are
 started. When the kernels finish, then the CPU copies the results back
 to main memory and carries on processing.
 
-% TODO: CUDA Example
-INSERT CUDA EXAMPLE HERE
+\begin{verbatim}
+  /**
+   * m and n are the input matrices
+   * p is the product matrix
+   * They are all of size width*width
+   */
+  void matrixMultiply(float *m, float *n, float *p, int width) {
+    // Allocate device memory
+    float *d_m, *d_n, *d_p;
+    int size = width * width * sizeof(float);
+    cudaMalloc(&d_m, width);
+    cudaMalloc(&d_m, width);
+    cudaMalloc(&d_p, width);
+    // Copy the data over
+    cudaMemcpy(d_m, m, size, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_n, n, size, cudaMemcpyHostToDevice);
+    // Run the computation
+    matrixMultiplyKernel<<<dim3(1,1), dim3(width, width)>>>(d_m, d_n, d_p, width);
+    // Get the result back
+    cudaMemcpy(d_p, p, size, cudaMemcpyDeviceToHost);
+    // Free the device memory
+    cudaFree(d_m);
+    cudaFree(d_n);
+    cudaFree(d_p);
+  }
+\end{verbatim}
+
+\begin{verbatim}
+  __global__ void matrixMultiplyKernel(float *m, float *n, float p, width) {
+    int x = threadIdx.x;
+    int y = threadIdx.y;
+    float product = 0;
+    for (int k = 0; k < width; k++) {
+      float mDel = m[y * width + k];
+      float nDel = n[k * width + x];
+      product += mDel * nDel;
+    }
+    p[y * width + x] = product;
+  }
+\end{verbatim}
 
 Note that each CUDA function is prefixed by
 either \texttt{\_\_device\_\_}, \texttt{\_\_global\_\_}
 or \texttt{\_\_host\_\_} according to where it is ran. If the function
 is global, then it will be callable (i.e. in memory on) on both the
-CPU and the GPU, and the compiler will generate a seperate function
+CPU and the GPU, and the compiler will generate a separate function
 for each.
 
 When the kernel is launched, it is executed on a grid of parallel
 threads, and the host controls the size of the grid (and therefore how
 many threads are launched).
-
-% TODO: CUDA Launch Code
 
 \subsection{OpenCL and OpenAAC}
 
