@@ -1458,7 +1458,12 @@ data it needs to execute, then it generates a result and passes it on
 to the nodes it is linked to. The overall inputs and outputs are just
 values flowing into and out of the graph.
 
-% TODO: Insert images of loop and normal program
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{diagrams/dataflow-prog}
+  \includegraphics[width=0.5\textwidth]{diagrams/dataflow-loop}
+  \caption{A dataflow program and a dataflow program with a loop.}
+\end{figure}
 
 To make interesting programs, we need flow control statements that
 take a single boolean value and redirect output values
@@ -1469,7 +1474,11 @@ function/execution has finished.
 
 The architecture of a dataflow processor is like so:
 
-% TODO: Insert dataflow diagram
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{diagrams/dataflow-arch}
+  \caption{The Dataflow Processor Architecture.}
+\end{figure}
 
 It contains the following components:
 
