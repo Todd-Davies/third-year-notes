@@ -1389,7 +1389,104 @@ architectures.
 
 % Lecture 15 - FP & Dataflow principles
 
-% TODO: Lecture 15
+\section{Dataflow and Functional Programming}
+
+Functional programming is a major programming paradigm, languages that
+support it (or for which it is their only method of computation)
+include Lisp, Haskell, Scala etc. FP is a subset of declarative
+programming, which include pure declarative languages such as SQL and
+logic programming languages such as prolog.
+
+One important aspect of FP is \textit{referential transparency}. This
+is the property where names mean the same thing wherever they occur,
+and you can always exchange a name with a value with no side effects
+and without changing the meaning of the program. The effect of this,
+is that there is no mutable state (i.e. variables).
+
+We can define the fibonacci series in a functional manner:
+
+\begin{verbatim}
+  let fun fib 0 = 1
+        | fib 1 = 1
+        | fib n = fib (n - 1) + fib (n – 2)
+\end{verbatim}
+
+When you call the \texttt{fib} function, the runtime will re-write it
+until it gets to a base case:
+
+\[
+\begin{split}
+  fib(4) &\rightarrow fib(3) + fib(2)\\
+         &\rightarrow fib(2) + fib(1) + fib(1) + fib(0)\\
+         &\rightarrow fib(1) + fib(0) + fib(1) + fib(1) + fib(0)\\
+         &\rightarrow 1 + 1 + 1 + 1 + 1\\
+         &\rightarrow 5
+\end{split}
+\]
+
+Since there are no variables, the ordering of the re-writing is not
+important, and can be done in parallel (this property is called the
+Church-Rosser property).
+
+In a functional language, you can still have datastructures just like
+in any other programming language, but they must be immutable. If you
+try to update the datastructure, then a copy of the datastructure will
+be created with the update applied to it. Other funky things include
+pattern matching of arguments (like in the example above), cool things
+to do with types (such as being able to integrate proofs into the
+program etc), and lazy evaluation (only execute code when it is
+absolutely required to be executed).
+
+FP is less good at IO, and is often hampered by its lack of mutable
+state. As a result, many FP languages let in a little bit of mutable
+state to make things easier for the programmer and possibly more
+efficient at runtime.
+
+However, one main advantage of FP is letting the programmer work at a
+higher level abstraction; ideas like higher order functions abstract
+away the need to do things like iterate over loops, which eases the
+mental strain of programming. It also gives the runtime and the
+compiler more flexilbility to do things like parallelism to make the
+best use of runtime resources.
+
+\subsection{Dataflow}
+
+Dataflow is a paradigm where the program is visualised as a graph
+(instructions are nodes, data are the edges), and data values flow
+between nodes in the graph. When a node (instruction) has all of the
+data it needs to execute, then it generates a result and passes it on
+to the nodes it is linked to. The overall inputs and outputs are just
+values flowing into and out of the graph.
+
+% TODO: Insert images of loop and normal program
+
+To make interesting programs, we need flow control statements that
+take a single boolean value and redirect output values
+appropriately. Token colouring can be used to make sure different
+calls to the same function don't interfere with each other. Graphs can
+be self cleaning (ensure that no values remain in the graph once the
+function/execution has finished.
+
+The architecture of a dataflow processor is like so:
+
+% TODO: Insert dataflow diagram
+
+It contains the following components:
+
+\begin{description}
+\item \textbf{Instruction Store}: Holds the coding of the dataflow graph
+\item \textbf{Processor Bank}: $n$ processors, all with no state between cycles
+\item \textbf{Token Queue}: A buffer to store input data
+\item \textbf{Matching Store}: Where tokens with the same colour are marshalled
+together to be sent to the same instruction.
+\end{description}
+
+Programming for this architecture can be done with assembly code which
+is very tedious, or at a higher level language such as with functional
+languages. SISAL was developed at Manchester and other institutions as
+a programming language that programmers with an imperative background
+could use to write programs that could be compiled down to run on a
+dataflow processor.
 
 % Bibliography
 \bibliography{bib}{}
