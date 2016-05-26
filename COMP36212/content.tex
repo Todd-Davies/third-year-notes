@@ -281,7 +281,9 @@ An optimal method is one that is both stable, and has an order of $k +
 2$ (where $k$ is the number of terms it has, e.g. the Euler method has
 $k = 1$, therefore the Euler method is not optimal).
 
-% TODO: Ask Milan about optimal methods
+The First Dahlquist Barrier states that a method cannot attain an
+order of convergence greater than $k + 1$ is $k$ is odd or $k + 2$ if
+$k$ is even.
 
 \subsubsection{Examples of Analysing Linear Multistep Methods}
 
@@ -421,8 +423,6 @@ convergent.
 
 \end{description}
 
-% TODO: Selecting initial values
-
 % Part Two
 
 \section{Optimisation and nature inspired algorithms}
@@ -445,7 +445,8 @@ dimensionality increases, the functions get harder to visualise; 2d functions
 are visualised on a 2d graph, where the intensity of the colour in each square
 represents the value of the function at that coordinate. 
 
-% TODO: inequality/equality constraints?
+When we are optimising over a function, we need criteria to know when
+we are done. Inequality constraints are when the value is less than or equal
 
 An optimisation problem is one where we attempt to maximise or minimise a
 function. This involves finding the input that will produce the largest or
