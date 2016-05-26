@@ -1,4 +1,4 @@
-#!/bin/python2.7
+#!/usr/bin/python2.7
 
 """
 Basic implementation of Thompson's NFA -> DFA algorithm
@@ -8,13 +8,14 @@ from functools import reduce
 from pprint import pprint
 
 nfa = {
-  0 : {"" : {1}},
-  1 : {"a": {0,2}, "b" : {0}},
-  2 : {"a": {3}, "b":{3}},
-  3 : {}
+  0 : {"" : {1,3}},
+  1 : {"" : {2}},
+  2 : {"a" : {1,3}, "b" : {1}, "c" : {1}},
+  3 : {"":{1}, "b":{4}},
+  4 : {}
 }
 
-accepting = {3}
+accepting = {4}
 
 def accept_nfa(nfa, acceptingStates, inputStr, currentState=0):
   if inputStr == None or len(inputStr) == 0:
