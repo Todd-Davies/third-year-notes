@@ -282,7 +282,8 @@ In order to let caches know what other core's caches are doing, we have them do
 modify the cache independently of the core so that the flags on the cache lines
 are correct.
 
-Given two cores, the following states are valid and invalid:
+Given two cores, the following states are valid and invalid (note that
+some states are symmetrical):
 
 \begin{center}
   \begin{tabular}{c|c c c}
@@ -298,9 +299,51 @@ states, since then we won't know which we should write to memory, and we can't
 have a dirty and valid state (since then, by definition, the valid state is not
 valid).
 
-% TODO: Talk about state transitions
+We can analyse the state changes resulting from cores memory activity
+by considering three aspects; accesses to memory, messages that need
+to be sent between caches and the state changes that result.
 
-% TODO: Slide 22 onwards
+\begin{description}
+  \item \textbf{Transitions from \{D,I\}}:\\ Reading on the dirty core
+  does nothing since a dirty value is always up-to-date, and writing
+  to the dirty core will maintain its dirty status.
+
+  If core two reads, then it gets the value from the first core and
+  turns to valid. However, the state \{D,V\} is not allowed (since
+  then consistency would be violated), so the first core writes its
+  cache line to memory and the resulting state is \{V,V\}.
+
+  If core two writes, then its state goes to D. However, there can't
+  be two dirty cores, core two invalidates core one (this value is
+  written back to memory) leaving the state in \{I,D\}.
+
+  \item \textbf{Transitions from \{I,I\}}:\\ Reading from either core
+  will make that core read the value from memory, which puts the
+  reading core into a V state; \{V,I\} or \{I,V\}.
+
+  Likewise, writing from either core results in that core going to the
+  dirty state; \{D,I\} or \{I,D\}. Note that the newly dirty core will
+  broadcast an invalidate message since it does not know the state of
+  the other core.
+
+  \item \textbf{Transitions from \{V,I\}}:\\ Reading from core one
+  will do nothing, since the cache is valid, and reading from core two
+  will request the value from the first core, leading to \{V,V\}.
+
+  When core one writes, then it goes into the dirty state and sends an
+  invalidate message to the other core (which does nothing); \{D,I\}.
+
+  When core two writes, then it goes into the dirty state, but its
+  invalidate message will cause the first core to be invalidated (no
+  writeback is needed here since the line was only valid, not
+  dirty); \{I,D\}.
+
+  \item \textbf{Transitions from \{V,V\}}:\\ Reading from any valid
+  state keeps the state valid and causes no invalidations.
+
+  Writing to any of the cores will set that core to dirty and send an
+  invalidate to the other core; \{D,I\} or \{I,D\}.
+\end{description}
 
 There are two types of messages between cores; read requests for a cache line
 (one core hopes that another core's cache has the cache line so that it doesn't
@@ -1403,7 +1446,7 @@ and you can always exchange a name with a value with no side effects
 and without changing the meaning of the program. The effect of this,
 is that there is no mutable state (i.e. variables).
 
-We can define the fibonacci series in a functional manner:
+We can define the Fibonacci series in a functional manner:
 
 \begin{verbatim}
   let fun fib 0 = 1
@@ -1446,7 +1489,7 @@ However, one main advantage of FP is letting the programmer work at a
 higher level abstraction; ideas like higher order functions abstract
 away the need to do things like iterate over loops, which eases the
 mental strain of programming. It also gives the runtime and the
-compiler more flexilbility to do things like parallelism to make the
+compiler more flexibility to do things like parallelism to make the
 best use of runtime resources.
 
 \subsection{Dataflow}
