@@ -66,8 +66,12 @@ in $k$ and sub in $20$ for the desired ending temperature:
 
 This was an easy problem though; often, an analytical solution (the
 equation for $T(t)$) will not exist and we will need to solve the
-problem numerically. Basically we want have a function that takes in
-the current $x$ and $y$ values and output the next $y$ value:
+problem numerically.
+
+\subsection{IVP's: Linear Multistep Methods}
+
+Basically we will have a function that takes in the current $x$ and
+$y$ values and output the next $y$ value:
 
 \[
   y' = f(x,y)
@@ -75,16 +79,358 @@ the current $x$ and $y$ values and output the next $y$ value:
 
 Where $a < x < b$, and we know the `first' $y$ value $y(a) = \alpha$.
 
-\subsection{Linear Multistep Methods}
+Linear multistep methods aim to emulate a target function using
+$y'$. Given $y'$ (a function that produces the next value of a target
+function $y' = f(x,y)$ for all $a < x < b$) and $y(a) = \alpha$, we
+can use Taylor expansion to find the value of any point where $b$ is
+greater than $a$:
+
+% TODO: Explain Taylor Expansion
+
+\[
+\begin{split}
+  y(x) &\approx y(a) + (b - a)y'(a)\\
+       &\approx y(a) + (b - a)f(a, y(a))
+\end{split}
+\]
+
+We want to move from $a$ to $b$ in small increments, otherwise any
+inaccuracies in the taylor expansion will become quickly apparent, so
+we define $h$ to be the step size between $x_n$ and $x_{n+1}$ (where
+$x_k$ are the intermediate steps between $a$ and $b$), such that $h
+= \frac{b - a}{N}$, where $N$ is the number of steps we want to take.
+
+This means that $x_n$ = $a + nh$.
+
+For Euler's method, we can describe:
+
+\[
+\begin{split}
+  y_{n+1} &= y_n + (x_{n+1} - x_n)f(x_n, y_n)\\
+          &= y_n + hf_n
+\end{split}
+\]
+
+The Euler method only uses the previous point to generate the next
+point, but in general, linear multistep methods use the previous $k$
+steps to calculate the next value. As such, they are described by a
+list of values $\alpha = (\alpha_1, \dots, \alpha_k), \beta =
+(\beta_1,\dots,\beta_k)$ ($\alpha_k$ is always 1), such that:
+
+\[
+  \sum\limits^k_{i=0}\alpha_iy_{n+i} = h \sum\limits^k_{i=0}\beta_if_{n+i}
+\]
+
+The designer of the method determines the coefficients
+$\alpha_{0,\dots,k-1}$ ($alpha_k$ is 1 remember) and $\beta_{0, k}$,
+and they will balance the accuracy of the approximation with the need
+to make the method easy to apply.
+
+If $\beta_k = 0$, then the method is said to be explicit, since the
+formula can directly compute $y_{n + k}$, whereas if $\beta_k \neq 0$,
+then the $y_{n+k}$ depends on $f(x_{n+x},y_{n+k}$, which means an
+equation must be solved to find $y_{n+k}$:
+
+\[
+  y_{n+k} = h\beta_kf(x_{n+k},y_{n+k})
+              + h\sum\limits^{k-1}_{i=0}\beta_if_{n+i}
+              - \sum\limits^{k-1}_{i=0}\alpha_iy_{n+i}
+\]
+
+Lets use the Euler method applied to the soup problems as an
+example. Since $\frac{dT}{dt} = -k(T - T_a)$\footnote{The change in
+temperature over time is equal to the temperature minus the ambient
+temperature multiplied by the cooling coefficient.},
+$f(x_{n+1},y_{n+1}) = -k(T_n - T_a)$.
+
+\begin{center}
+\begin{tabular}{ll}
+  Forward Euler & $T_{n+1} = T_n + h(-k(T_n - T_a))$\\
+  Backward Euler & $T_{n+1} = T_n + h(-k(T_{n+1} - T_a))$\\
+\end{tabular}
+\end{center}
+
+Since we know the starting temperature of the soup ($T_0 = 100$), we
+can simply iterate towards the end value with the forward Euler
+method. Lets say $h = 20$ and $k = 9.796\times10^{-4}$ as we worked
+out earlier:
+
+\[
+\begin{split}
+  T_0 &= 100\\
+  T_1 &= 100 + 20(-9.796\times10^{-4}(100 - 10)) = 98.237\\
+  T_2 &= 98.237 + 20(-9.796\times10^{-4}(98.237 - 10)) = 96.508\\
+  &\vdots\\
+  T_{111} &= \dots = 20.009\\
+  T_{112} &= \dots = 19.813\\
+\end{split}
+\]
+
+Since we did $112$ iterations before we dropped below the target
+temperature of $20$, and $h = 20$, we know the time is between $2220$
+and $2240$ seconds. Since we previously calculated the actual time it
+would take ($2242$ seconds), we're pretty close to the right
+answer. We probably got a bit of inaccuracy because the forwards Euler
+method is unstable (we'll get to that later). If we decreased $h$,
+then we would get a better answer (in fact, when $h=1$, we get $~2242$
+seconds).
+
+We can also use the backward Euler method. To do this we need to
+rearrange the method to give $T_{n+1}$ so that it is not a recursive
+definition:
+
+\[
+\begin{split}
+  T_{n+1} &= T_n + h(-k(T_{n+1} - T_a))\\
+          &= T_n - hk(T_{n+1} - T_a)\\
+  \frac{T_{n+1}}{-hk} &= \frac{T_n}{-hk} + T_{n+1} - T_a\\
+  \frac{T_{n+1}}{-hk} - T_{n+1} &= \frac{T_n}{-hk} - T_a\\
+  T_{n+1} + khT_{n+1} &= T_n + hkT_a\\
+  T_{n+1}(1 + hk) &= T_n + hkT_a\\
+  T_{n+1} &= \frac{1}{1 + hk}(T_n + hkT_a)
+  \end{split}
+\]
+
+So lets apply the backwards Euler method with $h=20$:
+
+\[
+\begin{split}
+  T_0 &= 100\\
+  T_1 &= \frac{1}{1 + 20\times9.796\times10^{-4}}(100 +
+  20\times9.796\times10^{-4}\times10) = 98.271\\
+  T_2 &= \frac{1}{1 + 20\times9.796\times10^{-4}}(98.271 +
+  20\times9.796\times10^{-4}\times10) = 96.574\\
+  &\vdots\\
+  T_{112} &= 20.047\\
+  T_{113} &= 19.854\\
+\end{split}
+\]
+
+Therefore we can see that the backwards Euler method says that the
+temperature reaches $20$ degrees bewteen $2240$ and $2260$ seconds
+($112$ and $113$ times $h$). If we decreased the step size $h$, we
+could get a more accurate calculation (when $h=1$ we get $2244-2245$
+seconds). The benefit of the backwards method is that it is
+unconditionally stable (i.e. errors in the input between successive
+iterations will diminish as the algorithm
+executes)\footnote{\url{http://mathworld.wolfram.com/NumericalStability.html}}.
+
+\subsubsection{Consistency of Linear Multistep Methods}
+
+We have seen how to construct linear multistep methods, and had a look
+at how to make them stable. Now we must examine their consistency,
+which is the property that as $h$ decreases, the truncation error can
+be made to approach zero; i,e, as $h$ approaches
+$\frac{1}{\infty}$, we approach the true solution of the equation.
+
+To find if a method is consistent, we must first find its order. This
+is done by defining the constants $C_0, \dots, C_j$:
+
+\[
+\begin{split}
+C_0 &= \alpha_0 + \dots + \alpha_k\\
+C_1 &= \alpha_1 + 2\alpha_2 + \dots + k\alpha_k - (\beta_0 + \dots
++ \beta_k)\\
+C_j &= \frac{1}{j!}(\alpha_1 + 2^j\alpha_2 + \dots + k^j\alpha_k)
+- \frac{1}{(j-1)!}(\beta_1 + 2^{j-1}\beta_2 + \dots + k^{j-1}\beta_k)
+\end{split}
+\]
+
+A linear multistep method is of order $p$ if $C_{p+1} \neq 0$. In
+other words $C_0 = C_1 = \dots = C_p = 0, C_{p+1} \neq 0$. If the
+method is of order $p \geq 1$ then it is consistent. This can also be
+expressed as the sum of the alphas being $0$, or the sum of the
+product of the index and the alpha being equal to the sum of the
+betas:
+
+\[
+  \sum\limits^k_{i=0}\alpha_i = 0, \sum\limits^k_{i=0}i\alpha_i
+    = \sum\limits^k_{i=0}\beta_i
+\]
+
+\subsubsection{Stability of Linear Multistep Methods}
+
+A method is stable if its first characteristic polynomial does not
+have zeros with a modulus greater than one, and if all the zeros with
+a modulus equal to one are simple. This sounded very abstract to me,
+but after talking to Milan about it, I'll give my best shot at what it
+means:
+
+We must define the first characteristic polynomial to be:
+
+\[
+\begin{split}
+  p(\zeta) &= \alpha_k\zeta^k + \alpha_{k-1}\zeta^{k-1} + \dots
+  + \alpha_0\zeta^0\\
+           &= \alpha_k\zeta^k + \alpha_{k-1}\zeta^{k-1} + \dots
+  + \alpha_1\zeta + \alpha_0\\
+\end{split}
+\]
+
+Now, we need to find the roots of this polynomial (i.e. where
+$p(\zeta) = 0$), which will give us a set of values
+$\zeta_1,\dots,\zeta_n$ (usually there are only a few values). Some of
+these values can be complex numbers (e.g. if $\zeta = a + ib$ is a
+solution, then $\zeta = a - ib$ is too). To calculate the modulus of
+one of these, you get the actual value if the number is real, or for
+complex numbers, you can do $|\zeta_n| = \sqrt{a^2 + b^2}$.
+
+\subsubsection{Optimal Methods}
+
+An optimal method is one that is both stable, and has an order of $k +
+2$ (where $k$ is the number of terms it has, e.g. the Euler method has
+$k = 1$, therefore the Euler method is not optimal).
+
+% TODO: Ask Milan about optimal methods
+
+\subsubsection{Examples of Analysing Linear Multistep Methods}
+
+\begin{description}
+\item \textbf{Example One:}\\
+
+Lets examine the Euler method first, defined as $y_{n+1} = y_n +
+hf_n$. We first need to get it into the form where all the $y$'s are
+on one side, and all the $f$'s are on the other side (this is easy):
+
+\[
+  y_{n+1} - y_n = hf_n
+\]
+
+Now we can simply read off the values of $\alpha$ and $\beta$:
+
+\[
+\begin{split}
+  \alpha_0 &= -1\\
+  \alpha_1 &= 1\\
+  \beta_0 &= 1\\
+  \beta_1 &= 0
+\end{split}
+\]
+
+Using these, we can calculate the values of the constants:
+
+\[
+\begin{split}
+C_0 &= \alpha_0 + \alpha_1 = -1 + 1 = 0\\
+C_1 &= \alpha_1 - \beta_0 - \beta_1 = 1 - 1 - 0 = 0\\
+C_2 &= \frac{1}{2}\alpha_1 - \beta_1 = \frac{1}{2} - 0
+= \frac{1}{2} \neq 0
+\end{split}
+\]
+
+Since $C_2$ is not $0$, then the method is consistent and of the first
+order. To calculate the stability, then we must find the first
+characteristic polynomial:
+
+\[
+  p(\zeta) = \alpha_1\zeta^1 - (\alpha_0 \zeta^0) = \zeta - 1
+\]
+
+Now we can solve for $\zeta$:
+
+\[
+\begin{split}
+  p(\zeta) &= 0\\
+  \zeta - 1 &= 0\\
+  \zeta &= 1\\
+\end{split}
+\]
+
+Since $\zeta = 1$ (which satisfies the conditions we said before), we
+know that it is stable. Since it is stable and it is consistent, then
+it is convergent.
+
+\item \textbf{Example Two:}\\
+
+For the next example, lets look at the equation:
+
+\[
+  y_{n+2} - y_{n+1} = \frac{h}{3}(3f_{n+1} - 2f_n)
+\]
+
+Lets see if it is consistent. To do this we must compute the
+constants:
+
+\[
+  \begin{split}
+    C_0 &= 0 - 1 + 1 = 0\\
+    C_1 &= -1 + 2(2) - (0 + \frac{3}{3} - {2}{3}\\
+        &= 3 - \frac{1}{3}\\
+        &= 2\frac{2}{3}
+  \end{split}
+\]
+
+Since $C_1 \neq 0$, the method is not consistent (and therefore cannot
+be convergent either). Next we can see if it is stable, but getting
+the first characteristic polynomial:
+
+\[
+\begin{split}
+  p(\zeta) &= \alpha_2\zeta^2 + \alpha_1\zeta + \alpha_0\\
+           &= \zeta^2 - \zeta\\
+  p(\zeta) &= 0\\
+  \zeta = 0&, \zeta = 1
+\end{split}
+\]
+
+Therefore we can see that the method is stable (since the roots are
+between 0 and 1).
+
+\item \textbf{Example Three:}\\
+
+We have:
+
+\[
+  y_{n+2} + 4y_{n+1} - 5y_n = \frac{2}{h}(8f_{n+1} + 4f_n)
+\]
+
+The consistency would be:
+
+\[
+\begin{split}
+  C_0 &= 1 + 4 - 5 + 0 = 0\\
+  C_1 &= 2(1) + 4 - (4 + 2) = 0\\
+  C_2 &= \frac{1}{2!}(-5 + 2^2(4) + 3^2(1)) - \frac{1}{1!}(2 +
+  2^1(4))\\
+      &= \frac{1}{2}(4(1) + 4) - 4\\
+      &= 0\\
+  C_3 &= \frac{1}{3!}(8(1) + 4) - \frac{1}{2!}(4)\\
+      &= \frac{1}{6}(12) - 2\\
+      &= 0\\
+  C_4 &= \frac{1}{4!}(16(1) + 4) - \frac{1}{3!}(4)\\
+      &= \frac{1}{24}(20) - 1.5\\
+      &= -\frac{2}{3}
+\end{split}
+\]
+
+Since it is of order $3$, the method is consistent.
+
+To find the stability, we must find the first characteristic
+polynomial:
+
+\[
+\begin{split}
+  p(\zeta) &= \zeta^2 + 4\zeta - 5\\
+  p(\zeta) &= 0\\
+  \zeta = 5&, \zeta = 1
+\end{split}
+\]
+
+Since $\zeta = 5$, the method is not stable, and is therefore not
+convergent.
+
+\end{description}
+
+% TODO: Selecting initial values
 
 % Part Two
 
 \section{Optimisation and nature inspired algorithms}
 
-To start, lets recap some stuff you should already know; a minima is a point of
-a function where all points in its vicinity have a higher value than itself,and
-a maxima is the opposite; a point where all points in its vicinity have a lower
-value than itself.
+To start, lets recap some stuff you should already know; a minima is a
+point of a function where all points in its vicinity have a higher
+value than itself,and a maxima is the opposite; a point where all
+points in its vicinity have a lower value than itself.
 
 Since we can invert a function by putting a minus in front of it, we don't
 really need to differentiate between maxima and minima, since we can always

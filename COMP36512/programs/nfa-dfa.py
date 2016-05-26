@@ -10,11 +10,12 @@ from pprint import pprint
 nfa = {
   0 : {"" : {1}},
   1 : {"a": {0,2}, "b" : {0}},
-  2 : {"a": {3}, "b":{3}},
-  3 : {}
+  2 : {"a": {3}},
+  3 : {"" :{4}},
+  4 : {"b" : {3}},
 }
 
-accepting = {3}
+accepting = {4}
 
 def accept_nfa(nfa, acceptingStates, inputStr, currentState=0):
   if inputStr == None or len(inputStr) == 0:
