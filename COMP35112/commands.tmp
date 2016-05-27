@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-pdflatex -shell-escape "\def\commitId{"48fde02eebc0f76e63e156b54792b6b557fd1220"} \def\buildId{58}  \input{notes.tex}"
-=======
-pdflatex -shell-escape "\def\commitId{"48fde02eebc0f76e63e156b54792b6b557fd1220"} \def\buildId{55}  \input{notes.tex}"
->>>>>>> d6b889436a54f6e69a64fe543806f9bd9bd6031f
+pdflatex -shell-escape "\def\commitId{"33b61694f6adc11e65c9c223645754ef7a527ad1"} \def\buildId{65}  \input{notes.tex}"

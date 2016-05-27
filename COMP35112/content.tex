@@ -576,7 +576,22 @@ There are two atomic operations that can be done on a semaphore;
 \texttt{s} is equal to $1$ (i.e. wait until it's free), then set \texttt{s} to
 $0$. \texttt{signal} sets \texttt{s} to be equal to $1$. For example:
 
-% TODO Side by side example of two threads in a critical section (lec 7 p 4)
+\begin{minipage}{0.5\textwidth}
+\textbf{Thread \#1}
+\begin{verbatim}
+wait(S)
+print "Thread 1 says 'Hi'"
+signal(S)
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+\textbf{Thread \#2}
+\begin{verbatim}
+wait(S)
+print "Thread 2 says 'Hi'"
+signal(S)
+\end{verbatim}
+\end{minipage}
 
 A \textbf{broken} implementation of \texttt{wait} could be:
 
@@ -597,20 +612,23 @@ A \textbf{broken} implementation of \texttt{wait} could be:
         POP PC
 \end{verbatim}
 
-The reason why this wouldn't work, is that if another thread was to change the
-value of the memory address pointed to by \texttt{R2} while were were inside
+The reason why this wouldn't work, is that if another thread was to
+change the value of the memory address pointed to by \texttt{R2} while
+were were inside
 \texttt{loop}, then we could get unpredictable results.
 
-In order to prevent this from happening, we need to make sure that \texttt{wait}
-is indivisible, which requires special hardware instructions. Even then, if
+In order to prevent this from happening, we need to make sure
+that \texttt{wait} is indivisible, which requires special hardware
+instructions. Even then, if
 \texttt{semaphore} was cached, then even indivisible waiting methods might get
 confused, so we need coherence operations in the cache.
 
-A simple solution (often implemented in older processors) is to provide an
-instruction called \texttt{test and set}, which is atomic. This takes a pointer
-as an argument, and tests if the memory location is \texttt{0}. If it is, then
-the memory location is set to \texttt{1}, and if its not, then the processors
-zero flag is cleared. Now our wait function becomes:
+A simple solution (often implemented in older processors) is to
+provide an instruction called \texttt{test and set}, which is
+atomic. This takes a pointer as an argument, and tests if the memory
+location is \texttt{0}. If it is, then the memory location is set
+to \texttt{1}, and if its not, then the processors zero flag is
+cleared. Now our wait function becomes:
 
 \begin{verbatim}
   # Move the address of the semaphore into R2
@@ -627,23 +645,24 @@ zero flag is cleared. Now our wait function becomes:
         POP PC
 \end{verbatim}
 
-Note that this is the logical opposite of how we defined the semaphore before,
-but it doesn't matter. Furthermore, though it looks like we've reduced the
-number of instructions, the \texttt{TAS} operation will be slow since it must
-read and possibly write a value in memory, which requires that memory location
-to be locked.
+Note that this is the logical opposite of how we defined the semaphore
+before, but it doesn't matter. Furthermore, though it looks like we've
+reduced the number of instructions, the \texttt{TAS} operation will be
+slow since it must read and possibly write a value in memory, which
+requires that memory location to be locked.
 
-If \texttt{semaphore} is cached, (which is likely since its going to be a shared
-memory location), then we're going to be using a lot of bus bandwidth because
-the processor must lock the snoopy bus for every \texttt{TAS} operation since it
-cannot let other cores write to that memory location. If the value of the
-semaphore was $1$, then the lock was wasted.
+If \texttt{semaphore} is cached, (which is likely since its going to
+be a shared memory location), then we're going to be using a lot of
+bus bandwidth because the processor must lock the snoopy bus for
+every \texttt{TAS} operation since it cannot let other cores write to
+that memory location. If the value of the semaphore was $1$, then the
+lock was wasted.
 
-A simple solution is to sit in a loop reading the value of the semaphore until
-it seems to be free, then use a \texttt{TAS} operation to obtain the lock. If
-the \texttt{TAS} operation was successful, then return to the calling code, and
-if it wasn't, then another thread must have got there first and the current
-thread should continue looping:
+A simple solution is to sit in a loop reading the value of the
+semaphore until it seems to be free, then use a \texttt{TAS} operation
+to obtain the lock. If the \texttt{TAS} operation was successful, then
+return to the calling code, and if it wasn't, then another thread must
+have got there first and the current thread should continue looping:
 
 \begin{verbatim}
   # Move the address of the semaphore into R2
@@ -665,17 +684,66 @@ thread should continue looping:
 
 \subsection{Other synchronisation primitives}
 
-There are other machine level primitives including \texttt{fetch and add} (get a
-memory location, add one and write back), and \texttt{compare and swap} (compare
-a memory location to a value and exchange it for another value if it was as
-expected). These are read-modify-write instructions and require the snoopy bus
-to be locked while they execute.
+There are other machine level primitives including \texttt{fetch and
+add} (get a memory location, add one and write back),
+and \texttt{compare and swap} (compare a memory location to a value
+and exchange it for another value if it was as expected). These are
+read-modify-write instructions and require the snoopy bus to be locked
+while they execute.
 
-The trouble with these operations, is that they are quite complicated (i.e. like
-CISC instructions, not RISC instructions), and as a consequence, they don't fit
-well with modern pipelined processors.
+The trouble with these operations, is that they are quite complicated
+(i.e. like CISC instructions, not RISC instructions), and as a
+consequence, they don't fit well with modern pipelined processors.
 
-%TODO Load linked & Spin locks L 7 S 15
+There are two instructions called `Load Linked' (\texttt{LDL Rx, Ry})
+and `Store Conditional' (\texttt{STC Rx, Ry}) respectively that are
+essentially atomic loads and stores.
+
+\texttt{LDL Rx, Ry} loads the value of the address \texttt{R2}
+into \texttt{R1} but also sets a special `load linked' flag on the
+processor core executing the instruction. The address \texttt{R2} is
+stored in a `locked address register' on that core.
+
+\texttt{STC Rx, Ry} stores the value in \texttt{Rx} into the location
+addressed by \texttt{Ry}, but it only works if the `load linked' flag
+is set. The value of the load linked flag is returned in \texttt{R1}
+(if the store was successful or not), and the load linked flag is
+cleared.
+
+The load linked flag is unset if another core writes to the address
+that is stored by the load linked register (if an invalidate message
+was received that matches the value in the register). This occurs when
+a write has occurred to the shared variable, and hence whatever
+operation we were working on with our core wouldn't be atomic.
+
+Here is a correct implementation of the semaphore:
+
+\begin{verbatim}
+loop: LDL R1, R2 # Load link the address of R2 into R1
+      CMP #0 R1  # See if the load link worked?
+      BEQ loop   # If not, then try again
+      MOV #0 R1  # Overwrite the register
+      STC R1, R2 # Try and write it back to memory
+      CMP #1 R1  # If R1 is set, it worked
+      BNC loop   # Loop back if it didn't work
+\end{verbatim}
+
+This works because any other core writing to the address
+in \texttt{R2} between lines $1-5$ will cause the load link flag to be
+unset, causing the \texttt{STC} instruction to fail.
+
+We have seen the Test and Set instruction, and the Load Linked/Store
+Conditional instructions. These are both useful and can guarantee
+atomicity, though LL/SC can guarantee atomicity of anything between
+the two instructions, while TAS is only atomic within itself.
+
+Implementing locks as we have above results in a \textbf{spin lock},
+where the processor will sit and continually check to see if the
+condition is such that it can proceed (also known as a busy wait or
+spinning). It is more efficient (especially for power in things like
+mobile phones) if the processor can switch off for this duration, or
+switch to another thread. Other forms of locking enable this, though
+the basic hardware support is similar or the same.
 
 % Lecture 8 - Lock free datastructures
 
@@ -914,7 +982,13 @@ after it becomes non-speculative and writes its modified values back
 to the main array. Eventually, all the threads will terminate and
 commit their data.
 
-% TODO: Commit images
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{diagrams/commit-diagram}
+\caption{A visualisation of how the threads could run; each thread
+must wait for the previous one to finish and for its data to become
+non-speculative before it can itself commit its data and exit.}
+\end{figure}
 
 Of course, this all introduces an overhead on each memory access as
 well as the overhead of running multiple threads, yet with the right
@@ -1010,7 +1084,69 @@ to be kept track of (the readset) and the variables that have been
 written to need to be kept track of too (the writeset). These two set
 are used to determine clashes with other transactions.
 
-% TODO Routing - slide 11
+An application for TM is routing; we have a number of points in a 2D
+plane that we want to make connections between, and the connections
+cannot cross each other (e.g. on a Printed Circuit Board). We could
+solve this by representing the plane as a 2D array of integers that
+encodes what is in each cell, and then we can find the routes between
+the connections in parallel so long as we avoid intersections.
+
+Of course, avoiding intersections is the hard bit. The easy way it so
+lock the array (and therefore get no parallelism), or we could lock
+individual cells (i.e. have a thread find a route, lock the whole
+route and then unlock the route when it's done), however this is hard
+to correctly and without introducing a bottleneck.
+
+With transactions, we can use one transaction for each required
+track (and that's it). So long as there aren't too many tracks, then
+the performance is good in parallel.
+
+\subsection{Versioning}
+
+If a transaction writes to a variables and reads the written value
+later, then the updated value should be visible, not the original
+one, yet if the transaction aborts, then the original
+value needs to be preserved. We need some kind of versioning to
+implement this:
+
+\begin{description}
+\item \textbf{Direct updating} (aka eager versioning) is when the transaction will
+change the shared variable, but log the change privately. If the
+transaction commits, then it will discard the log, but if it aborts,
+then it will undo the writes present the log. This is efficient if
+aborts are rare, and only works if the transaction clash detection is
+bulletproof.
+\item \textbf{Deferred updating} (aka lazy versioning) is the opposite of
+direct updating, where a private version of the changes to the shared
+variables is maintained, which can be thrown away on an abort. On a
+commit, the thread would copy the privately held values in the log to
+the shared variables. This is efficient if aborts are more common than
+commits.
+\end{description}
+
+As mentioned, both of these methods rely on being able to detect
+clashes. This is called \textit{validation} (or conflict detection),
+and can, like updating, be done in a lazy or eager manner:
+
+\begin{description}
+\item \textbf{Lazy Validation}: This is done when the transaction is
+about to commit. Here, we know the details of all of the reads and
+writes that occurred in the transaction, so we can just detect
+conflicts from these.
+\item \textbf{Eager Validation}: Every write operation to a shared
+variable in a transaction can cause other transactions to see if they
+have clashed. We can then choose which transaction to abort or
+possibly delay a transaction to let another finish first. We need to
+make sure that we don't accidentally cause livelock here.
+\end{description}
+
+Unlike for updating, we can mix the two at the same time, using one
+method for reads, and another for writes.
+
+Other design options for transactions include strong and weak
+isolation (allow access to shared variables only within transactions
+or from anywhere), and enabling nesting transactions (transactions
+within transactions), which is essential for composability.
 
 \subsection{Hardware support}
 
