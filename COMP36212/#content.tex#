@@ -95,7 +95,7 @@ greater than $a$:
 \]
 
 We want to move from $a$ to $b$ in small increments, otherwise any
-inaccuracies in the Taylor expansion will become quickly apparent, so
+inaccuracies in the taylor expansion will become quickly apparent, so
 we define $h$ to be the step size between $x_n$ and $x_{n+1}$ (where
 $x_k$ are the intermediate steps between $a$ and $b$), such that $h
 = \frac{b - a}{N}$, where $N$ is the number of steps we want to take.
@@ -207,7 +207,7 @@ So lets apply the backwards Euler method with $h=20$:
 \]
 
 Therefore we can see that the backwards Euler method says that the
-temperature reaches $20$ degrees between $2240$ and $2260$ seconds
+temperature reaches $20$ degrees bewteen $2240$ and $2260$ seconds
 ($112$ and $113$ times $h$). If we decreased the step size $h$, we
 could get a more accurate calculation (when $h=1$ we get $2244-2245$
 seconds). The benefit of the backwards method is that it is
@@ -1003,7 +1003,7 @@ The differences in the two algorithms are as follows:
 Rechenberger and Schwefel made another algorithm. In this algorithm,
 each gene has an associated standard deviation which affects how it
 mutates. This is an innovation because in the standard approach, the
-size of each mutation is the same for all genes and is constant
+sizer of each mutation is the same for all genesand is constant
 throughout the execution of the algorithm. Here, the standard
 deviation for each gene is updated throughout the algorithm, and
 henceforth mutations are different sizes for each gene and changes as
