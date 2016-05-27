@@ -892,7 +892,18 @@ population is a single candidate solution, and is stored as a
 \textit{chromosome}. This is a sequence of bits, split into $m$ sections called
 \textit{genes}. As described above, each gene maps onto a parameter.
 
-% TODO: Insert image showing chromosome/genes = parameters
+\begin{center}
+\fbox{
+\begin{minipage}{0.5\textwidth}
+\textbf{Chromosome:}\\
+\texttt{1100110 1010101 1010111 0101101 1011010}\\
+\textbf{Genes (each one is a parameter)}\\
+\texttt{102 85 87 45 90}\\
+\textbf{Alternately, floating point parameters}\\
+\texttt{4.48 2.20 8.80 3.0 1.11 4.12}
+\end{minipage}
+}
+\end{center}
 
 Fogel's algorithm for evolutionary programming is as such:
 
@@ -910,16 +921,16 @@ Fogel's algorithm for evolutionary programming is as such:
   \item Go back to step 2, or stop.
 \end{enumerate}
 
-% TODO: Can this be a negative number?
-
 In this algorithm, we described mutation (in step 4) and selection (in step 6).
 For mutation, we add a small random number to the original value of a gene.
 
-For selection, we want to select $n$ individuals, where better individuals have
-a greater chance of remaining in the population. A roulette wheel is a manual
-way of doing this, but stochastic ranking (e.g. a sort that has a chance of
-being wrong) or a tournament where each individual is compared against a small
-number of others and receives a score based off of its performance; the $n$
+For selection, we want to select $n$ individuals, where better
+individuals have a greater chance of remaining in the population. A
+roulette wheel is a manual way of doing this (each individual has a
+probability of being picked according to their fitness), but
+stochastic ranking (e.g. a sort that has a chance of being wrong) or a
+tournament where each individual is compared against a small number of
+others and receives a score based off of its performance; the $n$
 lowest scoring individuals are pruned.
 
 Holland and DeJong's Genetic algorithm is as follows. It encodes parameters in
@@ -939,7 +950,20 @@ binary, and genes are therefore strings of binary digits.
 The mutation operation flips bits in a gene with a small probability. The cross
 over operator swaps the latter halves of two chromosomes at a random index.
 
-% TODO: Cross over image
+\begin{center}
+\begin{tikzpicture}
+  \path [fill=gray] (0.2,-0.2) rectangle (1.02,0.2);
+  \path [fill=gray] (2.2,-0.2) rectangle (3.02,0.2);
+  \path [fill=gray] (0.2,0.8) rectangle (1.02,1.2);
+  \path [fill=gray] (2.2,0.8) rectangle (3.02,1.2);
+  \node at (1,1) {\texttt{01101000}};
+  \node at (3,1) {\texttt{01010010}};
+  \node at (1,0) {\texttt{01011000}};
+  \node at (3,0) {\texttt{01100010}};
+  \draw [->] (0.5,0.8) -- (2.5,0.2);
+  \draw [->] (2.5,0.8) -- (0.5,0.2);
+\end{tikzpicture}
+\end{center}
 
 The differences in the two algorithms are as follows:
 
@@ -954,23 +978,37 @@ The differences in the two algorithms are as follows:
   \end{tabularx}
 \end{center}
 
-%TODO: What is the standard deviation gene?
-Rechenberger and Schwefel made another algorithm:
+Rechenberger and Schwefel made another algorithm. In this algorithm,
+each gene has an associated standard deviation which affects how it
+mutates. This is an innovation because in the standard approach, the
+sizer of each mutation is the same for all genesand is constant
+throughout the execution of the algorithm. Here, the standard
+deviation for each gene is updated throughout the algorithm, and
+henceforth mutations are different sizes for each gene and changes as
+the algorithm progresses:
 
 \begin{enumerate}
   \item Generate $n$ random individuals
   \item Calculate the fitness of each
   \item Randomly pair up individuals
   \item Recombine them to create two offspring
-  \item Mutate each gene locus with a small probability
+  \item Mutate each gene locus with a small probability based of the
+  gene's standard deviation.
   \item Put the offspring in the new population ($2n$ large)
   \item Select the best $n$
   \item Go back to step 2, or stop.
 \end{enumerate}
 
-% TODO: How is std. deviation incorperated in mutation & recombination
+In this algorithm, the mutation happens in two stages: first the
+standard deviation is mutated first, and then the gene is added to by
+a random number based off the standard deviation.
 
-I should figure out how std. deviation incorporates in here...
+The recombination operator is also slightly different; since each gene
+in the child is the average of the parent gene:
+
+\[
+  (12 , 5 , 34 , 2), (10 , 7 , 30 , 4) \rightarrow (11 , 6 , 32 , 3)
+\]
 
 It is important to note the differences between selection and variation so we
 can get the balance right:
@@ -990,8 +1028,6 @@ Many genetic algorithms progress at very slow rates, but then have short bursts
 of very rapid progress. In general, it is not common for these algorithms to
 have proven convergence properties, but some of them do when applied to simple
 problems.
-
-%TODO: Split this uber sentence up
 
 Deciding when to stop a genetic algorithm isn't always simple; stopping after a
 predetermined number of generations requires lots of trial and error to get the
@@ -1106,7 +1142,11 @@ the depth of the tree to avoid it growing too big or generate a tree
 that can be used as input for the parent node (to avoid creating an
 invalid tree post-mutation), while others have no such constraints.
 
-% TODO: Insert mutation diagram
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/mutation}
+\caption{Mutation of tree.}
+\end{figure}
 
 % Lecture 6
 
@@ -1117,7 +1157,11 @@ each parent to cross over at is chosen at random (meaning that there
 could be a case when most of the tree is inherited from one parent and
 little of it is inherited from another.).
 
-% TODO: Cross over example
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/cross-over}
+\caption{Cross over between two trees.}
+\end{figure}
 
 \subsection{Bloat}
 
