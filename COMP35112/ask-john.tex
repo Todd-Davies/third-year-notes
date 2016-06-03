@@ -1,12 +1,51 @@
+------
+GPU question
+c flops, g flops, b bytes, nxn matrices
+
+Everything in the host, then n^3 floating point multiply-adds. Therefore n^3 flops. Therefore time is (n^3)/c.
+
+Everything in device. 2 x n^2 x 8 (doubles) bytes to transfer, to get time is (2 x n^2 x 8) / b.
+Computation is (n^3)/g.
+Transfer back is (n^2 x 8) / b
+All is (24 x n^2) / b + n^3 / g
+
+Therefore for GPU to be faster:
+
+((24 x n^2) / b) + (n^3 / g) < n^3 / c
+
+Solve for n.
+------
+TLS
+
+Speculative threads need to keep a copy of all the things that
+non-speculative threads have accessed (read and write sets).
+
+Four states; not accessed (N), speculatively loaded (S), modified (M),
+speculatively loaded and modified (SM)
+------
+Stages of a transaction
+
+Start (copy data)
+Run (update local data)
+Commit/Abort (work out if it's okay to commit, then copy data back)
+------
+
+
 - Slide 18, lecture 7: Why is the load linked flag removed if the
 thread is descheduled?
+
+So that you can assume a clean state when the thread resumes, since
+the descheduling takes so long anyway. Load link flag wouldn't carry
+on working during the time that the thread was descheduled.
 
 - Slide 10, lecture 11: TM wouldn't guarantee that you solve the
 problem first time though, right? There may be cases where there are
 no paths and you need to remove routes (i.e. backtrack)?
 
-- GPU Lecture: Is the old architecture of the GPU (pre CUDA) relevant
-for the exam?
+- Lecture 14 (GPU Lecture): Is the old architecture of the GPU (pre
+CUDA) relevant for the exam?
+
+Naah
 
 - Exam questions (technique): on past papers, I find myself putting
 loads down for the first part of the question, and then repeating
@@ -14,7 +53,16 @@ myself later. Any advice?
 
 - 2014 1c) ii); Go over the answer here; what happens to each code?
 
+
+
 - 2014 1d): Check this is correct. MOSEI is a little unclear in the notes
+
+
 
 - 2014 1f): This seems a little short for four marks, but I can't
 think of what else to put
+
+Three bits; part of transaction, read set, write set
+
+
+TODO: Revise lecture 13 (memory consistency)
