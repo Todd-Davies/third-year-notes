@@ -173,6 +173,7 @@
           sizeof(int) * 1000, cudaMemcpyDeviceToHost);
         cudaFree(d_array);
       \end{verbatim}
+    \item 
     \end{itemize}
   \end{enumerate}
 \end{enumerate}         
