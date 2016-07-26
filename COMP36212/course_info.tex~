@@ -1,0 +1,32 @@
+\section*{Overview}
+
+This course will explore certain classes of algorithms for modelling and
+analysing complex systems, as arising in nature and engineering. These examples
+include: flocking algorithms - e.g., how schools of fish or flocks of birds
+synchronised; optimisation algorithms; stability and accuracy in numerical
+algorithms.
+
+\section*{Aims}
+
+By the end of the course, students should:
+\begin{itemize}
+\item Appreciate the role of using nature-inspired algorithms in
+computationally hard problems.
+\item Be able to apply what they learnt across different disciplines.
+\item Appreciate the emergence of complex behaviours in networks not present in
+the individual network elements.
+\end{itemize}
+
+\section*{Syllabus}
+ %TODO: Put syllabus in
+
+\section*{Attribution}
+
+These notes are based off of both the course notes (found on Blackboard). Thanks
+to the course staff (<names>) for such a good course! If you find any errors,
+then I'd love to hear about them!
+
+\section*{Contribution}
+
+Pull requests are very welcome:
+\url{https://github.com/Todd-Davies/third-year-notes}

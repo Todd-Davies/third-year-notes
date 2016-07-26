@@ -8,3 +8,16 @@
 % Meta
 \author{\Author}
 \title{\Title}
+
+% Commit id
+\newcommand\commit{%
+  \ifdefined\commitId
+    Commit: \texttt{\commitId}
+  \fi
+}
+% Build id
+\newcommand\build{%
+  \ifdefined\buildId
+    Build: \texttt{\buildId}
+  \fi
+}

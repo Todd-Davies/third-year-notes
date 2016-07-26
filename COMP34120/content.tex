@@ -7,15 +7,17 @@
 In Semester One, of this course we covered zero and non-zero sum games (Nash
 games) and search algorithms to find equlibriums (minimax and alpha beta
 pruning). In this semester, we are no longer assuming that each player has the
-same `role' and the games are zero-sum. We are letting there be an infinite
-number of positions for each player and not assuming perfect information.
+same `role' and that the games are zero-sum. We are letting there be an infinite
+number of positions for each player to take and not assuming that players have
+perfect information.
 
 We're going to be looking at Stackelberg games; an example of which could be
 retail pricing. Different firms might offer different prices on products, they
-can choose infinite price points (or close enough) and some firms might have
-private information that others might not.
+can choose a price from an infinite set (the real numbers) and some firms might
+have private information that others might not\footnote{Typical examples of
+unknown information include payoff functions or unit cost.}.
 
-An industry can be controlled or dominated by a one, more or entity:
+An industry can be controlled or dominated by a one, two or multiple entities:
 
 \begin{description}
   \item \textbf{Monopoly}: When an industry consists of a single firm.
@@ -31,33 +33,39 @@ motivations behind the initial move.
 
 In a two player Stackelberg game, one player selects his strategy first, and
 then the other responds. The first player is called the leader ($P_L$) and the
-second is called the follower ($P_F$). In a Nash game, the players select their
-strategy simultaneously.
+second is called the follower ($P_F$). This contrasts with Nash games, where all
+of the players select their strategies simultaneously.
 
-There are payoff functions for the leader and follower, where each player wants
-to maximise their own:
-
-\[
-  J_L(U_L, U_F)
-\]
+Both the leader and follower have payoff functions\footnote{A payoff function
+indicates the benefit for that player given the chosen strategies of all the
+players.}, which they want to maximise:
 
 \[
-  J_F(U_L, U_F)
+  \begin{split}
+  &J_L(U_L, U_F)\\
+  &J_F(U_L, U_F)
+  \end{split}
 \]
 
 A strategy space is the set of all possible strategies for a single player. The
 leader's strategy space is $U_L$ and the follower's is $U_F$. They can include
-finite (discrete) or infinite (continuous) strategies. The leader must choose
-$u_L \in U_L$ and the follower must choose $u_F \in U_F$.
+finite (discrete) or infinite (continuous) strategies. To play the game, the
+leader must first choose some strategy $u_L \in U_L$ and then the follower must
+choose some strategy $u_F \in U_F$.
 
-% Slide 20??
-
-In a Stackelberg game, the leader first announces his strategy $u_L$, and then
-the follower selects his best response $R(uL) \in U_F$ which maximises:
+In a Stackelberg game, when the leader has announced $u_L$, the follower selects
+a strategy using their reaction function $R(u_L) \in U_F$ such that:
 
 \[
   J_F(u_L, R(u_L)) = MAX_{u_F \in U_F} J_F(u_L, u_F)
 \]
+
+This looks complicated, but what it says is that the payoff for the follower is
+given the parameters $u_L$ and $u_F$. The follower obviously wants to maximise
+their payoff, and so tries to find the strategy $u_F \in U_F$ that will maximise
+their payoff. This isn't always easy, since enumerating every possible strategy
+and knowing what will happen if any given strategy is deployed is sometimes
+impossible.
 
 In order to solve a Stackelberg game, we need to solve the following problem:
 
@@ -66,14 +74,15 @@ In order to solve a Stackelberg game, we need to solve the following problem:
   \item When we've found that, what leader strategy $u_L$ maximises the leader's
   payoff function:
   \[
-    J_L(u^*_L, R(u^*_L)) = MAX_{u_L \in U_L} J_L(u_L, u_L)
+    J_L(u^*_L, R(u^*_L)) = MAX_{u_L \in U_L} J_L(u_L, u_F)
   \]
 \end{itemize}
 
-If the follower has a reaction function $R(U_L)$ and there exists a leader
-strategy $U^*_L \in U_L$ and the response strategy is $u^*_F = R(U^*_L) \in U_F$
+If the follower has a reaction function $R(u_L)$ and there exists a leader
+strategy $u^*_L \in U_L$ and the response strategy is $u^*_F = R(U^*_L) \in U_F$
 such that $J_L(u^*_L, u^*_F) = MAX_{u_L \in U_L} J_L(u_L, R(u_L))$, then
-$(u^*_L, u^*_F)$ is called a \textbf{Stackelberg strategy/equilibrium}.
+$(u^*_L, u^*_F)$ is called a \textbf{Stackelberg strategy/equilibrium}; i.e.
+both sides are paying an optimal strategy.
 
 We always assume that the follower is rational and tries to find the best
 reaction strategy. Sometimes this is untrue, for example if taking a non-optimal
@@ -81,15 +90,16 @@ strategy results in a rival player having a big loss.
 
 For a player to be a leader, he needs to act first. There is no requirement that
 they are a leader in an economic or political sense. The only requirement to be
-a follower is to act second; the follower is not necessarily in a weaker
-position. As mentioned before, Stackelberg games can be continuous or discrete,
-depending on if the strategy space is finite or infinite.
+a follower is to react to the leader's strategy\footnote{Note that this does not
+mean the follower is in a weaker position.}. As mentioned before, Stackelberg
+games can be continuous or discrete, depending on if the strategy space is
+finite or infinite.
 
 Since the only difference between a Nash game and a Stackelberg game is whether
 moves are played simultaneously or in order, should we prefer Nash or
 Stackelberg games? If the player has the opportunity to be the leader, then
-Stackelberg games should be preferred, since he will always be better off than in
-a Nash game in this instance. Here's a mini-proof:
+Stackelberg games should be preferred, since he will always be better off than
+in a Nash game in this instance. Here's a mini-proof:
 
 Let $u_1$ and $u_2$ be the strategies for player's one and two, and let
 $J_1(u_1, u_2)$, $J_2(u_1, u_2)$ be their respective payoff functions. If there
@@ -98,10 +108,6 @@ is a Stackelberg strategy and a Nash strategy, then:
 \[
   J_1(u^{Stackelberg}_1, u^{Stackelberg}_2) \geq J_1(u^{Nash}_1, u^{Nash}_2)
 \]
-
-I don't understand the next bit on page 29...
-
-% TODO: Understand proof on P29
 
 Note that sometimes the follower can be better off in a Stackelberg game, but
 the leader would still be better off playing the Stackelberg game than playing a
@@ -143,7 +149,7 @@ problems. This is A-level maths, but we can recap it in the next bit.
 We want to find a point $x^* \in X$ that maximises $f(x)$ over $X$, such that
 $\forall x \in X, f(x^*) \geq f(x)$. Such a point is called the global maximum
 point of $f(x)$ on $X$. A local maximum point $y^*$ is the maximum value of
-$f(x)$ within the region $U$, such that $\forall x \in U, f(y^*) \geq f(x)$.
+$f(x)$ within the region $X$, such that $\forall x \in X, f(y^*) \geq f(x)$.
 
 \begin{figure}
   \centering
@@ -162,11 +168,14 @@ function at a specific point. If $f'(x) > 0$, then the line slopes upwards, and
 if $f'(x) < 0$ then it's sloping down. Obviously if it is equal to zero, then
 the line is horizontal.
 
-%TODO: Is this finding derivitives linear time?
+\marginpar{Question: Is this finding derivatives linear time? I think that you'd
+parse the input function into an AST\footnote{Abstract Syntax Tree}
+(linear time) with an LL(1) grammar, then repeatedly apply rules for
+finding the derivative (which is probably poly-time).}
 
 \subsubsection{Calculating a derivative}
 
-The most simple rule is: 
+The most simple rule is:
 
 \[
   f(x) = x^n \therefore f'(x) = nx^{n-1}
@@ -188,7 +197,12 @@ Here are three simple examples:
   f(x) = x^3 \therefore f'(x) = 3x^2
 \]
 
-If a function is composed of other functions that are added together (of the form $f(x) = f_1(x) + \dots + f_n(x)$ then:
+\[
+  f(x) = 5 \therefore f'(x) = 0
+\]
+
+If a function is composed of other functions that are added together (of the
+form $f(x) = f_1(x) + \dots + f_n(x)$ then:
 
 \[
   f'(x) = f_1'(x) + \dots + f_n'(x)
@@ -222,7 +236,7 @@ indicating that the point is a maxima.
 To find the largest maxima, we simply find the one that is largest value of
 $f(x)$.
 
-% See slide 15
+% Lecture 3
 
 \section{Solving Stackelberg game problems}
 
@@ -251,9 +265,12 @@ This is essentially the profit per unit (sale price minus cost) multiplied by
 the number of units sold in the sale. The sale function is given to you in exam
 questions and is a quadratic function over $u_L$ and $u_F$.
 
-We want to find the values of $u_L$ and $u_F$. To do this, we first
-differentiate $J_F$., then we differentiate $J_L$ and sub in the value for $u_F$
-we found in the first stage so we can get answers. Here is an example:
+We want to find the optimal values for $u_L$ and $u_F$. To do this, we
+first differentiate $J_F$., then we differentiate $J_L$ and sub in the
+value for $u_F$ we found in the first stage so we can get
+answers. Lets do an example; given the following situation, we want to
+find the follower's reaction function, and then an optimal values for
+$u_L$ to give us maximum profit:
 
 \[
   J_L(u_L, u_F) = (u_L - c_L) \times S_L(u_L, u_F)
@@ -288,7 +305,7 @@ To get the reaction function, we differentiate $J_F$:
 
 If we differentiate again, we see that this is a maxima ($-4 > 0$).
 
-We can rearrange it so that: $R(u_L) = \frac{u_L}{4} + 2$.
+We can rearrange it so that: $J_f'(U_L,U_F) = R(u_L) = \frac{u_L}{4} + 2$.
 
 Now we can sub in the value for $u_F$ into $J_L$:
 
@@ -305,7 +322,9 @@ And differentiate:
   \frac{d}{du_L}J_L(u_L, R(u_L)) = \frac{1}{4}(35 - 14u_L) = 0
 \]
 
-If we rearrange that, we get $u_L = \frac{35}{14}$, therefore $u_F = 2.625$.
+If we rearrange that, we get $u_L = \frac{35}{14}$, therefore $u_F =
+2.625$, which are the optimum values of $U_L$ and $U_F$ in terms of
+the leader profit.
 
 This means the profits are:
 
@@ -337,8 +356,7 @@ We're interested in the ML solution, but the obvious solutions are:
 \begin{itemize}
   \item Choose to be the follower. Then we don't have to decide on the first
   strategy, and can just choose a reaction. However, this isn't always possible
-  (sometimes you're forced to move first), and in some games, the follower may
-  always win.
+  (sometimes you're forced to move first).
   \item Find the best strategy for the worst scenario; that is to say we should
   find the best, worst strategy:
   \[
@@ -358,28 +376,28 @@ any chosen $u_L$.
 
 The approach we're going to use to do this is called linear regression. This
 involves finding a linear function that gives similar values to what the
-follower has done in the past. You could also use a polynomial function or a
+follower has done in the past. You could also use a polynomial function, a
 neural network (neural networks are called the \textit{universal approximation},
-since they can mimic any function).
+since they can mimic any function), or many other different techniques.
 
 So, if $y = R(x)$ be the unknown function, and imagine we have a set of $T$
 datapoints where we know the input $x$ and the value $y$. We want to make a new
 function $\hat{R}(x)$ that will approximate $R(x)$.
 
-We define $\epsilon(x) = R(x) - \hat{R}(x)$, and try to make $\epsilon$ as small
-as possible for all values of $x$. Unfortunately, since we don't know $R$, we
-can't work out $\epsilon$. However, we can work out the value of $\epsilon$ for
-all the datapoints we do have:
+We define $\epsilon(x) = R(x) - \hat{R}(x)$, and try to make
+$\epsilon$ as small as possible for all values of $x$. Unfortunately,
+since we don't know $R$, we can't work out $\epsilon$. However, we can
+work out the value of $\epsilon$ for all the datapoints we do
+have. Making the following function (called the least square
+criterion) as small as possible is the aim of the regression:
 
 \[
   \sum^T_{t=1}\epsilon^2[x(t)] = \sum^T_{t=1}\left(y(t) - \hat{R}(x(t))\right)^2
 \]
 
-Trying to make this value as small as possible is our goal. The value is called
-the least square criterion.
-
-Designing a function is problem dependent, but we know our reaction function
-will be linear:
+Designing a function is problem dependent, but we know our reaction
+function will be linear (because we're not considering other functions
+in the course):
 
 \[
   R(x) = a + bx
@@ -399,15 +417,13 @@ maximisation problem:
   max_{a,b} - \sum^T_{t=1}\left(y(t) - (a + b x(t)))\right)^2
 \]
 
-Of course, we can use partial differentiation to do this (just like in
-\texttt{COMP36212}), where you eventually get:
+We can use partial differentiation to do this (just like in
+\texttt{COMP36212}), but it's tricky, so this is what you will eventually get:
 
 \[
-  a = \frac{
-    \sum^T_{t=1}x^2(t)\sum^T_{t=1}y(t) - \sum^T_{t=1}x(t)\sum^T_{t=1}x(t)y(t)
-  }{
-    T\sum^T_{t=1}x^2(t) - (\sum^T_t{=1}x(t))^2
-  }
+  a = \frac{ \sum^T_{t=1}x^2(t)\sum^T_{t=1}y(t)
+    - \sum^T_{t=1}x(t)\sum^T_{t=1}x(t)y(t) }{ T\sum^T_{t=1}x^2(t) -
+    (\sum^T_t{=1}x(t))^2 }
 \]
 
 \[
@@ -583,7 +599,7 @@ Situation for the seller (mechanism designer) is as follows:
     F(x_1, \dots, x_n) = \sum\limits^n_{i=1} v_ix_i
   \]
   \item In a single parameter environment, there is a constraint meaning that
-  one agent can be alocated at most one item( with $x_i$ units in it).
+  one agent can be allocated at most one item( with $x_i$ units in it).
 \end{itemize}
 
 The problem is that we want to design a \textit{sealed bid auction}, and need
@@ -609,12 +625,12 @@ following characteristics:
 
 \begin{itemize}
   \item DSIC; Truthful bidding should always be the dominant strategy and never
-  lead to a negtive utility.
+  lead to a negative utility.
   \item We want to maximise $\sum^n_{i=1}v_ix_i$ (social surplus).
   \item Each bidder gets only one item, and each item can only be assigned to 
   one bidder. This can be defined mathematically:
   \begin{itemize}
-    \item[] There are $k$ items ($k>0$), amd $n$ bidders.
+    \item[] There are $k$ items ($k>0$), and $n$ bidders.
     $x = (x_1, \dots, x_n)$ is the assignment of items to bidders, and $x_i$ is
     either $0$ or $1$, representing whether bidder $i$ won an item. The 
     following must hold:
@@ -655,7 +671,7 @@ design such an algorithm we can work in two steps:
 \begin{description}
   \item \textit{Step 1}:\\
     Assume that the bidders will bid truthfully (assume DSIC). Decide how to 
-    assign bidders to items as to maxmimse social surplus with a poly time
+    assign bidders to items as to maximise social surplus with a poly time
     algorithm.
   \item \textit{Step 2}:\\
     Given our answer for step 1, decide how to set our selling prices so that
@@ -725,3 +741,144 @@ calculated that bidding lower or higher than $v_i$ gives a lower value for the
 utility function, since if $b_i < v_i$ then the bidder may get a smaller item
 and lose profitable units, and if $b_i > v_i$ then the bidder may get a bigger
 item, but these additional units are not profitable.
+=======
+\section{Mechanism Design}
+
+Mechanism design involves taking an engineering approach to designing
+economic mechanisms or incentives in order to steer the outcome of
+events/transactions/games etc towards a desired objective. As with the
+Nash games in semester one, and the Stackleberg games in the first
+part of semester two, it is always assumed that the players will act
+rationally. Since we start from the desired outcomes, and design a
+game to produce these outcomes, mechanism design is also known as
+\textit{reverse game theory}.
+
+\subsection{A toy example}
+
+A simple example is that of a mother dividing a cake for her two
+children, with a view to them both getting exactly half since
+otherwise they will complain. If the mother cuts the cake as equally
+as she can, then there is a risk that one or both of the children will
+have a different view on the size of the pieces to her, and will want
+a specific piece.
+
+\marginpar{Think about how this would work for $n$ children.}
+
+The solution is to have one child cut the cake into two pieces, but
+then let the other child have first pick of the pieces. Then, no
+matter if the first child cuts the cake evenly or not, the second
+child will take whichever one that they think is biggest, and since
+the first child cut the cake in the first place, they shouldn't (in
+theory) contest the choice.
+
+\subsection{A real example}
+
+There are lots of more interesting examples of mechanism design, such
+as the government assigning licences to mobile operators. If we view
+the government as one player, and the different mobile operators as
+$n$ different players, then it is easy to see their differing aims.
+The government wants to allocate a licence to whoever values it the
+most highly since an operator who highly values the licence is likely
+to use it best for their customers and maximise \textit{social
+surplus}. The goal of mobile operators is to maximise their own profit
+(i.e. to minimise the price they actually pay for the licence).
+
+If the government could simply ask for an honest recommendation of
+each mobile operator's valuation of the licence, then they could
+simply give the licence to the highest valuing operator. However,
+since the government does not know the \textit{true} valuation (as
+opposed to whatever the operator may tell the government) of the
+licence by each operator, they cannot really know who to give it to.
+
+Other than asking for the valuation, the government could also require
+the operators to pay their valuation when they submit it (so that they
+don't overstate their valuation), but then they would likely
+understate their valuation to save money. The solution is to allocate
+the licence to the operator with the highest valuation, but have them
+pay the \textit{second highest} valuation.
+
+If this is done, then the operator would not report a higher valuation
+than their true valuation as it would not be profitable (since they
+would only pay the second highest), if they bid lower than their true
+valuation they might lose the chance of winning, and the operators
+would be willing to participate in the first place (and bid their true
+valuation) since it is profitable if the win, and they don't lose if
+they don't win.
+
+% NOTE: I skipped all the history of mechanism design bits.
+
+\subsection{Defining `Mechanism Design'}
+
+From the lecture notes:
+
+\begin{quote}
+  Mechanism design is the sub-field of microeconomics and game theory
+  that considers how to implement good system-wide solutions to
+  problems that involve multiple self-interested agents, each with
+  private information about their preferences.
+\end{quote}
+
+Overall, there are $n$ players (aka agents), and each player has some
+private information and will try to maximise their own payoff (aka
+utility) function\footnote{Note that the strategy space over which the
+payoff function is defined is not itself defined until the mechanism
+has been designed.}.
+
+There is a mechanism designer such as the government in the mobile
+operator's spectrum example above. The designer does not know the
+private information of each agent, but wants to achieve some desired
+outcome such as maximising the social welfare (e.g. a government) or
+their own profit (e.g. a private seller).
+
+So, we need to design the rules of the game in order to coerce a
+desirable outcome based on agent strategies.
+
+\subsubsection{A Mathematical Definition}
+
+The outcome is the set $\Omega$, and the players are $i \in I$ where
+$I$ is the set of players and $|I| = N$. The private information of
+each player is $\theta_i \in Theta_i$.
+
+The utility function for each player is $u(o,\theta_i)$ for the
+player's information set $\theta_i$ and the outcome $o \in \Omega$.
+
+A mechanism is a pair $M = (S,g)$ where $S$ is the strategy space $S^N
+= S_1 \times \dots \times S_N$ where player $I$ chooses a strategy
+$s_i(\theta_i) \in S_i$ and $s_i$ maps the set of information sets
+onto the set of strategies available to the player
+$s_i: \Theta_i \rightarrow S_i$. The outcome function is $g:
+S^N \rightarrow \Omega$.
+
+Finally, a game is the utility to player $i$ from their strategy
+profile; $u_i(g(s(\theta)), \theta_i)$.
+
+We want to make a mechanism $M = (S,g)$ where
+$g(s_1(\theta_1)), \dots, s_N(\theta_N)) =
+f(\theta), \forall \theta \in \Theta^N$, such that $(s_1,\dots,s_N)$
+is an equilibria.
+
+\subsection{Implementing Mechanisms}
+
+There is always a danger that if there are multiple equlibria in a
+mechanism, then the participants of the game may end up stuck in some
+sub-optimal equlibria. We want to create a mechanism where all of its
+equlibria are optimal to avoid this conundrum, which can only be done
+if the mechanism is a maskin monotonicity.
+
+% TODO Make sure to explain somewhere what a masikn monotonicity is.
+
+\subsection{Why Do We Care About Mechanism Design?}
+
+Mechanism design has wide applications in applied CS, such as in
+internet routing, job scheduling, peer to peer systems, cryptography
+etc. Mechanism design has some complicated computational problems, and
+often requires effective algorithms to solve it.
+
+\subsection{Single Item Auctions}
+
+If we want to sell one item to $n$ bidders who all want to maximise
+their utility (the value they give the item minus the price they pay
+for it), then we need to create an auction to solicit the bids and
+choose the winner (and how much the winner pays). At first, this seems
+like a trivial problem, but in fact it has many intricacies.
+

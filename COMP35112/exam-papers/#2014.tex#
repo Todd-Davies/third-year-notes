@@ -1,0 +1,181 @@
+\documentclass{report}
+
+\usepackage{tabularx}
+
+\begin{document}
+
+\begin{enumerate}
+\item
+  \begin{enumerate}
+  \item Cache coherence is a key feature in chip multiprocessor design
+    because it allows multiple cores to have the same view of
+    memory. This is important since it allows for the maximum amount
+    of coordination and collaboration between cores, which in turn,
+    lets programmers obtain a maximal performance from parallelising
+    programs.
+
+    Cache coherency is important because it avoids the need for each
+    write to memory to be written \textit{all the way} to memory
+    (which can take many hundreds of CPU cycles in the worst case),
+    but instead lets memory be written to a fast cache (which can take
+    one cycle, or only a few cycles) and written later, while
+    maintaining the semantics of the computation on the accessing core
+    and other cores. This also applies when reading values from
+    memory.
+  \item Modified means that a core has written to the memory location,
+    but the write has not been propagated through to main memory.
+
+    Shared means that this cache holds the up-to-date value of a
+    memory location, and at least one other cache holds the same
+    value.
+
+    Invalid means that the value held for the memory location has been
+    updated by either another CPU core or a DMA operation since the
+    memory location was loaded.
+  \item
+    \begin{enumerate}
+      \item This is what the MESI protocol does. The advantage of
+        having the `exclusive' state is that the core does not need to
+        send out an invalidate broadcast on the system bus if it
+        writes to the value.
+      \item This is an optimisation since one core could evict the
+        cache line from its cache and not have to write the line back
+        to memory, since the other cache still retains the updated
+        value, and this cache would go to state M or O depending on if
+        there was more than one core sharing the value. This is the
+        MOSEI protocol (Owned).
+    \end{enumerate}
+  \item
+    \begin{tabularx}{\textwidth}{llX}
+      Cycle & States & Explanation\\ \hline
+      1.    & EII    & Core one has loaded x and is the only core to
+      have done so\\
+      2.    & SSI    & Both core one and two have loaded x; they're
+      both in the shared state\\
+      3.    & SSI    & Add does nothing to memory\\
+      4.    & SSI    & Add does nothing to memory\\
+      5.    & MII    & Core one writes to the cache, and invalidates
+      core two.\\
+      6.    & OIS    & Core three loads the value, and receives it
+      directly from core one, which becomes an owner\\
+      7.    & OIS    & Add does nothing\\
+      8.    & IIM    & Core three's write invalidates core one. Core
+      one may write back to memory now if this is not optimised out.\\
+      9.    & IMI    & Core two writes its value to memory, and
+      invalidates core three, which may write back.\\
+    \end{tabularx}
+  \item Since the threads do not synchronise their memory accesses,
+    the actual order that their instructions are executed is not
+    defined at runtime. If two threads read the same value from
+    memory, they then both add one to it, and then write back one
+    after the other, then the location will only be incremented
+    once. The memory location could be incremented by either one two
+    or three. (Include example run in exam for each case)
+  \item Transactional memory would require bits to indicate whether
+    the cache line is in the readset or writeset of the
+    transaction. This can be done with two extra bits (one for each
+    set). These bits are then used at the end of transactions
+    (assuming lazy conflict detection) to determine whether it is safe
+    to commit the transaction.
+  \end{enumerate}
+\item
+  \begin{enumerate}
+  \item Synchronisation constructs are required in Java since it is a
+    high level language, and single statements compile down to many
+    machine instructions. As a result, these statements do not happen
+    atomically at runtime, for example, incrementing an integer would
+    be a RMW (read, modify, write) operation.
+
+    \begin{verbatim}
+      LOAD R1, x
+      ADD R1, R1, #1
+      STORE R1, x
+    \end{verbatim}
+
+    If two threads were to execute this code at the same time, then
+    they could both read, both increment their own registers, and then
+    both write. The result would be that the memory location would be
+    incremented once, not twice.
+
+    Synchrnoisation constructs in Java let the compiler know to use
+    atomic operations such as load-link and store conditional.
+  \item Blah
+  \item Long pipelines make CISC instructions slooow.
+  \item
+    \begin{verbatim}
+      loop LDR R1, semaphore
+           CMP R1, #1
+           BNE loop
+           LDL R1, semaphore
+           CMP R1, #1
+           BNE loop
+           MOV R1, #1
+           STC R1, semaphore
+           CMP R1, #1
+           BNE loop
+           MOV PC, LR
+    \end{verbatim}
+  \item The first time that STC happens, the load link flag will be
+    cleared, so that the second time it happens, the load link flag
+    will not be set and the whole thing will reset. In short, you
+    cannot nest load linked instrucitons.
+  \item Obtain one lock, then spin wait to obtain the other. Problem;
+    you might get deadlock if two threads wait on each other.
+  \end{enumerate}
+\item This question is okay.
+\item
+  \begin{enumerate}
+  \item Main architecutral features are:
+    \begin{itemize}
+    \item GPGPU's have a massively parallel architecture that utalises
+      Streaming Multiprocessors (SM's) to run SIMD style
+      computations. GPU's also have their own on-board memory which
+      makes up a completely seperate address space from that of the
+      rest of the system. In order to do useful computation, data is
+      transferred over a fast (and wide) bus to the GPU where it is
+      stored in GPU memory (usually facilitated by DMA).
+
+      Each SM has multiple `cores' (or `CUDA cores' using NVIDIA's
+      terminology), each of which is a relatively simple processor
+      with a small amount of cache, a short pipeline and a reduced
+      instruction set (very RISC). Most of the die area on a GPU core
+      is dedicated to the ALU's rather than control logic or cache,
+      since latency is sacrificed for throughput in GPU computations.
+    \item CUDA and OpenCL build on the existing language to let
+      programmers provide hints of how to parallelise, while mostly
+      leaving the low level details to the framework (thought with
+      both libraries you can be specific about how parallelisation is
+      done).
+
+      For example, with CUDA, you write kernels which are executed on
+      the GPU device in a massively parallel manner. Each kernel is
+      initialised on multiple threads, and the number of threads over
+      which the kernel is started is defined using the `dim3'
+      construct. A grid size and a block size is given (the total
+      number of threads launched is equal to the size of the grid
+      multiplied by the size of each block in the grid). For example:
+
+      \begin{verbatim}
+        __global__ myKernel(int* array) {
+          int id = threadId.x + (blockDim.x * blockId.x);
+          array[id] = array[id] + 1;
+        }
+
+        ...
+
+        int* h_array, d_array;
+        h_array = calloc(sizeof(int) * 1000);
+        cudaMalloc(&d_array, sizeof(int) * 1000);
+        cudaMemcpy(d_array, h_array,
+          sizeof(int) * 1000, cudaMemcpyHostToDevice);
+        myKernel<<<dim3(10,1,1), dim3(10, 10, 1)>>>(d_array);
+        cudaMemcpy(h_array, d_array,
+          sizeof(int) * 1000, cudaMemcpyDeviceToHost);
+        cudaFree(d_array);
+      \end{verbatim}
+    \item 
+    \end{itemize}
+  \end{enumerate}
+\end{enumerate}         
+
+\end{document}

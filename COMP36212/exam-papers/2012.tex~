@@ -1,0 +1,21 @@
+\documentclass{report}
+
+\begin{document}
+
+\begin{enumerate}
+\item Didn't answer this one
+\item
+  \begin{enumerate}
+  \item Evolutionary algorithms are driven by selection and variation.
+
+    Selection aims to remove members of the population that have a low
+    fitness, and retain individuals with a high fitness in the
+    population. This can be achived through a variety of methods, but
+    usually starts with scoring each individual against the value of
+    an objective function, and then using a weighted random selection
+    to determine which individuals to remove from the population (such
+    as with a roulette wheel, stochastic ranking or a tournament).
+  \end{enumerate}
+\end{enumerate}
+
+\end{document}

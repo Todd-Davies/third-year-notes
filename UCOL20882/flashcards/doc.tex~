@@ -1,0 +1,1285 @@
+\documentclass[frontgrid]{flacards}
+\usepackage{color}
+% For funky database symbols
+\usepackage{newlfont}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{mathtools}
+
+\definecolor{light-gray}{gray}{0.75}
+
+\newcommand{\frontcard}[1]{\textcolor{light-gray}{\colorbox{light-gray}{$#1$}}}
+\newcommand{\backcard}[1]{#1} 
+
+\newcommand{\flashcard}[1]{% create new command for cards with blanks
+    \card{% call the original \card command with twice the same argument (#1)
+        \let\blank\frontcard% but let \blank behave like \frontcard the first time
+        #1
+    }{%
+        \let\blank\backcard% and like \backcard the second time
+        #1
+    }%
+}
+
+\begin{document}
+
+\pagesetup{2}{4}
+
+\flashcard{Each DNA molecule is packed into a \blank{chromosome}.}
+
+\flashcard{\blank{Genes} contain instructions for making
+  \blank{proteins}.}
+
+\flashcard{The two strands of DNA twist to form a \blank{double
+    helix}.}
+
+\flashcard{When replicating, the \blank{hydrogen bonds} between the
+  DNA strands break, and \blank{new bases} come to bind with the
+  exposed ones on the separated strands to form new strands.}
+
+\flashcard{Proteins act alone or in \blank{complexes} to perform many
+  cellular functions.}
+
+\card{The four DNA bases are...}{Adenine, Thymine, Guanine, Cytosine}
+
+\flashcard{A \blank{sugar-phosphate} backbone provides structure for
+  the DNA.}
+
+\flashcard{\blank{Hydrogen} bonds hold the two strands of DNA
+  together.}
+
+\flashcard{\blank{Adenine} binds to \blank{Thymine}, \blank{Cytosine}
+  binds to \blank{Guanine.}}
+
+\flashcard{Before a cell divides, its DNA is duplicated using
+  \blank{semi-conservative replication}.}
+
+\card{What is the Karyotype?}{The 23 pairs of chromosomes in the
+  cell.}
+
+\card{What is an autosome?}{One of the 22 pairs of normal chromosomes
+  in humans.}
+
+\card{In addition to the autosomes, what other chromosomes are
+  there?}{One pair of sex chromosomes.}
+
+\flashcard{\blank{Meiosis} is the process where a sperm producing cell
+  or an egg producing cell makes a new cell with 23 chromosomes.}
+
+\flashcard{\blank{Mitosis} is when an exact replica of the genome is
+  made (46 chromosomes).}
+
+\flashcard{\blank{Meiosis} is when only one chromosome from each pair
+  is passed on to the new \blank{gamete} (sperm/egg).}
+
+\flashcard{DNA $\xrightarrow[]{\blank{transcription}}$ RNA
+  $\xrightarrow[]{\blank{translation}}$ protein}
+
+\flashcard{When a gene is \blank{transcribed}, it forms many
+  \blank{RNA} molecules.}
+
+\flashcard{\blank{RNA} molecules get \blank{translated} into
+  proteins.}
+
+\card{Define an allele}{Any of several forms of a gene, usually
+  arising through mutation. Alleles are responsible for hereditary
+  variation.}
+
+\card{Define polymorphism (in the context of DNA)}{The existence of
+  several alleles for one gene locus. Individuals have one or two
+  alleles per locus.}
+
+\flashcard{\blank{Homozygous} is when a person has two copies of one
+  allele on a gene locus.}
+
+\flashcard{\blank{Heterozygous} is when a person has two different
+  alleles on a gene locus.}
+
+\flashcard{A gene is \blank{recessive} if the \blank{mutated} protein
+  that it produces can be compensated for by the correct protein
+  produced by \blank{an alternative allele}.}
+
+\flashcard{If a mutated gene produces proteins that fulfil a new
+  function, then it may be \blank{co-dominant}, since the original
+  function will be fulfilled by \blank{the other allele}.}
+
+\flashcard{Genes can be \blank{recessive}, \blank{dominant} or
+  \blank{co-dominant}.}
+
+\card{Define genotype.}{The genetic make-up of an individual, which
+  includes the genes or alleles present in it.}
+
+\card{Define phenotype}{The physical appearance of an individual,
+  including its observable or measurable traits.}
+
+\flashcard{The phenotype is controlled by \blank{proteins} derived
+  from \blank{genes}, and the \blank{environment}.}
+
+\card{What bloodgroup is made from two co-dominant alleles?}{AB}
+
+\flashcard{ Blood groups:
+  \begin{tabular}{>{$}c<{$}|>{$}c<{$}>{$}c<{$}>{$}c<{$}}
+        & I^A & I^B & i\\ \hline I^A & \blank{A} & \blank{AB} &
+    \blank{A}\\ I^B & \blank{AB} & \blank{B} & \blank{B}\\ i &
+    \blank{A} & \blank{B} & \blank{O}
+  \end{tabular}
+}
+
+\flashcard{Allele frequency is linked to \blank{the fitness it
+    provides} to its \blank{carriers} in a given \blank{environment}.}
+
+\card{Define genetic fitness}{The reproductive success of a genotype,
+  measured as the number of offspring produced by and individual that
+  survive to a reproductive age relative to the average age for the
+  population.}
+
+\flashcard{If an allele provides \blank{an advantage}, it is likely to
+  \blank{persist} and become \blank{more prominent} in a given
+  population.}
+
+\flashcard{Mutations have allowed us to \blank{diversify} our
+  diet. This includes a mutation that lets us produce \blank{lactase}
+  during adulthood (to drink milk) and another one that reduces the
+  function of a \blank{bitter substance taste receptor} allowing us to
+  eat broccoli and sprouts! This is an example of \blank{natural
+    selection}.}
+
+\flashcard{Carriers of \blank{sickle cell anaemia} alleles are
+  \blank{asymptomatic} and get protection from malaria.}
+
+\flashcard{Carriers of \blank{sickle cell anaemia} alleles die if they
+  are \blank{homozygous} since their haemoglobin does not function
+  well.}
+
+\flashcard{People \blank{homozygous} for a mutation affecting
+  \blank{CCR5} are asymptomatic and immune to HIV. Probably because
+  this gave protection against \blank{the plague} and \blank{smallpox}
+  in the past. This mutation is less effective against pathogens from
+  \blank{developing countries}.}
+
+\flashcard{Environment interaction can influence the
+  genotype. \blank{Himalayan rabbits} and \blank{arctic foxes} are
+  sensitive to temperature, and change colour at different
+  temperatures. This is caused by temperature sensitive
+  \blank{tyrosine}.}
+
+\flashcard{The environment affects the phenotype; a \blank{worse diet}
+  can make a human twin grow to be smaller, and flowers have
+  \blank{different colours} based on the soil \blank{pH}.}
+
+\flashcard{Most \blank{phenotypes} are due to several genes and the
+  environment (e.g. \blank{skin colour}, \blank{height},
+  \blank{weight}).}
+
+\flashcard{A greater similarity between \blank{identical twins} for a
+  particular \blank{trait} compared to \blank{fraternal twins}
+  provides evidence that \blank{genetic} factors play a role.}
+
+\flashcard{\blank{Identical} twins share all their genes and their
+  home environment. \blank{Fraternal} twins share \blank{half} their
+  genes and a home environment.}
+
+\card{Define a mutation}{A \textbf{permanent} alteration in the DNA
+  sequence passed on into daughter cells (and sometimes gametes).}
+
+\flashcard{The size of mutations ranges from \blank{a single base
+    pair} (\blank{single nucleotide polymorphism} - SNP) to
+  \blank{large segments of a chromosome} (\blank{chromosome
+    rearrangement})}
+
+\flashcard{SNP mutations are \blank{micro-mutations}, chromosome
+  rearrangements are \blank{macro-mutations}}
+
+\card{Define a hereditary mutation.}{A mutation inherited from a
+  parent gamete and present throughout a person's life and in every
+  cell in their body. This can be passed on to progeny through
+  meiosis.}
+
+\card{Define an acquired (somatic) mutation.}{When a mutation occurs
+  at some point in a person's life, and is present only in the cell
+  that it occurred and it's daughter cells (through mitosis).}
+
+\card{Environmental factors that cause mutations include...}{Mutagens;
+  chemicals, radiation etc that causes breaks between DNA
+  bases. Biological factors such as viruses that can integrate into
+  the genome and cause disturbances in the DNA.}
+
+\card{Intrinsic factors causing mutations include...}{Errors during
+  DNA replication (before mitosis) and repair. Errors during meiosis
+  (e.g. an error in chromosome separation).}
+
+\flashcard{Macro mutations occur during \blank{meiosis} or in
+  \blank{late stage cancers}}
+
+\card{Mutations during meiosis include...}{Trisomy (when a sperm has
+  an extra chromosome) or monosomy (when a sperm has one too few
+  chromosomes).}
+
+\card{What will these mutations result in when the gamete is combined
+  with
+  another?\\\includegraphics[scale=0.4]{images/meiosis-mutations}}{Left
+  is trisomy, right is monosomy.}
+
+\card{Single chromosome macro-mutations include...}{Within one
+  chromosome; deletion, duplication and inversion of regions of the
+  chromosome. Within two chromosomes, part of one can go into another
+  (insertion), parts of chromosomes can swap places (translocation).}
+
+\flashcard{Examples of diseases caused by macro-mutations include
+  \blank{down syndrome}, \blank{klinefelter syndrome} and \blank{Cri
+    du chat}.}
+
+\card{What are the three types of substitution micro-mutations and
+  what are they caused by?}{Caused by single base substitutions (SNP),
+  and they are silent, nonsense (STOP) and mis-sense.}
+
+\card{How does a nonsense mutation occur?}{When a SNP (single base
+  substitution) converts a triplet from coding a protein to coding a
+  STOP signal.}
+
+\card{What is a silent mutation?}{When the protein coded for by a
+  triplet is not changed by an SNP.}
+
+\card{What is a mis-sense mutation?}{When a SNP mutation changes the
+  protein coded for by a triplet.}
+
+\flashcard{\blank{Insertions and deletions} can cause great
+  disturbances to a protein through \blank{frameshift mutations}
+  unless the number of bases \blank{is divisible by three}, so there
+  is no \blank{frameshift}}.
+
+\flashcard{There are \blank{900} bad (but \blank{recessive}) alleles
+  for cystic fibrosis. The normal gene \blank{produces enough protein
+    to compensate}. Patient must be \blank{homozygous} for one bad
+  allele, or \blank{heterozygous} for two.}
+
+\flashcard{\blank{Trinucleotide repeated expansions} are when a person
+  has many repeats of a base pair triplet. \blank{The number of
+    repeats} dictates the likelihood of a person getting certain
+  diseases (more is worse for the patient).}
+
+\flashcard{Sometimes a SNP in a region far away from a gene can cause
+  problems. In the case of lactose intolerance, a pair 13910 bases
+  before the relevant gene is substituted (from T to C), meaning a
+  protein cannot bind. This is recessive, since just a bit of lactase
+  does the job.}
+
+\flashcard{The Human Genome project took \blank{13 years} to sequence
+  \blank{3 billion} base pairs. DNA from \blank{5 anonymous}
+  individuals of \blank{varying ethnicity} was taken.}
+
+\flashcard{It was discovered that humans only have \blank{20,500}
+  genes, but it was thought that humans should have around
+  \blank{100,000}. This was because flies have \blank{13,000} and
+  humans are more complicated!}
+
+\flashcard{Humans share \blank{sixty percent} of their genes with
+  flies, and only \blank{two percent} of the human DNA codes for
+  genes.}
+
+\card{Why can humans get by with so few genes?}{Alternative splicing;
+  the same gene can produce different proteins when it is shaped
+  differently (isoforms). This means that we can make 100k proteins
+  with 23k genes.}
+
+\flashcard{Cells have the \blank{same genome}, but do not express the
+  \blank{same genes and isoforms}. Where these \blank{proteins} are
+  expressed determines the type of cell formed.}
+
+\flashcard{Humans genomes differ by about \blank{0.01 percent}, which
+  is about \blank{3 million} base pairs which are mostly
+  \blank{SNP's}}
+
+\flashcard{The frequency of SNP's is one in every \blank{300} base
+  pairs. Most are \blank{outside genes} and have \blank{no effect on
+    the phenotype}.}
+
+\card{SNP's outside of genes are useful because...}{They act as
+  landmarks for us as scientists!}
+
+\card{GWAS stands for...}{Genome wide association studies}
+
+\flashcard{Most diseases result from \blank{polygenic and
+    environmental interactions}, patients with \blank{particular
+    groups of landmark SNP's} have been found to be more at risk of
+  developing some diseases.}
+
+\flashcard{GWAS aim to identify the common SNP's associated with
+  \blank{complex diseases and traits} by testing at least
+  \blank{hundreds of thousands} of SNP's in large population samples.}
+
+\card{Where are the samples for GWAS taken from}{Both patients who
+  have the disease and people who do not (the control).}
+
+\flashcard{When particular landmark SNP's are seen in greater diseased
+  patients compared to controls, we say that the SNP's are
+  \blank{associated} with the disease.}
+
+\card{If a patient has SNP's associated with a disease, what does it
+  mean?}{The patient as a higher risk of the disease (very rarely,
+  there could be a 100 percent association).}
+
+\flashcard{Some people will be affected more by \blank{their
+    environment} if they have SNP's associated to a disease in their
+  genome (e.g. are far more likely to get a disease if they smoke).}
+
+\card{What is pharmacogenomics?}{How do patients genomes affect their
+  response to a treatment?}
+
+\flashcard{In 2005, \blank{less than 50} SNP's were known to be
+  associated with diseases, in 2008, it was \blank{over 500} and now
+  it's over \blank{14,000}.}
+
+\card{What was the aim of the 1000 genomes project?}{To establish the
+  most detailed catalogue of human genetic variations.}
+
+\flashcard{On average, each person carries \blank{250-300} loss of
+  function variants in annotated genes, and \blank{50-100} previously
+  implicated in inherited disorders.}
+
+\card{How many new disease causing mutations were identified in the
+  1000 genomes project?}{671}
+
+\flashcard{In \blank{2014} the 100,000 genomes project was started by
+  \blank{the NHS}. It was split between helping \blank{cancer
+    patients} and \blank{patients with rare diseases}.}
+
+\flashcard{The 100,000 genomes project sampled \blank{75,000} people
+  including \blank{40,000} serious illness patients. \blank{50,000}
+  cancer patient genomes (one cancer and one normal per patient), and
+  \blank{50,000} rare disease genomes (three per patient; \blank{one
+    patient genome and two blood relatives)})}
+
+\flashcard{\blank{23andMe} and \blank{Illumina} both let you get your
+  genome sequenced. \blank{23andMe} does not offer much advice or
+  counselling, but \blank{illumina} does, and is therefore more
+  expensive.}
+
+\flashcard{Immlumina tests healthy adults interested in learning about
+  their risk for \blank{a set of adult-onset conditions}, assessing
+  their \blank{carrier} status and understanding their response to
+  certain \blank{drugs}.}
+
+% Lecture 3
+
+\card{How many different types of cell are there in humans?}{220 cell
+  types.}
+
+\card{What is the first cell created by the fusion of the egg and
+  sperm?}{The zygote.}
+
+\card{What are the initial cells formed from the zygote
+  called?}{Blastomeres}
+
+\card{After there are more than 8 blastomeres, what is there?}{A
+  blastocyst a ball of cells.}
+
+\card{What is the trophoblast?}{The embryo after it was a blastocyst
+  (5 days). Separate from the inner cell mass}
+
+\card{Where does the embryo form from?}{The inner cell mass, not the
+  trophoblast.}
+
+\flashcard{When the \blank{inner cell mass} is dividing, the cells
+  become smaller since they are partitioning the \blank{zygote}
+  cytoplasm via mitosis.}
+
+\card{What lets the embryo attach to the wall of the uterus?}{The
+  trophoblast}
+
+\flashcard{\blank{uterine implantation} is driven by the
+  \blank{trophoblast}. The \blank{Inner cell mass} expands and changes
+  shape and location, but is still \blank{only one type of cell}.}
+
+\flashcard{Once attached to the uterus wall, the inner cell mass sets
+  the \blank{axis of the body}. The \blank{primitive streak} is the
+  \blank{anterior posterior (head to tail)} axis.) The body is
+  symmetrical along this.}
+
+\flashcard{After setting the axis, \blank{gastrulation} takes
+  place. This is where cells migrate, along the bottom, endoderm form,
+  \blank{mesoderm} in the middle \blank{and ectoderm} at the
+  top. \blank{ectoderm} will be the skin and nerves, \blank{mesoderm}
+  forms \blank{muscles, blood, skeleton, heart etc} and the
+  \blank{endoderm} forms the \blank{digestive system, lungs etc}}
+
+\card{What is a highly coordinated cell movement?}{Gastrulation}
+
+\card{What structures become the vertebrae?}{Somites; they emit
+  signals telling what organs to form where.}
+
+
+\card{What do somites eventually form into?}{Muscles, vertebral column
+  and dermis of the skin. They are landmarks for organ formation
+  during development.}
+
+\card{Growing organs is called...}{Organogenesis}
+
+\card{By saying organogenesis is progressive, we mean}{That the organs
+  grow in stages, e.g. there is a little growth for the arm first,
+  then it gets longer, then it gets digits etc.}
+
+\card{What is used as a reference for growing specialised cells in an
+  embryo?}{The head to tail framework.}
+
+\card{What is a differentiated cell?}{One where the shape, structure
+  and function is well defined.}
+
+\card{The gurdon experiment was done on...}{Frogs}
+
+\card{The gurdon experiment involves...}{Taking egg cells, removing
+  the nuclei and inserting nuclei from either a small embryo or a
+  developed intestine cell. The former usually develop into tadpoles,
+  but the latter mostly stop developing before the tadpole stage.}
+
+\card{Cells developmental potential (potency) changes how as it gets
+  more specialised?}{It decreases.}
+
+\card{What is involved in a grafting experiment?}{Cells from an early
+  gastrula (early embryo) that would form an eye are taken and
+  transplanted into an host embryo (oldest), as well as ones from an
+  neurala (older embryo than gastrula). The ones from the younger
+  embryo develop into anything depending where they are implanted, the
+  ones from the older embryo develop into eyes.}
+
+\flashcard{The fate of a cell \blank{can be locked} before
+  differentiation. They can sometimes \blank{not adapt to} a new
+  situation, up to \blank{4 generations before}.}
+
+\flashcard{ \small
+  \begin{tabularx}{0.5\textwidth}{c|X|X|X}
+    \textbf{Source} & \textbf{Potential} & \textbf{Type of cell} &
+    \textbf{Can develop into}\\ \hline Zygote & \blank{Totipotent} & -
+    & Whole organism.\\ \hline \blank{Blasocyst} & \blank{Pluripotent}
+    and self-renewing & Embryonic stem cell & Any cell type\\ \hline
+    Adult & Multipotent, \blank{self-renewing} & multipotent
+    \blank{stem cells} & Some cell types\\ \hline Organ & Limited
+    potential and renewal & \blank{Progenitor} & Choice of between
+    \blank{2-6} types\\ \hline - & Limited division & committed
+    progentor & 1 type, locked fate.\\ \hline - & No division &
+    Differentiated & No division.
+  \end{tabularx}
+}
+
+\card{Once a cell is differentiated...}{It has a clear cut identity
+  and expresses specific proteins for morphology and function.}
+
+\flashcard{Cells have the same genes, but it's how they express their
+  genes that makes them different.}
+
+\flashcard{At any given time, each cell expresses around \blank{20
+    percent} of it's genes}
+
+\flashcard{About \blank{ten percent} of the \blank{20 percent} active
+  genes are developmental genes.}
+
+\card{Developmental genes control:}{Proteins that regulate genes
+  expression (turn genes on and off), proteins involved in cell
+  communication or signalling (tell other cells what genes to turn on
+  and off).}
+
+\flashcard{One small difference in gene expression can \blank{create a
+    cascade of changes downstream}.}
+
+\flashcard{Proteins inside the egg are \blank{not uniformly
+    distributed}.}
+
+\flashcard{After two \blank{cleavage divisions} of the zygote (egg to
+  two cells, to four), the \blank{same maternal proteins} are in the
+  cytoplasm. After division two, the cells have different maternal
+  proteins after division, so they have different gene expressions and
+  more differences occur after each cell division onwards.}
+
+\card{Describe the cell lineage of insulin producing beta
+  cells.}{Fertilised egg (zygote) $\rightarrow$ inner cell mass
+  $\rightarrow$ endoderm $\rightarrow$ pancreas $\rightarrow$ endocrine
+  $\rightarrow$ beta cell}
+
+\flashcard{A differentiated cell can give rise to a new organism
+  (\blank{totipotent}), which means genes are \blank{not lost} as a
+  cell specialises.}
+
+\flashcard{\blank{Epigenetics} are proteins that bind to the DNA and
+  \blank{retrieve totipotency}. They change how the DNA is shaped so
+  that different parts can be accessed.}
+
+\flashcard{ The embryo starts with a zygote (\blank{totipotent}.\\ It
+  becomes a \blank{blastocyst} with a \blank{trophoblast} and
+  \blank{ICM} (\blank{plurpiotent})\\ Before full differentiation,
+  cells \blank{become locked in their fate} and are
+  \blank{determined}\\ At the gene level, cells become different by
+  \blank{expressing different developmental genes}\\ The initial
+  differences come from the \blank{maternal developmental proteins}
+  being unevenly distributed in the \blank{egg cytoplasm}. As
+  \blank{blastomeres} form from \blank{cleavage divisions}, they end
+  up not having the same \blank{developmental proteins}.  }
+
+% Lecture 4
+
+\flashcard{\blank{Totipotent} stem cells can become any cell.}
+
+\flashcard{\blank{totipotent stem cells} have the minimum level of
+  specialisation, \blank{differentiated cells} have the maximum level
+  of specialisation.}
+
+\flashcard{\blank{Committed progenitor} cells are not stem cells, but
+  \blank{progenitor} cells are.}
+
+\flashcard{\blank{8} cell stage is the limit for totipotency in
+  humans.}
+
+\flashcard{Stem cells in the ICM are \blank{pluripotent}.}
+
+\flashcard{Adult stem cells are \blank{multipotent}.}
+
+\card{Adult stem cells are found in...}{Brain, Skin, Bone Marrow,
+  Skeletal muscle, Intestines (any cell that needs regrowth).}
+
+\flashcard{Embryonic stem cells are \blank{immortal} and
+  \blank{pluripotent}.}
+
+\flashcard{In order to control ESL's in vitro, we can \blank{change
+    the chemical composition of the} culture medium, or \blank{insert
+    specific genes into cells}.}
+
+\flashcard{Adult stem cells are \blank{harder} to grow in the lab than
+  \blank{ESC's} but do show \blank{some plasticity}.}
+
+\card{Describe the plasticity of ASC's}{Most adult stem cells can
+  trans-differentiate in the lab, but this is a low efficiency
+  process.}
+
+\card{What are the most apparently plastic cells?}{Mesenchymal stem
+  cells (mesoderm), which can transform into liver cells (endoderm)
+  and brain cells (ectoderm)}
+
+\card{Why are UC-MSC's better than BM-MSC's?}{
+  \begin{tabular}{rl}
+    -&Less immunogenic\\
+    -&longer telomeres\\
+    -&less DNA damage\\
+    -&non-invasive to harvest\\
+    -&same plasticity as BM-MSC's.
+  \end{tabular}
+}
+
+\card{How many proteins are usually considered for
+  immuno-compatibility?}{5}
+
+\card{What is GVHD?}{Graft Vs Host Disease, where the immune cells in
+  the transplant attack the host.}
+
+\card{Why are neonatal (UC cells) less immunogenic?}{Embryos and
+  foetuses have to evade the mother's immune system, so there are less
+  surface markers on cells. Also, newly born babies have no/little
+  immune system so there is less chance of GVHD.}
+
+\flashcard{Neonatal cells have longer \blank{telomeres} (which
+  \blank{indicate the age of the cell}), since they get shorter
+  \blank{at each cell division} since they do not get replicated, and
+  neonatal cells have not divided many times.}
+
+\card{In ESC's what enzyme is expressed that stops a telomeres from
+  getting shorter?}{Telomerase}
+
+\card{When is telomerase turned off?}{Before the baby is born}
+
+\card{What enzyme do most cancer cells produce and why?}{Telomerase so
+  that the cells are immortal and divide indefinitely.}
+
+\card{What is a bank of ESC lines?}{A bank of embryonic stem cells,
+  where each `line' of cells is derived from a single embryo.}
+
+\card{What are the three sources of human stem cells?}{Embryonic SC's,
+  Neonatal SC's, adult SC's (bone marrow, fat tissue (liposuction),
+  skin).}
+
+\card{How could we make a stem cell with only some skin cells?}{Make
+  it into an induced pluripotent stem cell in the lab.}
+
+\card{What are the currently approved stem cell based therapies?}{Skin
+  grafts, Hematopoietic SC transplant from adult bone marrow or
+  neonatal cells.}
+
+\card{How does a bone marrow transplant to cure leukaemia
+  work?}{1. Get a matching donor 2. Replicate stem cells ex vitro
+  3. Destroy bone marrow in patient using irradiation and chemotherapy
+  4. transplant stem cells into patient.}
+
+\card{Give an example of tissue engineering}{Remove cells from lungs,
+  hips and nose, remove a donor trachea (from cadaver) and remove all
+  cells, grow cells around trachea and transplant in patient.}
+
+\card{What is ex-vivo and in-situ cartilage engineering}{Growing new
+  cartilage outside the body and in the body respectively (using MSC's
+  to stimulate growth).}
+
+\card{List advantages of MSC's}{
+  \begin{tabular}{rl}
+    -&Easy to isolate\\ &Plastic (not literally!) in the lab\\ &Can be
+    -frozen and thawed\\ &Possess potent immuno-suppression and
+    -anti-inflammation effects\\ &Capable of homing (going to site of
+    -injury)\\ &Stimulate regeneration
+  \end{tabular}
+}
+
+\flashcard{MSC's might be good for \blank{cotransplants} e.g. with
+  HMC's since they help other stem cells to graft}
+
+\flashcard{Clinical trials take \blank{a long time}, and \blank{less
+    than 10} therapies are in phase 3 for stem cell
+  treatments. Foreign clinics advertise MSC treatments, but none have
+  published data from clinical trials.}
+
+\flashcard{Most trials for stem cell therapies are carried out with
+  MSC's (\blank{70 percent}), HSC's count for \blank{20
+    percent}. ESC's are around \blank{2 percent} and are being tested
+  with \blank{eyes} since they are \blank{immuno-privileged}.}
+
+\flashcard{SC's can be used for \blank{replacing cells
+    (e.g. transplants)}, \blank{repairing cells (e.g. genetically
+    modify SC's outside the body and re-implant)} and
+  \blank{protecting via MSC immunosupression}.}
+
+\card{For repairing and replacing cells, what type of cell should we
+  use?}{The patients own cells (autologous transplants). This requires
+  adult stem cells that are reasonably plastic though, and its hard to
+  isolate ASC's in the lab. Otherwise, use donor SC's with low
+  immunogenicity.}
+
+\card{What is an induced pluripotent stem cell?}{When you reprogram a
+  normal (e.g. skin) cell by inserting genes (via viruses or
+  otherwise). Only 3-4 gene insertions required.}
+
+\card{How to do Parkinson's in a dish?}{
+  \begin{tabular}{rl}
+    -&Collect skin cells\\ &Re-program them into stem cells\\ &Grow
+    -brain cells from them (induce brain\\ &cell
+    -differentiation)\\ &Stress out the brain cells with
+    -toxins\\ &Observe Parkinson's-like features
+  \end{tabular}
+}
+
+% Personalised medicine Lecture 1
+
+\flashcard{The traditional approach to medicine is \blank{one size
+    fits all}.}
+
+\flashcard{The traditional approach to medicine does not take into
+  account \blank{individual differences between patients}, which is
+  successful for some, but not all patients.}
+
+\card{What is stratified medicine?}{Targeting different types of
+  specific diseases made up of lots of different genes e.g. maturity
+  onset diabetes}
+
+\flashcard{Personalised medicine (aka \blank{precision medicine})
+  takes into account individual differences such as \blank{genes},
+  \blank{environment} and \blank{lifestyle}.}
+
+\card{Examples of historical personalised medicine
+  include...}{Inheritance of alkaptunoria, blood transfusions using
+  blood capability testing, genetic basis of selective toxicity of an
+  antimalarial drug.}
+
+\flashcard{When the human genome project started, \blank{4} drugs had
+  pharmacogenetic information. After it ended, \blank{46} drugs had
+  this information and ten years later, there \blank{104} drugs. Now
+  the \blank{genome}, \blank{proteome}, \blank{metabolome} and
+  \blank{epigenome} are examined.}
+
+\flashcard{Genetic changes of interest include \blank{SNP's},
+  \blank{base insertions}, \blank{copy-number variations} and
+  \blank{variable number tandem repeats}. These all change how much of
+  the proteins coded for by an affected gene is produced.}
+
+\card{What are the advantages of personalised medicine (6 things)?}{
+\begin{tabularx}{\cardwidth}{rX}
+  -&Shift reaction to prevention\\
+  -&Predict susceptibility of developing a disease\\
+  - &Improve dosing of drugs (increase efficiency, reduce side effects)\\
+  - &Reduce cost, time and attrition rate in drug development\\
+  - &Decrease adverse affects of drugs, increase diagnostic and detection power for disease
+\end{tabularx}}
+
+\card{What genes increase your risk of breast and ovarian cancer and
+  how much by?}{BRAC1, BRAC2; 85 percent higher lifetime chance of
+  breast cancer and 60 percent chance of ovarian cancer.}
+
+\flashcard{There are over \blank{15000} predictive tests looking at
+  \blank{2800} genes. They can \blank{save the cost} of treating
+  patients.}
+
+\flashcard{Even if a predictive test for a gene doesn't have an
+  associated drug to lower risk, you can \blank{change environmental
+    factors (e.g. eat better, stop smoking etc)}. Sergey Brin does
+  this for Alzheimer's!}
+
+\flashcard{It's easy to take biopsy of cancer tumours (because they're
+  by definition, not needed), so they can have their genome sequenced
+  to see what genes the cancers have.}
+
+\flashcard{There are drugs (Ivacaftor) that target the \blank{gene
+    underlying cause} of diseases rather than just treating symptoms.}
+
+\card{What does metastatic cancer mean?}{When the cancer has moved
+  from the original site to other areas of the body.}
+
+\flashcard{Enzymes metabolise drugs, and \blank{one family of enzymes}
+  metabolise over \blank{90} percent of drugs. There are
+  \blank{thousands of mutations} in genes that code for these
+  enzymes. Some people metabolise fast (and are at risk of
+  \blank{overdose toxicity}), or even ultra-fast metabolisers (meaning
+  the drugs \blank{are broken down before they have an effect}).}
+
+\flashcard{After a stent has been put into \blank{an artery}, the body
+  recognises it as foreign and blood will clot around it. A drug is
+  given to stop clotting, but one enzyme (\blank{CYP 2C19}) converts
+  the drug from inactive to active. Variations in this enzyme mean not
+  as much is converted, meaning the blood can clot possibly causing a
+  heart attack or stroke.}
+
+\card{What are some problems with personalised medicine?}{Ethics,
+  multiple gene variations per disease, quantity of data}
+
+\card{What are the ethical problems with personalised medicine (5
+  things)?}{Who sees the data? How will it be stored? How will it be
+  used? Could it be used against us? What legal protection do we
+  have?}
+
+\flashcard{\blank{Driver and passenger} mutations can be involve with
+  genes. Drugs need to target driver mutations in order to be
+  effective.}
+
+% Lecture 2 of personalised medicine
+
+\card{Define biomarker}{A naturally occurring molecule, gene or
+  characteristic by which a particular pathological or physiological
+  process, disease etc can be identified.}
+
+\card{Why are biomarkers helpful?}{Because they help with prediction,
+  diagnosis, progression, regression, or the outcome of treatment of a
+  disease.}
+
+\flashcard{\blank{multiple biomarkers} can be used to build up a
+  signature, telling us how multiple \blank{genes/proteins} etc
+  contribute towards a disease}
+
+\flashcard{\blank{GWAS} and \blank{microarrays} are used to identify
+  genes involved in diseases.}
+
+\flashcard{Given a patient, we can use \blank{DNA sequencing},
+  \blank{microarrays} and \blank{immunohistochemistry} (detecting
+  antigens on the surface of cells) to determine their
+  biomarkers. These can be gotten from \blank{normal or diseased
+    tissue}, \blank{blood}, \blank{saliva}, \blank{sweat}
+  etc. Anywhere where we \blank{can find protein or DNA} in the body.}
+
+\card{How do DNA chips work?}{First, sample DNA is taken, then it is
+  amplified using PCR. It is then placed on a DNA chip with many
+  probes, where it will bind to probes that it is complementary
+  to. The chip is washed to remove the non-bound DNA, then scanned,
+  where the bound probes will be visible.}
+
+\card{What is the name for a test that goes with a drug?}{A companion
+  diagnostic (CDx).}
+
+\flashcard{Oncotype Dx identifies \blank{16} genes associated with
+  \blank{breast cancer} and \blank{5} housekeeping genes (used as a
+  control). These are used to give a score of 1-100 giving the likely
+  reoccurrence of \blank{the tumor} within the next \blank{ten}
+  years. It also predicts the response to \blank{chemotherapy}. This
+  costs \blank{\$4175}.}
+
+\flashcard{\blank{MammaPrint} determines how aggressive a
+  \blank{breast cancer} tumor is (i.e. whether there is a high or low
+  risk of \blank{metastasis}). It measures the mRNA of \blank{1900}
+  genes. A biopsy is taken and determined to make sure that
+  \blank{thirty percent} or more cells are cancerous, then the tissue
+  is used for a \blank{microarray}.}
+
+% Lecture 1 Biodiversity
+
+\card{What is ecosystem services?}{Involves putting a value on a
+  service that protects biodiversity. E.g. instead of building a dam,
+  work out how much preseving a forest can help water retention
+  (protecting water resources).}
+
+\card{Give examples of ecosystem services.}{Protection of water
+  resources, controbution to climate stability, maintinance of
+  ecosystems, pollution breakdown and absorbtion, nutrient storage and
+  recycling, soil formation etc...}
+
+\card{Biological resources include...}{Food, medinal resources and
+  pharmaceutical drugs (e.g. stuff in rainforests), wood, ornamental
+  plants, breeding stocks, gene diversity.}
+
+\card{What are the social benefits to biodiversity?}{Research,
+  recreation and tourism, culture.}
+
+\card{Define biodiversity}{The variety of life at all levels; gene
+  level, population level, species level, ecosystem level. Also, the
+  interactions between these living things.}
+
+\card{What are the three main levels of biodiversity.}{Genetic
+  diversity, species diversity, ecosystem diversity.}
+
+\card{Define genetic diversity}{The combination of different genes
+  found within a population of a single species, and the pattern of
+  variation found within different populations of the same species.}
+
+\card{What does a low genetic diversity mean?}{The key factor driving
+  the extinction vortex is the loss of genetic variation since
+  variation is necessary for evolutionary responses to environmental
+  change.}
+
+\flashcard{A small population is prone to positive feedback loops that
+  draw it down an \blank{extinction vortex}.}
+
+\card{Define genetic drift}{When a population has little genetic
+  variation, any disease that all individuals are suseptible to could
+  kill the whole population.}
+
+\flashcard{Extinction vortex: small population means interbreeding and
+  genetic drift, so there is a loss of genetic diversity, meaning that
+  there is a reduction in individual fitness and population
+  adaptability so there is lower reproduction and a higher mortality.}
+
+\card{What (is the biggest thing that) makes species susceptible to
+  extinction?}{Small population size; i.e. rare species are most at
+  risk.}
+
+\flashcard{Cheetah has a \blank{low genetic variation} because it had
+  a \blank{genetic bottleneck} near the last ice age (\blank{only a
+    few individuals survived}) and they had an isolated populations in
+  North Africa and Asia are \blank{still genetically similar}.}
+
+\flashcard{Greater Prarie Chicken were fragmented by
+  \blank{agriculture}, and then found to exhibit a decreased
+  fertility. In order to try to save the colonies, genetic variation
+  was imported by \blank{taking birds from larger populations}, and
+  the declining populations rebounded, confirming that \blank{low
+    genetic variation} was causing the \blank{extinction vortex}.}
+
+\card{Define species diversity}{The variety and abundance of different
+  types of organisms which inhabit an area.}
+
+\card{Define species richness}{The number of different species in a
+  particular area.}
+
+\card{Define species evenness}{The relative abundance with which each
+  species is represented in an area (e.g. lots more grey than red
+  squirels).}
+
+\card{Define ecosystem diversity}{Encompasses the variety of habitats
+  that occur in a ragion, or the mosaic of patches found within a
+  landscape}
+
+\flashcard{An ecosystem can \blank{cover a large area} such as a whole
+  forest or a \blank{small area} such as a pond.}
+
+\card{Give four causes of biodiversity loss}{Habitat loss, intriduced
+  species, overexploitation, pollution.}
+
+\flashcard{Most threatened species are imperiled \blank{for more than
+    one reason}.}
+
+\card{Give the three types of (endangered) species}{Rare, dominant and
+  keystone}
+
+\card{What is a rare species?}{A species that has a small population.}
+
+\card{What is a dominant species?}{A species that supports many other
+  species. Saving these often helps many others.}
+
+\card{What is a keystone species?}{A keystone species is a species
+  whos very presence contributes to a diversity of life and whos
+  extinction would lead to the extinction of many otheres. They help
+  support the whole ecosystem.}
+
+\flashcard{Conserving biodiversity aims to look for \blank{hotspots}
+  by mapping biodiversity by region (richness, levels of threat) and
+  by country. These areas are ranked and preserved.}
+
+\flashcard{Hotspots have three aspects; \blank{richness},
+  \blank{threatened species} and \blank{endemic (unique to a location)
+    species}. These rarely overlap.}
+
+\flashcard{There are \blank{34} hotspots in the world containing
+  \blank{seventy five percent} of the worlds threatened vertebrates
+  and only cover \blank{two point three percent} of the earth's
+  surface.}
+
+\flashcard{Costa Rica has \blank{4} percent of global biodiversity,
+  but only \blank{0.01} percent of the land surface of earth. It has
+  the highest \blank{species richness} per kilometer squared in the
+  world, and \blank{half} of the country is conserved.}
+
+\flashcard{The Isthmohyla rivularis frog was thought to be eztinct in
+  \blank{Costa Rica} for \blank{20} years before a \blank{female} was
+  spotted in \blank{2008}.}
+
+%TODO: Missed lecture (biodiversity) notes - Looks weird, lets wait
+% and see for the practice exam questions
+
+% Brain lecture 1
+
+\card{\includegraphics[width=\cardwidth]{images/brain-un}}{\includegraphics[width=\cardwidth]{images/brain}}
+
+\card{What are the lobes in the brain?}{Frontal, parietal, temporal,
+  occipital}
+
+\card{What are the parts of the brain?}{Cerebellum, brainstem, frontal
+  lobe, parietal lobe, temporal lobe, occipital lobe.}
+
+\flashcard{An obvious feature of the hemisphere of the brain is the
+  \blank{highly convoluted surface}. The ridges are called
+  \blank{gyri} and the valleys are called \blank{sulci/fissures}.}
+
+\flashcard{The frontal lobe has the \blank{primary motor cortex} and
+  the \blank{central sulcus}. The latter seperates the frontal lobe
+  from the rest of the brain. The \blank{primary motor cortex} is
+  located in the \blank{pre-central gyrus}.}
+
+\flashcard{The frontal lobe is responsible for \blank{movement},
+  \blank{personality} and \blank{planning}.}
+
+\card{What is a lesion?}{When the function of an organ is impaired}
+
+\flashcard{The parietal lobe is located \blank{behind the pre-central
+    cortex}, and is responsible for \blank{awareness of surroundings}
+  and \blank{stereognosis}.}
+
+\flashcard{The temporal lobe is responsible for \blank{hearing},
+  \blank{language} and \blank{naming}.}
+
+\flashcard{The occipital lobe is responsible for \blank{processing
+    visual signals}.}
+
+\flashcard{The cerebellum \blank{coordinates movement and posture}.}
+
+\flashcard{The brainstem has \blank{cardiovascular and respiratory
+    centers} are here. This dictates things like \blank{heart beat
+    speed} and \blank{blood pressure}.}
+
+\card{What are the two different types of the somatic nervous
+  system.}{Central nervous system (CNS; brain, brain stem and spinal
+  chord) and peripheral nervous system (includes the cranial and
+  spinal nerves).}
+
+\card{What makes up the Centeral Nervous System (CNS) )}{The brain,
+  brain stem and spinal chord}
+
+\card{What makes up the Peripheral Nervous System (PNS)}{The brain,
+  brain stem, spinal chord and cranial + spinal nerves}
+
+\card{\includegraphics[width=\cardwidth]{images/neuron-un}}{\includegraphics[width=\cardwidth]{images/neuron}}
+
+\flashcard{Myelin acts as an \blank{insulator} and \blank{speeds up
+    transmission along the axon}.}
+
+\flashcard{Axons that have a myelin sheath are called
+  \blank{Myelinated axons}.}
+
+\flashcard{The gaps bewteen myelin sheathes are called \blank{Nodes of Ranvier}}
+
+\flashcard{
+  Affeent neurones go \blank{from} a receptor and efferent neurones is \blank{to~~~} a receptor.
+	\begin{tabular}{lll}
+	  Name & Number of connections & Class\\ \hline
+          \blank{Unipolar} & 1 &        Structural\\ \hline
+          Interneurone & \blank{1} & \blank{Functional} \\ \hline
+          \blank{Bipolar} & 2 & \blank{Structural}\\ \hline
+          Multipolar & \blank{n} & \blank{Structural}\\ \hline
+	\end{tabular}
+}
+
+\flashcard{
+	\begin{tabular}{ll}
+	  Sense & Name\\ \hline
+          Pressure & \blank{Mechanoreceptor}\\
+          Temperature & \blank{Thermoreceptor}\\
+          Light & \blank{Photoreceptor}\\
+          Smell/taste & \blank{Chemoreceptor}\\ 
+          Pain/heat/tissue damage & \blank{Nociceptor}\\
+	\end{tabular}	
+}
+
+\flashcard{
+  `Glia' means \blank{glue}. The job of the neuroglia is to \blank{hold the neurones together}. \blank{95} percent of the brain is neuroglia
+  \begin{tabularx}{\cardwidth}{llX}
+    Name & Where & Function\\ \hline
+    Schwann & \blank{PNS} & \blank{Create the myline sheath}\\
+    \blank{Muller} & Retina & \blank{Provide structural stability in retina}\\
+    Oligodendrocyte & \blank{CNS} & \blank{Create the myline sheath} and \blank{maintain homeostasis}\\
+    Astrocyte & \blank{Brain} & \blank{Phagocytose (eat debris)}
+  \end{tabularx}
+}
+
+\flashcard{Neuroglia are \blank{supporting cells} for the neurons.}
+
+\flashcard{The plasma membrane is a \blank{selectively permeable}
+  membrane that allows some things to move through and not
+  others. Structures such as \blank{sodium and potassium channels} are
+  on the membrane.}
+
+\card{What is the resting membrane potential of a cell?}{-70mv}
+
+\flashcard{At rest, \blank{all of the sodium channels are closed} in a
+  neurone. \blank{Some potassium channels} are closed, others are
+  open.}
+
+\flashcard{When a cell is stimulated, the \blank{sodium} channels
+  open, and \blank{the potassium channels} \blank{close}. This makes
+  the cell cytoplasm \blank{less negative}.}
+
+\card{Define depolarisation}{The inside of the cell has gone from -ve
+  to +ve.}
+
+\flashcard{An action potential is \blank{an explosion of electrical
+    activity} created by \blank{a depolarising current}. It is an
+  \blank{all or nothing} event.}
+
+\card{\includegraphics[width=\cardwidth]{images/ac-pot-bl}}{\includegraphics[width=\cardwidth]{images/ac-pot}}
+
+\flashcard{At rest, the neuron is at \blank{-70mV} and when an action
+  potential occurs, then the cell \blank{depolarises} and goes to
+  \blank{30mV}. A \blank{sodium potassium} pump gets rid of
+  \blank{sodium} in the cell to reset the charge
+  (\blank{repolarisation}.}
+
+\flashcard{\blank{hyperpolarisation} is when a stimulus is applied to
+  neurone that causes it to go very negative.}
+
+\flashcard{Sensory pathways have \blank{three neurones} in them. They
+  are called \blank{first, second and third order} neurones
+  respectively.}
+
+\card{\includegraphics[width=\cardwidth]{images/synapse-bl}}{\includegraphics[width=\cardwidth]{images/synapse}}
+
+\flashcard{\blank{Action potential} reaches axon
+  terminal. \blank{Vesicles} fuse with the pre-synaptic
+  membrane. \blank{Neurotransmitters} are released from vesicles, they
+  travel in the \blank{synaptic cleft} to bind with receptors on
+  \blank{post-synaptic neuron}. This works using the \blank{Lock and
+    Key} model.}
+
+% Brain lecture 2
+
+\flashcard{A seizure is \blank{the same as a convlusion}, and is a
+  \blank{transient abnormal} event resulting from {discharge of
+    cerebral neurone}. Epilepsy is the \blank{continued tendancy} to
+  have such seisures.}
+
+\flashcard{An \blank{electroencephalogram} that has \blank{an
+    explosion in the middle} is called \blank{spike and wave}, and
+  indicates \blank{transient abnormal discharge}.}
+
+\card{What are the three types of seisure?}{Generalised (all over the
+  brain), partial (one part of the brain), partial with secondary
+  generalisation (initially partial, then moves).}
+
+\flashcard{A tonic clonic seizure (\blank{grand mal}) is a
+  \blank{movie style seizure where the body jerks, the mouth froths
+    etc}, before \blank{muscle paralysis occurs}}
+
+\flashcard{An absence seizure (\blank{petit mal}) is
+  \blank{when the patient goes blank for a few seconds}.}
+
+\flashcard{A myoclonic seizure is
+  \blank{when a muscle or muscle group twitches}.}
+
+\flashcard{Types of generalised seizures include \blank{tonic clonic},
+  \blank{absence} and \blank{myoclonic} seizures}.
+
+\flashcard{Partial seizures include \blank{induced aura},
+  \blank{jacksonian seizure} (\blank{motor cortex}) and \blank{Todd's
+    paralysis}.}
+
+\flashcard{Induced Aura is when \blank{in some patients, they can tell
+    if they're going to have a seizure}.}
+
+\flashcard{Jacksonian seizure is in the \blank{motor cortex}
+  (\blank{frontal lobe}), \blank{twitching} progresses from \blank{one
+    part of the body} to \blank{another, stopping inbetween}}.
+
+\flashcard{Todd's paralysis is \blank{limpness} after a seizure.}
+
+\flashcard{Causes of seizues include \blank{trauma to the brain} such
+  as \blank{penetrating brain injury}, \blank{bruised brain}
+  (\blank{cerebral contusion}) or a \blank{dural tear} (where the
+  clingfilm-like lining of the brain is damaged). Cerebrovascular
+  causes can also contribute such as when \blank{part of the brain
+    dies due to stroke}. Other causes include \blank{alcohol},
+  \blank{hypoglycaemia}, \blank{high fever} and \blank{brain tumors}.}
+
+\card{How is a seizure diagnosed and treated?}{Diagnoses wise,
+  alternate causes are ruled out with eyewitness accounts and an EEG
+  is taken. Treatement wise, patients should not be restrained since
+  they could hurt themselves/others, and medication such as diazepam
+  could be taken.}
+
+\card{What is diazepam}{A muscle supressant given to fitting
+  people. Too much can inhibit breathing.}
+
+\flashcard{Epiletic people must not have a fit for \blank{ten years}
+  in order to \blank{drive trucks, planes, boats etc} and must always
+  \blank{inform the DVLA}, though \blank{most people have normal
+    lives}.}
+
+\flashcard{\blank{1} person per \blank{500} people are affected in the UK
+  by parkinsons disease.}
+
+\flashcard{The \blank{basal glandla} are regions within the brain that
+  are responsible for \blank{learned movements}, \blank{advanced
+    planning for later movements} and emotive aspects of
+  movements. This shrinks in \blank{parkinson's}
+  patients. \blank{Lewy} bodies are often found within nerve cells of
+  these patients.}
+
+\flashcard{Parkinson's patients will often have \blank{a stooped
+    posture}, \blank{a shuffling gait}, \blank{poor arm swing},
+  \blank{tremors and rigidity}, \blank{a mask like face} and
+  \blank{monotonous speech}.}
+
+\flashcard{Diagnosis for parkinson's is \blank{clinical}, and patients
+  typically live for \blank{10-15} years from diagnosis. Death is
+  usualyl caused by \blank{bhronchopneumonia}. There are treatements
+  available that produce striking improvements at first, \blank{but
+    don't alter the course} of the disease (\blank{dopamine} agents).}
+
+\card{Define dementia.}{A set of symptoms that include memory loss,
+  and difficulties with thinking, problem solving or language.}
+
+\card{How many people in the UK have dementia?}{520,000}
+
+\card{List the causes of dementia. Give a factor that may help prevent
+  it.}{ Degenerative; Alzheimers, multisystem atrophy, huntingtons,
+  lewy body dementia. Infective; CJD (mad cow), AIDS,
+  syphilis. Metabolic; Vitamin B12 deficiency, folate deficiency,
+  hypogylcemia. Alcohol/drugs. Tumors. The mediterranean diet has been
+  correlated with a reduced risk of the disease.}
+
+% TODO : Rest of lecture
+
+% Lecture 3 Human Brain
+
+% Lecture 1 Infectious Disease
+
+\flashcard{Viruses are \blank{genetic elements} that \blank{replicate
+    inside cells}. They are often referred to as \blank{sub-cellular
+    parasites}, and consist of \blank{nucleic acid} surrounded by
+  \blank{protein}. They are classified by the type of \blank{nucleic
+    acid}, how they \blank{replicate} and if they are \blank{single}
+  or \blank{double stranded}.}
+
+\flashcard{Bacteria are \blank{prokaryotic} microorganisms, since they
+  have a \blank{cell wall} and no \blank{distinct nucleus}.}
+
+\flashcard{Fungi are \blank{eukaryotic} microorganisms with
+  \blank{rigid cell walls}, and are sized at anywhere from micrometers
+  to cenitmeters. Some are \blank{unicellular} and others are
+  \blank{filamentous} (i.e. shrooms).}
+
+% Lecture 2 Infectious Disease
+
+\card{Are viruses life?}{No, since they have to be inside another cell
+  to replicate.}
+
+\flashcard{Flu and ebola are \blank{negative} strand group \blank{5}
+  viruses}
+
+\card{Why is influenza so prevalent?}{Since it has so many hosts that
+  it can infect (i.e. different species)}.
+
+\card{How many types of flu viruses are there? Which is the main human
+  one?}{Three; A, B and C. A is the one that is the main human
+  pathogen.}
+
+% TODO: Fill in (slide 4 ish of lecture 2)
+\card{What is the structure of the influenza virus?}{See slide...}
+
+\card{Where does influenza infect in the mammal?}{The respiritory
+  tract. The lower down, the worse the symptoms.}
+
+% TODO How influensza infects cells
+\flashcard{TODO}
+
+\flashcard{\blank{Cytokines} are messenging molecules for the immune
+  system that are released by cells infected with a virus.}
+
+\card{Why is invluenza so prone to variation?}{Since the RNA of
+  viruses lacks proof reading, so that the H and N antigens change
+  (``antigenic drift''). This is why there are new flu vaccines
+  produced every year.}
+
+\card{How often are there flu epedemics?}{There is a localised
+  epedemic, every 2-3 years.}
+
+\flashcard{There are \blank{18} subtypes of H-influenza and \blank{11}
+  subtypes of N-influenza.}
+
+\card{How often are there influenza pandemics?}{Every ten to fourty
+  years?}
+
+% TODO Flu pandemics
+
+\card{Why are young healthy people vulnrable to flu?}{Since they have
+  a very good immune system, and there will be a large response, which
+  can cause death (lots of fever etc). This is called a cytokine
+  storm.}
+
+\card{Talk about hong kong bird flu.}{Hong Kong Bird flu (1997, H5N1)
+  went from birds to humans. Increased pathogenesis, efficient viral
+  replication and cytokine storm. Mortality rate was about
+  ~55\%. Probably caught via bird faeces.}
+
+% What affects the contagiousness of the virus?
+
+% TODO Flu drugs
+
+\flashcard{There is lots of drug resistance for anti-virals for flu
+  because \blank{the virus mutates so rapidly}.}
+
+\flashcard{Ebola virus has a \blank{shepherd's crook} shape under the
+  electron microscope. It has \blank{one long strand} of RNA, and the
+  natural host is \blank{probably fruit bats}. It is spread by
+  \blank{bodily contact with humans}.}
+
+\card{What is the mortality rate of ebola}{30-50 percent.}
+
+\card{Symptoms of ebola?}{Asymptomatic for 2-21 days. and not
+  infectious for that time. Abrupt manifestation after that, fever,
+  chills, muscle pain and other infections. Then more (nausea,
+  vomoting, headache etc). After that, haemorrhagic manifestations
+  (coughing up blood etc) in 30-50 percent of patients. Post infection
+  complications.}
+
+\flashcard{Ebola infects \blank{immune system} cells, which then
+  trigger an immune response, and usually release a cytokine called
+  \blank{interferon}, which acts as a warning system for nearby
+  cells. Ebola lets \blank{interferon} be produced, but stops the
+  immune cells working, which means that cells repond to the cytokines
+  and die/slow down protein synthesis etc.}
+
+\card{What are the ebola drugs?}{Most support blood pressure and
+  fluids. There are several unapproved treatments but these can only
+  be used with patient consent.}
+
+\card{What diagnostic tests are there for ebola?}{Can't detect
+  antibody response for ebola sometimes since the immune system is
+  partially deactivated, and also that people die before a measurable
+  antibody reponse is detected (and patients often die before
+  then). Electron microscopes can be used to identify the virus.}
+
+\flashcard{Ebola has a biosafety level of \blank{4}, where there is a
+  high risk of transmission through the air, and can cause severe and
+  fatal disease where there is no vaccine.}
+
+\card{Why is it unlikely that ebola will become airborn?}{There has
+  been no virus that has been transmitted by bodily fluids that has
+  mutated to become transmitted through the air.}
+
+
+
+\end{document} 

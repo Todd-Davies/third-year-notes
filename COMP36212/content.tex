@@ -4,537 +4,521 @@
   pdfauthor = {\Author}
 }
 
-\section{Finite precision computation}
+% Part One
 
-Unfortunately, the world is not solely restricted to integers, and computers
-often need to work with real numbers $\mathbb{R}$. With integers, the main
-problem we have in computer terms is overflow, and since there is a finite
-distance from one to the next, they are easy to encode in a computer.
+%\input{partone}
 
-On the other hand, between any two real numbers, there are infinitely many more
-real numbers. Since computers are discrete, we need to sample the real numbers
-so that we can find a representation for them in the computer. However, this
-introduces errors, since we can't represent every value exactly and therefore
-most approximate.
+\section{Initial Value Problems}
 
-\subsection{Floating point numbers}
+An initial value problem is an ordinary differential equation with a
+given value called the initial condition, which is the value of the
+unknown function (that we're trying to model) at a given point in the
+domain of the solution.
 
-%Slide 1
+In the notes, the example of a chef leaving a large pot of soup to
+cool is given. If the pot starts at $T_0 = 100$, and the desired
+temperature of the soup is $T_e = 20$, then how long should the chef
+leave it cooling?
 
-One problem we have with computation is that we don't know what the error is
-with computations; how `good' is the result of an algorithm or computation? We
-would like to know the error bounds of a solution, and have the output be
-reliable.
+We can't know this until we have the initial conditions, which is that
+the ambient temperature is $T_\alpha = 10$, and the given point in the
+solution domain; the chef left the soup for ten minutes and the
+temperature was $T_i = 60$.
 
-%Slide 2
+The cooling of the soup is modelled by $\frac{dT}{dt}$ (change in
+temperature over time), and we can use Newton's law of cooling and
+heating to change this to: $\frac{dT}{dt} = f(T - T_\alpha)$. Since we
+know that the ambient temperature is larger than the starting
+temperature ($T > T_\alpha$) and that the soup is actually cooling (as
+evidenced by $T_i < T_0$), we know that $k < 0$.
 
-In the $70$'s, it was realised that different floating point implementations
-produced different results. This had significant concerns for reproducability,
-and as a result the ANSII IEEE standard for binary floating point arithmetic was
-created.
-
-%Slide 3
-
-Each floating point number is represented as four integers; the base, the
-precision, the exponent and the mantissa.
+We can work out the value of $k$ from the analytical solution:
 
 \[
-  x = \pm m \times b^{e-n}
+  T(t) = T_\alpha + (T_0 - T_\alpha)e^{-kt}
 \]
 
-Where:
-
-\begin{center}
-  \begin{tabular}{>{$}l<{$}|l}
-    m & The Mantissa (the bit before the decimal place)\\
-    b & The base (or radix), usually two or ten\\
-    e & The exponent (the power of the radix)\\
-    n & The precision (the number of digits in the mantissa)
-  \end{tabular}
-\end{center}
-
-We can represent different numbers in different ways, for example:
-
-\[
-  0.121e10^3 = 0.0121e10^4
-\]
-
-In this case, we can normalise the way in which we represent numbers and at
-least all computers will get the same errors.
-
-% Slide 4
-
-The amount of numbers we can represent with the floating points depends on the
-values permissible for $b,n$ and $e$. When $b=2,n=2$ and $e=[-2\dots2]$:
-
-\marginpar{The Python code used to generate this is found in the
-\texttt{/COMP36212/programs} folder of the source for these notes.}
-
-\begin{center}
-  \begin{tabular}{>{$}c<{$} >{$}c<{$} >{$}c<{$} >{$}c<{$} >{$}c<{$}}
-    2 & \times & 2^{-2} & = & 0.500000\\
-    3 & \times & 2^{-2} & = & 0.750000\\
-    2 & \times & 2^{-1} & = & 1.000000\\
-    3 & \times & 2^{-1} & = & 1.500000\\
-    2 & \times & 2^{0} & = & 2.000000\\
-    3 & \times & 2^{0} & = & 3.000000\\
-    2 & \times & 2^{1} & = & 4.000000\\
-    3 & \times & 2^{1} & = & 6.000000\\
-    2 & \times & 2^{2} & = & 8.000000\\
-    3 & \times & 2^{2} & = & 12.000000\\
-  \end{tabular}
-\end{center}
-
-The mantissa is always $2$ or $3$ since we're using an explicit one, so the
-binary values are either $[1,0]$ or $[1,1]$.
-
-Floating point numbers are relatively spaced; even though they might not be the
-same distance apart, the ratio between them is the same. The unit round off
-(basically the last digit) is called the \textit{relative machine precision}.
-
-The \textbf{Relative Machine Precision} is given by $u = 0.5 \times b^{1 - n}$,
-and is the largest possible difference between a real number and its floating
-point representation. In the above example, $u = 0.5 \times 2^{-1} =
-\frac{1}{4}$. The value $2u$ is called the \textbf{Machine Precision}.
-
-%Slide 5
-
-In the exam, assume explicit storage of leading bit of mantissa.
-
-\subsubsection{Real world floats}
-
-% TODO: Insert diagram of float format here
-
-For the sign bit, $0$ is for positive numbers and $1$ is for negative ones. The
-exponent must also be able to represent negative numbers (in the case of
-$24\times2^{-2}$ for example), and thus in single precision floats, a bias of
-$+127$ is added to the exponent and that value is stored. The exponent values
-$-127$ and $+128$ are reserved for special numbers.
-
-The first bit of the mantissa is implicitly $1$ in the IEEE base two floating
-point representation. This is because normalised numbers always have $1$ as the
-first digit of their mantissa, and then we can get another digit of precision.
-
-% TODO: Ranges of floating point numbers slide 1
-
-Sixty-four bit floating point numbers have one sign bit, $11$ exponent bits and
-$52$ mantissa bits. This means their bias will be $2^{11} = 2048$ and the range
-will be $2 - 2^{52} \times 2^{2^{11}}$.
-
-The standard also has special values built in:
-
-\begin{description}
-  \item \textbf{Zero}: When the exponent is all zeros and the mantissa equal to 
-  zero.
-  \item \textbf{Denormalised number}: If the exponent is all zero, but the
-  mantissa is non-zero, then the number is
-  $-1^{sign} \times 0.m\times 2^{-126}$.
-  \item \textbf{Infinity}: Exponent is all 1's and mantissa is all 0's. The
-  sign dictates between positive and negative infinity.
-  %TODO: Signalling and quite NaN's
-  \item \textbf{NaN}: Not your grandma, this is when the value isn't a real
-  number, such as when a division by zero occurs.The exponent is all 1's and
-  the mantissa is non-zero.
-\end{description}
-
-\subsubsection{Error in floating point numbers}
-% Example exam q:
-% Given a decimal number x, convert it to normal form and then into binary
-% with specific values for e, m and b. Then trunctuate/round it and estimate
-% the error
-
-% TODO: How can a computer work out this error? It only knows floats...
-
-When a real number is converted to floating point number, it may lose precision.
-If the real number if $x$ and the floating point representation is
-$\bar{x}$, then the error is:
-
-\[
-  e = \bar{x} - x
-\]
-
-You can find how many significant digits a floating point number approximates a
-real number to by doing:
-
-\[
-  |\bar{x} - x| = 10^{-\text{significant digits}}
-\]
-
-
-However, the absolute error $e$ does not give us a good description of the
-accuracy (if the error is $10^{-6}$ but the value is $10^{-7}$ then we're very,
-very inaccurate)! To rectify this, we have relative error:
-
-\[
-  r = \frac{e}{x} = \frac{\bar{x} - x}{x}
-\]
-
-%TODO: Wat is bounds?!
-
-When we're getting the floating point number from the real number, we can
-truncate the (possibly infinite) digits so that it fits in the mantissa. Simply
-chopping the number so it fits in $m$ bits is called \textbf{simple truncation}.
-
-If we round numbers instead of using simple truncation, then we can reduce the
-error. We need some rules though:
-
-\begin{itemize}
-  \item If the part of the mantissa to be chopped of is less than $0.5$, use
-  simple truncation.
-  \item If it's greater, then increment the last digit of the mantissa, and then
-  truncate.
-  \item If it's equal to $0.5$, then we can do either (though IEEE says to round
-  up).
-\end{itemize}
-
-Now the relative error is:
-
-\[
-  |r| = \frac{|e|}{|x|} = \frac{0.5 \times b^{e-n}}{|m|\times b}
-      = \frac{1}{2 \times m \times b^n}
-\]
-
-There are three types of errors that computers can make:
-
-\begin{itemize}
-  \item Essential errors are ones that cannot be avoided (e.g. from erroneous
-  input).
-  \item Rounding errors are when we have to approximate real numbers with
-  floating point ones. This error can be measured and controlled.
-  \item Methodology errors come into play when replacing one problem by another
-  similar, easier but less accurate problem is done. The solution is close, but
-  not exact.
-\end{itemize}
-
-Unfortunately, errors can propagate through a computation. We must know the
-errors introduced by every operation a computer performs on floating point
-numbers. If we know $e_x = \bar{x} - x$ and $e_y = \bar{y} - y$, what is $e_{x
-\cdot y}$?
-
-The error introduced by addition, subtraction, multiplication and division is:
-
-\begin{description}
-  \item Addition:
-  \[
-    \bar{x} + \bar{y} = (x + e_x) + (y + e_y) = (e_x + e_y) + (x + y)
-  \]
-  \[
-    e_{x+y} = e_x + e_y
-  \]
-  \item Subtraction:
-  \[
-    e_{x-y} = e_x - e_y
-  \]
-  \item Multiplication:
-  \[
-    \bar{x} \times \bar{y} = (x + e_x) \times (y + e_y) =
-      xy + xe_y + ye_x + e_xe_y
-  \]
-  \[
-    e_{x \times y} \approx xe_y + ye_x
-  \]
-  \item Division:
-  %TODO: Equation here...
-  \[
-    e_\frac{x}{y} \approx \frac{1}{y}e_x - \frac{x}{y^2}e_y
-  \]
-\end{description}
-
-Relative error can also be calculated:
-
-\begin{description}
-  \item Addition:
-    \[
-      r_{x+y} = \frac{e_{x+y}}{x + y} = \frac{x}{x + y}r_x + \frac{y}{x + y}r_y
-    \]
-  \item Subtraction:
-    \[
-      r_{x-y} = \frac{e_{x-y}}{x - y} = \frac{x}{x - y}r_x + \frac{y}{x - y}r_y
-    \]
-  \item Multiplication:
-    \[
-      r_{x \times y} = \frac{e_{x \times y}}{x \times y} \approx r_x + r_y
-    \]
-  \item Division:
-    \[
-      r_{x / y} = \frac{e_{x / y}}{x / y} \approx r_x - r_y
-    \]
-\end{description}
-
-In general, $\bar{x} \circ \bar{y} = (x \circ y)(1 + r_{x \circ y})$.
-
-\marginpar{Remember, error propagation is not associative. The error from a
-multiplication and then an add is probably not the same as doing the add then
-the multiplication.}
-
-While it is useful to know the error of one operation, we also need to be able
-to work out the error of consecutive operations. That is to say given $e_x =
-\bar{x} - x$ and  $e_y = \bar{y} - y$, determine $e_{x \bar{\circ} y}$.
-\[
-  \begin{split}
-  \bar{x} &= FP(\bar{x_1} \circ \bar{x_2})\\
-          &= \bar{x_1} \bar{\circ} \bar{x_2}\\
-          &= (\bar{x_1} \circ \bar{x_2})(1 + u)\\
-  \end{split}
-\]
-
-Where $|u| \leq 0.5 \times b^{-n + 1}$.
-
-The total relative error is given by:
-
-\[
-  r^t_z = \frac{e^t_z}{x} = r_{x \circ y} + u = a_xr_x + a_yr_y + u
-\]
-
-$a_x$ and $a_y$ is the error introduced by the $\circ$ operation.
-
-Lets put all that into an example. Given the numbers $x,y$ and $x$ with their
-relative round off errors $r_x, r_y$ and $r_z$, determine the relative error in
-$u = (x + y)z$:
-
-\[
-  r^t_{x + y} = \frac{x}{x + y}r_x + \frac{y}{x + y}r_y + r_+
-\]
-
-%TODO: Ask Milan about this slide (23)
-
-\[
-  r^t_{u} = \frac{x}{x + y}r_x + \frac{y}{x + y}r_y + r_+ + r_z + r_*
-\]
-
-We can work out the unit round off errors somehow\ldots
-
-%END TODO
-
-
-\subsection{Finding the number of significant digits}
-
-We want to find an integer that represents how many digits in our number are
-non-nonsense (i.e. how many significant digits we have). The number of
-significant digits in the floating point number $\bar{x}$ where its real
-equivalent is $x$ is:
-
-\marginpar{Z is the set of integers.}
-
-\[
-  l = Z(\log_b\frac{|x|}{|\bar{x} - x|})
-\]
-
-If we rearrange this, the relative error is:
-
-\[
-  r_x \approx b^{-l}
-\]
-
-If we have a computation that takes $m$ real numbers as arguments and outputs a
-real number, if the arguments are floating point numbers with $l_i$ significant
-digits then we can estimate:
-
-\[
-  |e| \approx |\sum^m_{i=1} x_i\frac{\delta f}{\delta x_i}b^{-l_i}|
-\]
-
-Also:
-
-\[
-  |\sum^m_{i=1} x_i\frac{\delta f}{\delta x_i}b^{-l_i}|
-    \leq b^{-l_{\min}}|\sum^m_{i=1} x_i\frac{\delta f}{\delta x_i}|
-\]
-
-The number of significant digits in the answer is:
-
-\[
-  l = l_{\min} - \delta
-\]
-
-Where $\delta$ is the loss of significant digits:
-
-\[
-  \delta = Z(\log_b(
-    \frac{
-      \sum^m_{i=1}|x_i\frac{\delta f}{\delta x_i}|
-    }{
-      |f(x_1, \dots, x_m)|
-    }
-  )
-\]
-
-If we try and subtract numbers that are close in magnitude, then we will lose
-lots of significant digits. If we do $\sqrt{2.01} - \sqrt{2}$ (where both
-numbers are known to 9 significant digits), then we get:
-
-\[
-  \delta = Z(\log_{10}(
-    \frac{
-      |\sqrt{2.01}| + |\sqrt{2}|
-    }{
-      |\sqrt{2.01} - \sqrt{2}|
-    })) = 3
-\]
-
-Our answer would be to six significant figures. In order to get all of the
-significant figures, we need to use a different method:
+By subbing in the values $t = 600, T(600) = 60, T_\alpha = 10$ we can
+get $k$:
 
 \[
   \begin{split}
-    z &= \sqrt{2.01} - \sqrt{2}\\
-      &= (\sqrt{2.01} - \sqrt{2})\frac{\sqrt{2.01}
-         + \sqrt{2}}{\sqrt{2.01} + \sqrt{2}}\\
-      &= \frac{\sqrt{2.01}^2 - \sqrt{2}^2}{\sqrt{2.01} + \sqrt{2}}\\
-      &= \frac{0.01}{\sqrt{2.01} + \sqrt{2}}
+  60 &= 10 + (100 - 10)e^{-600 \times k}\\
+  50 &= 90e^{-600 \times k}\\
+  \frac{5}{9} &= e^{-600 \times k}\\
+  log(\frac{5}{9}) &= -600k\\
+  k &= 9.796\times10^{-4}
   \end{split}
 \]
 
-\marginpar{Revision break? Read this:
-\href{https://randomascii.wordpress.com/2014/01/27/theres-only-four-billion-floatsso-test-them-all/}{https://randomascii.wordpress.com
-/2014/01/27/theres-only-four
--billion-floatsso-test-them-all/}}
-
-\subsubsection{Accurately computing sample variance}
-
-Computing the sample variance of a set of numbers is done by the formula:
+To see how long the cook should leave the soup for, we can simply sub
+in $k$ and sub in $20$ for the desired ending temperature:
 
 \[
-  s^2_n = \frac{1}{n - 1}\sum^n_{i=1}(x_i - \hat{x})^2
+\begin{split}
+  T(t) &= T_\alpha + (T_0 - T_\alpha)e^{-kt}\\
+  20 &= 10 + 90e^{-9.796\times10^{-4}t}\\
+  \frac{1}{9} &= e^{-9.796\times10^{-4}t}\\
+  t &= \frac{log(\frac{1}{9})}{-9.796\times10^{-4}}\\
+  t &= 2242s
+\end{split}
 \]
 
-Where $\hat{x} = \frac{1}{n}\sum^n_{i=1}x_i$ is the mean of the values.
+This was an easy problem though; often, an analytical solution (the
+equation for $T(t)$) will not exist and we will need to solve the
+problem numerically.
 
-In order to compute the variance, we would need to calculate the mean first,
-then calculate the variance, which requires two for loops. However, a
-numerically equivalent formula exists for doing the same thing:
+\subsection{IVP's: Linear Multistep Methods}
+
+Basically we will have a function that takes in the current $x$ and
+$y$ values and output the next $y$ value:
 
 \[
-  s^2_n = \frac{1}{n-1}(\sum^n_{i=1}x_i^2 - \frac{1}{n}(\sum^n_{i=1}x_i)^2)
+  y' = f(x,y)
 \]
 
-If we use the following data:
+Where $a < x < b$, and we know the `first' $y$ value $y(a) = \alpha$.
+
+Linear multistep methods aim to emulate a target function using
+$y'$. Given $y'$ (a function that produces the next value of a target
+function $y' = f(x,y)$ for all $a < x < b$) and $y(a) = \alpha$, we
+can use Taylor expansion to find the value of any point where $b$ is
+greater than $a$:
+
+% TODO: Explain Taylor Expansion
+
+\[
+\begin{split}
+  y(x) &\approx y(a) + (b - a)y'(a)\\
+       &\approx y(a) + (b - a)f(a, y(a))
+\end{split}
+\]
+
+We want to move from $a$ to $b$ in small increments, otherwise any
+inaccuracies in the Taylor expansion will become quickly apparent, so
+we define $h$ to be the step size between $x_n$ and $x_{n+1}$ (where
+$x_k$ are the intermediate steps between $a$ and $b$), such that $h
+= \frac{b - a}{N}$, where $N$ is the number of steps we want to take.
+
+This means that $x_n$ = $a + nh$.
+
+For Euler's method, we can describe:
+
+\[
+\begin{split}
+  y_{n+1} &= y_n + (x_{n+1} - x_n)f(x_n, y_n)\\
+          &= y_n + hf_n
+\end{split}
+\]
+
+The Euler method only uses the previous point to generate the next
+point, but in general, linear multistep methods use the previous $k$
+steps to calculate the next value. As such, they are described by a
+list of values $\alpha = (\alpha_1, \dots, \alpha_k), \beta =
+(\beta_1,\dots,\beta_k)$ ($\alpha_k$ is always 1), such that:
+
+\[
+  \sum\limits^k_{i=0}\alpha_iy_{n+i} = h \sum\limits^k_{i=0}\beta_if_{n+i}
+\]
+
+The designer of the method determines the coefficients
+$\alpha_{0,\dots,k-1}$ ($alpha_k$ is 1 remember) and $\beta_{0, k}$,
+and they will balance the accuracy of the approximation with the need
+to make the method easy to apply.
+
+If $\beta_k = 0$, then the method is said to be explicit, since the
+formula can directly compute $y_{n + k}$, whereas if $\beta_k \neq 0$,
+then the $y_{n+k}$ depends on $f(x_{n+x},y_{n+k})$, which means an
+equation must be solved to find $y_{n+k}$:
+
+\[
+  y_{n+k} = h\beta_kf(x_{n+k},y_{n+k})
+              + h\sum\limits^{k-1}_{i=0}\beta_if_{n+i}
+              - \sum\limits^{k-1}_{i=0}\alpha_iy_{n+i}
+\]
+
+Lets use the Euler method applied to the soup problems as an
+example. Since $\frac{dT}{dt} = -k(T - T_a)$\footnote{The change in
+temperature over time is equal to the temperature minus the ambient
+temperature multiplied by the cooling coefficient.},
+$f(x_{n+1},y_{n+1}) = -k(T_n - T_a)$.
 
 \begin{center}
-  \begin{tabular}{>{$}c<{$}|>{$}c<{$}}
-    \text{Value} & \text{Floating point representation}\\ \hline
-    100 & 0.1000\times10^3\\
-    101 & 0.1010\times10^3\\
-    102 & 0.1020\times10^3
-  \end{tabular}
+\begin{tabular}{ll}
+  Forward Euler & $T_{n+1} = T_n + h(-k(T_n - T_a))$\\
+  Backward Euler & $T_{n+1} = T_n + h(-k(T_{n+1} - T_a))$\\
+\end{tabular}
 \end{center}
 
-If we use formula one for the variance with these input numbers, then we get an
-answer of $1$, if we use formula two, then we get the answer to be $-1.667$
-
-% TODO: Why???
-
-\subsubsection{Overflow and underflow}
-
-We must be aware of overflow and underflow in our operations. For example, if we
-were calculating the length of the hypotenuse of a triangle
-($\sqrt{\text{opposite}^2 + \text{adjacent}^2}$), then we could have an overflow
-if $x = y = 10^{200}$, since the range representable by a single precision float
-is $10^{\pm308}$.
-
-This can be remedied by using a different formula:
-
-\begin{center}
-  \includegraphics[width=0.3\textwidth]{images/safe-pythag}
-\end{center}
-
-\subsection{Condition of a problem}
-
-The condition of a problem is how sensitive it is to changes in the data. A
-problem is ill-conditioned if a small change in the data results in a large
-change in the solution. This is concerned with the problem, not the method used
-to solve it.
-
-Consider the equation $x^3 - 21 x^2 + 120x - 100 = 0$; the solutions are $x =
-\{1, 10\}$. However, if we change the value of $x^3$ to $0.99$ or $1.01$, then
-the roots become $x = \{1, 11.17, 9.041\}$ and $x = \{1, 9.896 \pm 1.044\}$
-respectively.
-
-We can work out the sensitivity by using partial differentiation, if the
-perturbed function if $\bar{f}(x) = f(x) + \epsilon g(x)$, where $g(x)$ is the
-change applied to $f(x)$, then:
+Since we know the starting temperature of the soup ($T_0 = 100$), we
+can simply iterate towards the end value with the forward Euler
+method. Lets say $h = 20$ and $k = 9.796\times10^{-4}$ as we worked
+out earlier:
 
 \[
-  |\delta| \approx |\frac{\epsilon g(x)}{f'(x)}|~\text{(single root)}
+\begin{split}
+  T_0 &= 100\\
+  T_1 &= 100 + 20(-9.796\times10^{-4}(100 - 10)) = 98.237\\
+  T_2 &= 98.237 + 20(-9.796\times10^{-4}(98.237 - 10)) = 96.508\\
+  &\vdots\\
+  T_{111} &= \dots = 20.009\\
+  T_{112} &= \dots = 19.813\\
+\end{split}
 \]
+
+Since we did $112$ iterations before we dropped below the target
+temperature of $20$, and $h = 20$, we know the time is between $2220$
+and $2240$ seconds. Since we previously calculated the actual time it
+would take ($2242$ seconds), we're pretty close to the right
+answer. We probably got a bit of inaccuracy because the forwards Euler
+method is unstable (we'll get to that later). If we decreased $h$,
+then we would get a better answer (in fact, when $h=1$, we get $~2242$
+seconds).
+
+We can also use the backward Euler method. To do this we need to
+rearrange the method to give $T_{n+1}$ so that it is not a recursive
+definition:
 
 \[
-  |\delta| \approx |\sqrt{-\frac{2\epsilon g(x)}{f''(x)}}|~\text{(double root)}
+\begin{split}
+  T_{n+1} &= T_n + h(-k(T_{n+1} - T_a))\\
+          &= T_n - hk(T_{n+1} - T_a)\\
+  \frac{T_{n+1}}{-hk} &= \frac{T_n}{-hk} + T_{n+1} - T_a\\
+  \frac{T_{n+1}}{-hk} - T_{n+1} &= \frac{T_n}{-hk} - T_a\\
+  T_{n+1} + khT_{n+1} &= T_n + hkT_a\\
+  T_{n+1}(1 + hk) &= T_n + hkT_a\\
+  T_{n+1} &= \frac{1}{1 + hk}(T_n + hkT_a)
+  \end{split}
 \]
 
-In the above example, $g(x) = x^3, \epsilon = -0.01, f'(x) = 3x^2 - 42x + 120$:
+So lets apply the backwards Euler method with $h=20$:
 
 \[
-  |\delta| \approx |\frac{-0.01 \times 1^3}{81}| \approx 0.0001
+\begin{split}
+  T_0 &= 100\\
+  T_1 &= \frac{1}{1 + 20\times9.796\times10^{-4}}(100 +
+  20\times9.796\times10^{-4}\times10) = 98.271\\
+  T_2 &= \frac{1}{1 + 20\times9.796\times10^{-4}}(98.271 +
+  20\times9.796\times10^{-4}\times10) = 96.574\\
+  &\vdots\\
+  T_{112} &= 20.047\\
+  T_{113} &= 19.854\\
+\end{split}
 \]
 
-For the double root, $f''(x) = 6x - 42$
+Therefore we can see that the backwards Euler method says that the
+temperature reaches $20$ degrees between $2240$ and $2260$ seconds
+($112$ and $113$ times $h$). If we decreased the step size $h$, we
+could get a more accurate calculation (when $h=1$ we get $2244-2245$
+seconds). The benefit of the backwards method is that it is
+unconditionally stable (i.e. errors in the input between successive
+iterations will diminish as the algorithm
+executes)\footnote{\url{http://mathworld.wolfram.com/NumericalStability.html}}.
+
+\subsubsection{Consistency of Linear Multistep Methods}
+
+We have seen how to construct linear multistep methods, and had a look
+at how to make them stable. Now we must examine their consistency,
+which is the property that as $h$ decreases, the truncation error can
+be made to approach zero; i,e, as $h$ approaches
+$\frac{1}{\infty}$, we approach the true solution of the equation.
+
+To find if a method is consistent, we must first find its order. This
+is done by defining the constants $C_0, \dots, C_j$:
 
 \[
-  |\delta| \approx |\sqrt{-\frac{2 \times -0.01 \times 1000}{18}}| \approx 1.054
+\begin{split}
+C_0 &= \alpha_0 + \dots + \alpha_k\\
+C_1 &= \alpha_1 + 2\alpha_2 + \dots + k\alpha_k - (\beta_0 + \dots
++ \beta_k)\\
+C_j &= \frac{1}{j!}(\alpha_1 + 2^j\alpha_2 + \dots + k^j\alpha_k)
+- \frac{1}{(j-1)!}(\beta_1 + 2^{j-1}\beta_2 + \dots + k^{j-1}\beta_k)
+\end{split}
 \]
 
-So the double root is vastly affected, but the single root isn't.
-
-\subsection{Stability}
-
-The stability of a method is how sensitive it is to rounding errors. A method
-that guarantees as accurate solution as the input data allows is said to be
-stable, otherwise it's unstable. Condition is about the sensitivity of the
-problem, but stability is about the sensitivity of the method.
-
-Given the quadratic equation $1.6x^2 - 100.1x + 1.251 = 0$, the solution can be
-found using the standard formula (in floating point) ($x = \frac{-b \pm\sqrt{b^2
-- 4ac}}{2a}$), which gives $x = \{62.53, 0.03125\}$.
-
-If we only compute the first root to be $x_1 = 62.53$, but use $x = c/ax_1$ for
-the second, then we get the second root to be $0.01251$. The correct solutions
-are $x = \{62.53, 0.0125\}$.
-
-The problem was that $y_1 = -b = 100.1$, and  $y_2 = \sqrt{b^2 - 4ac} = 100.06$.
-Since if we do subtraction with very close numbers, the error is high. If we
-calculate $\delta$ for this then we get:
+A linear multistep method is of order $p$ if $C_{p+1} \neq 0$. In
+other words $C_0 = C_1 = \dots = C_p = 0, C_{p+1} \neq 0$. If the
+method is of order $p \geq 1$ then it is consistent. This can also be
+expressed as the sum of the alphas being $0$, or the sum of the
+product of the index and the alpha being equal to the sum of the
+betas:
 
 \[
-  \delta = X(\log_10\frac{|y_1| + |y_2|}{|y_1 - y_2|}) = 4
+  \sum\limits^k_{i=0}\alpha_i = 0, \sum\limits^k_{i=0}i\alpha_i
+    = \sum\limits^k_{i=0}\beta_i
 \]
 
-Meaning all of our digits were rubbish!
+\subsubsection{Stability of Linear Multistep Methods}
 
-%TODO: Page 41 onwards for an example
+A method is stable if its first characteristic polynomial does not
+have zeros with a modulus greater than one, and if all the zeros with
+a modulus equal to one are simple. This sounded very abstract to me,
+but after talking to Milan about it, I'll give my best shot at what it
+means:
 
-% Part two of the course!
+We must define the first characteristic polynomial to be:
+
+\[
+\begin{split}
+  p(\zeta) &= \alpha_k\zeta^k + \alpha_{k-1}\zeta^{k-1} + \dots
+  + \alpha_0\zeta^0\\
+           &= \alpha_k\zeta^k + \alpha_{k-1}\zeta^{k-1} + \dots
+  + \alpha_1\zeta + \alpha_0\\
+\end{split}
+\]
+
+Now, we need to find the roots of this polynomial (i.e. where
+$p(\zeta) = 0$), which will give us a set of values
+$\zeta_1,\dots,\zeta_n$ (usually there are only a few values). Some of
+these values can be complex numbers (e.g. if $\zeta = a + ib$ is a
+solution, then $\zeta = a - ib$ is too). To calculate the modulus of
+one of these, you get the actual value if the number is real, or for
+complex numbers, you can do $|\zeta_n| = \sqrt{a^2 + b^2}$.
+
+\subsubsection{Optimal Methods}
+
+An optimal method is one that is both stable, and has an order of $k +
+2$ (where $k$ is the number of terms it has, e.g. the Euler method has
+$k = 1$, therefore the Euler method is not optimal).
+
+The First Dahlquist Barrier states that a method cannot attain an
+order of convergence greater than $k + 1$ is $k$ is odd or $k + 2$ if
+$k$ is even.
+
+\subsubsection{Examples of Analysing Linear Multistep Methods}
+
+\begin{description}
+\item \textbf{Example One:}\\
+
+Lets examine the Euler method first, defined as $y_{n+1} = y_n +
+hf_n$. We first need to get it into the form where all the $y$'s are
+on one side, and all the $f$'s are on the other side (this is easy):
+
+\[
+  y_{n+1} - y_n = hf_n
+\]
+
+Now we can simply read off the values of $\alpha$ and $\beta$:
+
+\[
+\begin{split}
+  \alpha_0 &= -1\\
+  \alpha_1 &= 1\\
+  \beta_0 &= 1\\
+  \beta_1 &= 0
+\end{split}
+\]
+
+Using these, we can calculate the values of the constants:
+
+\[
+\begin{split}
+C_0 &= \alpha_0 + \alpha_1 = -1 + 1 = 0\\
+C_1 &= \alpha_1 - \beta_0 - \beta_1 = 1 - 1 - 0 = 0\\
+C_2 &= \frac{1}{2}\alpha_1 - \beta_1 = \frac{1}{2} - 0
+= \frac{1}{2} \neq 0
+\end{split}
+\]
+
+Since $C_2$ is not $0$, then the method is consistent and of the first
+order. To calculate the stability, then we must find the first
+characteristic polynomial:
+
+\[
+  p(\zeta) = \alpha_1\zeta^1 - (\alpha_0 \zeta^0) = \zeta - 1
+\]
+
+Now we can solve for $\zeta$:
+
+\[
+\begin{split}
+  p(\zeta) &= 0\\
+  \zeta - 1 &= 0\\
+  \zeta &= 1\\
+\end{split}
+\]
+
+Since $\zeta = 1$ (which satisfies the conditions we said before), we
+know that it is stable. Since it is stable and it is consistent, then
+it is convergent.
+
+\item \textbf{Example Two:}\\
+
+For the next example, lets look at the equation:
+
+\[
+  y_{n+2} - y_{n+1} = \frac{h}{3}(3f_{n+1} - 2f_n)
+\]
+
+Lets see if it is consistent. To do this we must compute the
+constants:
+
+\[
+  \begin{split}
+    C_0 &= 0 - 1 + 1 = 0\\
+    C_1 &= -1 + 2(2) - (0 + \frac{3}{3} - {2}{3}\\
+        &= 3 - \frac{1}{3}\\
+        &= 2\frac{2}{3}
+  \end{split}
+\]
+
+Since $C_1 \neq 0$, the method is not consistent (and therefore cannot
+be convergent either). Next we can see if it is stable, but getting
+the first characteristic polynomial:
+
+\[
+\begin{split}
+  p(\zeta) &= \alpha_2\zeta^2 + \alpha_1\zeta + \alpha_0\\
+           &= \zeta^2 - \zeta\\
+  p(\zeta) &= 0\\
+  \zeta = 0&, \zeta = 1
+\end{split}
+\]
+
+Therefore we can see that the method is stable (since the roots are
+between 0 and 1).
+
+\item \textbf{Example Three:}\\
+
+We have:
+
+\[
+  y_{n+2} + 4y_{n+1} - 5y_n = \frac{2}{h}(8f_{n+1} + 4f_n)
+\]
+
+The consistency would be:
+
+\[
+\begin{split}
+  C_0 &= 1 + 4 - 5 + 0 = 0\\
+  C_1 &= 2(1) + 4 - (4 + 2) = 0\\
+  C_2 &= \frac{1}{2!}(-5 + 2^2(4) + 3^2(1)) - \frac{1}{1!}(2 +
+  2^1(4))\\
+      &= \frac{1}{2}(4(1) + 4) - 4\\
+      &= 0\\
+  C_3 &= \frac{1}{3!}(8(1) + 4) - \frac{1}{2!}(4)\\
+      &= \frac{1}{6}(12) - 2\\
+      &= 0\\
+  C_4 &= \frac{1}{4!}(16(1) + 4) - \frac{1}{3!}(4)\\
+      &= \frac{1}{24}(20) - 1.5\\
+      &= -\frac{2}{3}
+\end{split}
+\]
+
+Since it is of order $3$, the method is consistent.
+
+To find the stability, we must find the first characteristic
+polynomial:
+
+\[
+\begin{split}
+  p(\zeta) &= \zeta^2 + 4\zeta - 5\\
+  p(\zeta) &= 0\\
+  \zeta = 5&, \zeta = 1
+\end{split}
+\]
+
+Since $\zeta = 5$, the method is not stable, and is therefore not
+convergent.
+\item \textbf{Example Four}:\\
+  Sometimes, Milan will ask for the roots of a complicated polynomial
+  like he did in 2014. Here is the question:
+
+  \begin{center}
+    \includegraphics[width=\textwidth]{images/2014q}
+  \end{center}
+
+  Here is my answer:
+
+  In order to determine the order of method two, we first must find the
+  values of $\alpha$ and $\beta$:
+
+    \[
+      \begin{split}
+        \alpha_0 &= 0, \alpha_1 = \frac{1}{6}, \alpha_2 = -1\\
+        \alpha_3 &= \frac{1}{2}, \alpha_4 = \frac{1}{3}\\
+        \beta_0 &= 0, \beta_1 = 0, \beta_2 = 1
+      \end{split}
+    \]
+
+  And now using those, we can find the constants:
+
+      \[
+      \begin{split}
+        C_0 &= \sum\limits^k_{i=0}\alpha_i = \frac{1}{6} - 1 +
+        \frac{1}{2} + \frac{1}{3} = 0\\
+        C_1 &= \sum\limits^k_{i=1}i\alpha_i -
+        \sum\limits^k_{i=0}\beta_i = \frac{1}{6} - 2(-1) + \frac{3}{2}
+        + \frac{3}{3} - 1 = -\frac{1}{3}
+      \end{split}
+      \]
+
+      Therefore we can see that the method is not consistent as it is
+      of order $0$.
+
+      The first characteristic polynomial is:
+
+      \[
+        p(\zeta) = \frac{1}{3}\zeta^3 + \frac{1}{2}\zeta^2 - \zeta + \frac{1}{6}
+      \]
+
+      Since we can (relatively easily) see that $\zeta = 1$ is a root,
+      we can use polynomial division to get the rest:
+
+      \begin{center}
+      \polylongdiv{\frac{1}{3}x^3 + \frac{1}{2}x^2 - x +
+        \frac{1}{6}}{x - 1}
+      \end{center}
+      
+      Now we have $(\zeta - 1)\left(\frac{\zeta^2}{3} + \frac{5\zeta}{6} -
+      \frac{1}{6}\right)$, we can use the quadratic formula to find the rest
+      of the roots:
+
+      \[
+      \begin{split}
+        a &= \frac{1}{3}, b = \frac{5}{6}, c = \frac{-1}{6}\\
+        \zeta &= \frac{-b \pm\sqrt{b^2 - 4ac}}{2a} = \frac{15 \pm
+          \sqrt{209}}{12}\\
+        \zeta &= 2.556, \zeta = 0.0453
+      \end{split}
+      \]
+
+      Since $2.556$ is greater than $1$, the method is not stable.
+
+\end{description}
+
+% Part Two
 
 \section{Optimisation and nature inspired algorithms}
 
-To start, lets recap some stuff you should already know; a minima is a point of
-a function where all points in its vicinity have a higher value than itself,and
-a maxima is the opposite; a point where all points in its vicinity have a lower
-value than itself.
+To start, lets recap some stuff you should already know; a minima is a
+point of a function where all points in its vicinity have a higher
+value than itself, and a maxima is the opposite; a point where all
+points in its vicinity have a lower value than itself.
 
-Since we can invert a function by putting a minus in front of it, we don't
-really need to differentiate between maxima and minima, since we can always
-express on in terms of the other.
+Since we can invert a function by putting a minus in front of it, we
+don't really need to differentiate between maxima and minima, since we
+can always express one in terms of the other. We can however
+differentiate between \textit{global optimums}, which are the best
+values for the entire domain, and \textit{local optimums} are best in
+some bounded region.
 
-Global optimums are the best values for the entire domain, while local optimums
-are best in some bounded region.
-
-One dimensional functions are easiest to visualise; they are just a graph, where
-the y value is the value of the function and the x value is the input. As the
-dimensionality increases, the functions get harder to visualise; 2d functions
-are visualised on a 2d graph, where the intensity of the colour in each square
-represents the value of the function at that coordinate. 
-
-% TODO: inequality/equality constraints?
+One dimensional functions are easiest to visualise; they are just a
+graph, where the y value is the value of the function and the x value
+is the input. As the dimensionality increases, the functions get
+harder to visualise; 2d functions are visualised on a 2d graph, where
+the intensity of the colour in each square represents the value of the
+function at that coordinate.
 
 An optimisation problem is one where we attempt to maximise or minimise a
 function. This involves finding the input that will produce the largest or
 smallest value. Optimisation problems are really search problems; given a
-domain, find an input that produces the smallest output.
+domain, find an input that produces the most desirable output.
 
-If we know exactly what the function we're trying to optimise is (i.e. we have
-an equation), then it's an explicit problem, but if we just have some inputs and
-outputs, then it's a black box problem.
+If we know exactly what the function we're trying to optimise is
+(i.e. we have an equation), then it's an explicit problem, but if we
+just have some inputs to an unknown function, and their corresponding
+output values, then it's a black box problem.
 
 Similarly, there are two different approaches to solving these problems:
 
@@ -543,9 +527,10 @@ Similarly, there are two different approaches to solving these problems:
    This is where there is a single candidate solution that is incrementally 
    improved by the algorithm throughout the procedure.
   \item \textbf{Population based solution}:\\
-    This is where there is a set of candidate solutions (the population) and an
-    iterative operation combines the best ones to improve the quality of the 
-    population.
+    This is where there is a set of candidate solutions (the
+    population) and an iterative operation combines and mutates the
+    best ones, or increments the whole population to improve the
+    quality of the population.
 \end{description}
 
 All of the optimisation methods follow a cycle:
@@ -556,14 +541,15 @@ All of the optimisation methods follow a cycle:
   \begin{itemize}
     \item Evaluate how the current parameters perform
     \item If we're satisfied, then we've finished
-    \item Otherwise, then determine new parameters based on the current ones
+    \item Otherwise, determine new parameters based on the current ones
       and their evaluation.
   \end{itemize}
 \end{itemize}
 
-We can use derivatives to try and find maxima and minima in a function. If we do
-not have an explicit function for the derivative, then we can calculate them
-using \textbf{finite differences}:
+We can use derivatives to try and find maxima and minima in a
+function. If we do not have an explicit function for the derivative,
+then we can calculate them using \textbf{finite differences}, of which
+two approaches are presented here:
 
 \begin{description}
   \item \textit{Forward difference}:\\
@@ -609,16 +595,37 @@ the range.
 
 \subsubsection{Quadratic interpolation algorithm}
 
-Here, we make a quadratic function that goes through three points $a, b$ and
-$c$, then we either drop $a$ or $b$ depending on which way we should move the
-quadratic function. Here, \textbf{we do not need the differential} which is good
-since we won't always have it!
+Here, we make a quadratic function that goes through three points $a,
+b$ and $c$, then we either drop $a$ or $b$ depending on which way we
+should move the quadratic function. Here, \textbf{we do not need the
+differential} which is good since we won't always have it!
 
-% TODO: Insert & explain psudo code
+Please look at the lecture notes for psudo code here.
 
-\begin{verbatim}
-  Sudo insert psudo code
-\end{verbatim}
+% TODO: I don't think this is right...
+%% \begin{verbatim}
+%%   quadInterpolate(f'(x), a, b, e) { 
+%%     i = 1;
+%%     c1 = (a + b) / 2;
+%%     c2 = compute(a, b, c1);
+%%     while (|c2 - c1| <= e) {
+%%       cn = 0;
+%%       l = min(c1, c2);
+%%       r = max(c1, c2);
+%%       if (f(r) < f(l)) {
+%%         a = l;
+%%         cn = r;
+%%       } else {
+%%         b = r;
+%%         cn = l;
+%%       }
+%%       i += 1;
+%%       cn = compute(a, b, c1);
+%%       c1 = c2;
+%%       c2 = cn;
+%%     }
+%%   }
+%% \end{verbatim}
 
 \subsubsection{Stopping criteria}
 
@@ -644,7 +651,7 @@ functions:
     % TODO: Give an example of this, since it's really quite vague.
 
     \[
-      \Phi'_r = \lim_{h \rightarrow 0}\frac{f(x + hr) - f(x)}{h}
+      \Phi'_r = lim_{h \rightarrow 0}\frac{f(x + hr) - f(x)}{h}
     \]
 
     Where $r$ is the direction. If $\Phi'_r$ is positive, then the direction is
@@ -656,7 +663,7 @@ functions:
 
     \[
       \frac{\delta f}{\delta x_j} =
-        \lim_{h \rightarrow 0} \frac{f(x + he_j) - f(x)}{h}
+        lim_{h \rightarrow 0} \frac{f(x + he_j) - f(x)}{h}
     \]
 
     $e_j$ is the unit vector in the direction of axis $j$, so to construct the 
@@ -800,7 +807,7 @@ algorithms try to find global optimums:
 
   \item \textbf{Random search}:\\
   Here, we simply generate $n$ random points and sample the objective function
-  at these points. The point that gives the best value for th objective
+  at these points. The point that gives the best value for the objective
   function is remembered for possible later use (since that's the optimum).
   Obviously this algorithm runs in $O(n)$ time, and its quality depends on the
   number of random points chosen. It is possible that the random search method
@@ -966,12 +973,23 @@ out, but there is a mapping from biology terminology to CS terminology:
 
 Evolutionary algorithms evolve their populations. This means there will be $n$
 points in the parameter space, and each iteration will drop some of the points
-and create new ones (hopefully, in better locations). Each individual in the 
+and create new ones (in hopefully better locations). Each individual in the 
 population is a single candidate solution, and is stored as a
 \textit{chromosome}. This is a sequence of bits, split into $m$ sections called
 \textit{genes}. As described above, each gene maps onto a parameter.
 
-% TODO: Insert image showing chromosome/genes = parameters
+\begin{center}
+\fbox{
+\begin{minipage}{0.5\textwidth}
+\textbf{Chromosome:}\\
+\texttt{1100110 1010101 1010111 0101101 1011010}\\
+\textbf{Genes (each one is a parameter)}\\
+\texttt{102 85 87 45 90}\\
+\textbf{Alternately, floating point parameters}\\
+\texttt{4.48 2.20 8.80 3.0 1.11 4.12}
+\end{minipage}
+}
+\end{center}
 
 Fogel's algorithm for evolutionary programming is as such:
 
@@ -989,16 +1007,16 @@ Fogel's algorithm for evolutionary programming is as such:
   \item Go back to step 2, or stop.
 \end{enumerate}
 
-% TODO: Can this be a negative number?
-
 In this algorithm, we described mutation (in step 4) and selection (in step 6).
 For mutation, we add a small random number to the original value of a gene.
 
-For selection, we want to select $n$ individuals, where better individuals have
-a greater chance of remaining in the population. A roulette wheel is a manual
-way of doing this, but stochastic ranking (e.g. a sort that has a chance of
-being wrong) or a tournament where each individual is compared against a small
-number of others and receives a score based off of its performance; the $n$
+For selection, we want to select $n$ individuals, where better
+individuals have a greater chance of remaining in the population. A
+roulette wheel is a manual way of doing this (each individual has a
+probability of being picked according to their fitness), but
+stochastic ranking (e.g. a sort that has a chance of being wrong) or a
+tournament where each individual is compared against a small number of
+others and receives a score based off of its performance; the $n$
 lowest scoring individuals are pruned.
 
 Holland and DeJong's Genetic algorithm is as follows. It encodes parameters in
@@ -1018,7 +1036,20 @@ binary, and genes are therefore strings of binary digits.
 The mutation operation flips bits in a gene with a small probability. The cross
 over operator swaps the latter halves of two chromosomes at a random index.
 
-% TODO: Cross over image
+\begin{center}
+\begin{tikzpicture}
+  \path [fill=gray] (0.2,-0.2) rectangle (1.02,0.2);
+  \path [fill=gray] (2.2,-0.2) rectangle (3.02,0.2);
+  \path [fill=gray] (0.2,0.8) rectangle (1.02,1.2);
+  \path [fill=gray] (2.2,0.8) rectangle (3.02,1.2);
+  \node at (1,1) {\texttt{01101000}};
+  \node at (3,1) {\texttt{01010010}};
+  \node at (1,0) {\texttt{01011000}};
+  \node at (3,0) {\texttt{01100010}};
+  \draw [->] (0.5,0.8) -- (2.5,0.2);
+  \draw [->] (2.5,0.8) -- (0.5,0.2);
+\end{tikzpicture}
+\end{center}
 
 The differences in the two algorithms are as follows:
 
@@ -1033,23 +1064,37 @@ The differences in the two algorithms are as follows:
   \end{tabularx}
 \end{center}
 
-%TODO: What is the standard deviation gene?
-Rechenberger and Schwefel made another algorithm:
+Rechenberger and Schwefel made another algorithm. In this algorithm,
+each gene has an associated standard deviation which affects how it
+mutates. This is an innovation because in the standard approach, the
+size of each mutation is the same for all genes and is constant
+throughout the execution of the algorithm. Here, the standard
+deviation for each gene is updated throughout the algorithm, and
+henceforth mutations are different sizes for each gene and changes as
+the algorithm progresses:
 
 \begin{enumerate}
   \item Generate $n$ random individuals
   \item Calculate the fitness of each
   \item Randomly pair up individuals
   \item Recombine them to create two offspring
-  \item Mutate each gene locus with a small probability
+  \item Mutate each gene locus with a small probability based of the
+  gene's standard deviation.
   \item Put the offspring in the new population ($2n$ large)
   \item Select the best $n$
   \item Go back to step 2, or stop.
 \end{enumerate}
 
-% TODO: How is std. deviation incorperated in mutation & recombination
+In this algorithm, the mutation happens in two stages: first the
+standard deviation is mutated first, and then the gene is added to by
+a random number based off the standard deviation.
 
-I should figure out how std. deviation incorporates in here...
+The recombination operator is also slightly different; since each gene
+in the child is the average of the parent gene:
+
+\[
+  (12 , 5 , 34 , 2), (10 , 7 , 30 , 4) \rightarrow (11 , 6 , 32 , 3)
+\]
 
 It is important to note the differences between selection and variation so we
 can get the balance right:
@@ -1070,8 +1115,6 @@ of very rapid progress. In general, it is not common for these algorithms to
 have proven convergence properties, but some of them do when applied to simple
 problems.
 
-%TODO: Split this uber sentence up
-
 Deciding when to stop a genetic algorithm isn't always simple; stopping after a
 predetermined number of generations requires lots of trial and error to get the
 number right, waiting until a desired fitness is reached is okay if you know
@@ -1080,91 +1123,181 @@ time, and waiting for the fitness variations from one population to the next to
 become stable isn't a good idea either because of the propensity for genetic
 algorithms to progress very slowly then have a burst of progress.
 
-% Part 2 Lecture 5
+% Lecture 5
 
-\subsubsection{Genetic programming}
+\subsection{Genetic Programming}
 
-Most evolutionary algorithms try and optimise the parameters of a
-function to find a minima, however, genetic programming aims to change
-the function until it fits our purpose. If we view computer programs
-as mathematical functions (which they are at some level), then we can
-evolve computer programs in this way.
+With evolutionary programming, we optimised the parameters of the
+input function in order to find the ones that produce the best
+solution. On the other hand, genetic programming optimises the
+function until it fits our purpose. This may seem like a strange
+approach, but when you consider that any computer program is just a
+big mathematical function, then genetic programming just becomes
+automatic computer programming.
 
-Genetic programming evolves programs in two ways; generating new
-sections of code and combining or mutating existing code. This
-analogous to how a programmer works if you think about it!
+In this sense, programs evolve to become better at solving the problem
+they are being evaluated against. If you think about it, programmers
+have two `phrases' when to producing code; developing new code, and
+editing existing code. This maps cleanly onto genetic programming,
+since the algorithms first generate entirely new pseudo-random code,
+and then mutate/cross it over with other code.
 
-If you've taken the compilers course, you're most likely already
-comfortable with representing programs as trees. We can represent a
-program as a tree with nodes that are either \textit{functions} or
-\textit{terminals}. Terminals are either inputs, constants or
-programming statements without arguments, while functions are
-programming statements, arithmetic functions or operations.
+We can represent programs as trees, where internal nodes are functions
+(which includes arithmetic/logical operations) with arguments, and
+where leaf nodes correspond to constant values, functions with no
+arguments, or inputs to the program.
 
-In order to generate a program using genetic programming, you must
-define both a function set and a terminal set. These are the sets of
-allowable nodes that you can have in your program tree. Examples
-include \texttt{XOR}, \texttt{READ}, \texttt{IF} etc for functions and
-named variables, random variables or constants for the terminals.
+The genetic algorithm must be given a set of functions and a set of
+terminals that it can use to generate the tree. Example functions
+include:
 
-% TODO: Insert a figure of a tree, preferable a side figure so it
-% doesn't interrupt the flow?
+\begin{itemize}
+\item Boolean functions (\texttt{AND}, \texttt{OR},\dots)
+\item Arithmetic functions ($+$,$\%$,\dots)
+\item Transcendental\footnote{A transcendental function is one that
+cannot be described with a finite sequence of algebraic operations;
+i.e. it transcends algebra.} functions (sin, cos, log,\dots)
+\item Conditional statements (if, switch, etc)
+\item Loops (while, for, etc)
+\item Variable manipulation (set, etc)
+\item Subroutines\footnote{Think of these like library calls. The
+evolutionary algorithm is really just trying to string these
+together.} (http-request, read-sensor, etc)
+\end{itemize}
 
-Of course, every program tree must be semantically correct; function
-nodes should have the correct amount of children (one for each
-argument), they must be of the correct type. Furthermore, since we're
-aiming to generate these trees automatically, we need to account for
-when things go wrong. What if we pass $-1$ into a logarithmic
-function? We can either make functions that fail return a default
-value, or have them throw exceptions that reduce the overall program
-fitness.
+The set of terminal nodes is smaller, and can include
+constants\footnote{Random constants are determined at the start of the
+program (i.e. once per run).}, functions such as \texttt{rand()},
+variables etc.
 
-Cramer and Koza made the following genetic programming algorithm:
+In order to create valid programs, the genetic algorithm should
+implement some type checking to ensure that only valid inputs are
+given to functions. This may include automatic type conversions to
+increase the number of valid trees that can be generated.
+
+The algorithm must also attempt to stop things
+like \texttt{RuntimeException} occuring; i.e. the program must produce
+some usable output. This can be done by having functions return a
+default value if they fail with invalid inputs\footnote{Type checking
+can't catch everything (though some functional languages have type
+systems that integrate proof systems and can check all kinds of funky
+stuff; Google for `dependent types'), divide by zero is an example of
+this.}, or by making functions that fail score very low when they are
+evaluated (so that they are selected out of the population).
+
+\subsection{Cramer \& Koza's Genetic Programming}
+
+As previously stated, the program is encoded as a tree, using
+functions and terminals. Cramer and Koza's algorithm is as follows:
 
 \begin{enumerate}
-  \item Initialise a random population of $n$ individuals.
-  \item Calculate the fitness of each individual in the population
-    (i.e. how well the function represented by each individual
-    performs).
-  \item Select two parents at random proportionally to their fitness
-    and reproduce them, producing new children.
-  \item Apply cross-over and mutation with a certain probability.
-  \item Remove all the parents.
-  \item Go back to step 2 unless satisfied.
+\item Initialise a random population of $n$ individuals
+\item Calculate the fitness of each individual
+\item Select two parents at random proportionally to their fitness and
+reproduce them together, producing two children
+\item Apply cross over with a certain probability
+\item Apply mutation with a certain probability
+\item Remove the parents
+\item Loop back to step 2 unless satisfied.
 \end{enumerate}
 
-Unfortunately, we're not finished yet. We need to have some checks on
-our trees to make sure that they don't become too large. First of all,
-we need to make sure that we generate sensible trees. We can do this
-in two ways:
+While the algorithm may seem well specified, there are a few
+additional things we need to clear up; namely initialisation and
+mutation/cross over.
+
+Initialisation is done using one of two methods:
 
 \begin{description}
-  \item \textbf{Full method}:
-    \begin{itemize}
-      \item Choose a random function node.
-      \item If the maximum depth has been reached, then fill the child
-        nodes with terminals.
-      \item Otherwise, recurse for the child nodes of the function.
-    \end{itemize}
-  \item \textbf{Grow method}:
-    \begin{itemize}
-      \item Choose a function or a terminal node at random.
-      \item If the maximum depth has been reached, then fill the child
-        nodes with terminals.
-      \item Otherwise, recurse for the child nodes of the function.
-    \end{itemize}
+\item \textbf{Full method}:\\ Choose a function node at random, and
+either fill its children with terminal nodes if we have reached the
+required depth, or loop and choose more function nodes.
+\item \textbf{Grow method}:\\ Choose a function or a terminal node at
+random, and fill its children with child nodes if the maximum depth
+has been reached, or loop back and choose child or function nodes.
 \end{description}
 
-Essentially, the \textit{full} method generates trees that are always
-of a specific depth (and each subtree of every node is of the same
-depth, unless you allow nodes with no arguments in your functions
-set). The \textit{grow} method will give you a larger range of trees,
-some will be far smaller than those generated by the other method (a
-terminal node could be picked on the first iteration for example).
+Both of these methods generate trees of up to a specified depth,
+though the full method always generates a tree where all branches are
+that depth, while the grow method generates branches \textit{up to}
+that depth.
 
-Mutation is applied to single individuals, where a node is chosen at
-random, and replaced by a randomly generated sub-tree. The sub-tree
-could be the same depth as the removed node if you wanted to preserve
-the depth of the tree (though sometimes deeper, more complicated
-functions may be needed to encapsulate the intricacies of the
-reference function).
+Mutation is applied to single individuals; a node is chosen at random
+and is substituted with a randomly generated sub-tree. Different
+implementations generate the sub-tree differently, some will maintain
+the depth of the tree to avoid it growing too big or generate a tree
+that can be used as input for the parent node (to avoid creating an
+invalid tree post-mutation), while others have no such constraints.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/mutation}
+\caption{Mutation of tree.}
+\end{figure}
+
+% Lecture 6
+
+Cross over is when children inherit information from both their
+parents. For our purposes, this involves making a tree with a sub-tree
+from one parent and a sub-tree from another parent. The node within
+each parent to cross over at is chosen at random (meaning that there
+could be a case when most of the tree is inherited from one parent and
+little of it is inherited from another.).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/cross-over}
+\caption{Cross over between two trees.}
+\end{figure}
+
+\subsection{Bloat}
+
+Bloat is when programs created by genetic algorithms get larger and
+larger trees without significant improvement to the fitness of the
+program for the function it is trying to perform. This is undesirable,
+since more memory is used, the expressions are evaluated slower and
+the population evolves more slowly.
+
+Bloat is caused by a variety of sources, such as when cross over is
+very unbalanced, and through random mutations. Bloat often `survives'
+and accumulates because it is neutral to fitness; many bloated
+sub-trees will have no effect on the fitness (these are celled
+introns).
+
+Examples of introns include expressions like $x-x$,
+$x~\&\&~\mathrm{true}$ etc (basically the identity functions).
+
+Controlling bloat is hard; but we can do so in a few different ways:
+\begin{itemize}
+\item Enforce tree size and depth limits, maybe by returning a parent
+of a tree if its child violates a limit.
+\item Anti bloat operations could be implemented such as making sure
+that the second subtree in cross over is small enough to not violate
+size constraints, or by making sure that a mutated tree is of the same
+size as the original one was.
+\item Selection can be used to reduce bloat; the fitness of trees can
+be reduced proportional to their size (parsimony pressure), or the
+fitness of trees violating the size constraints could simply be set to
+zero (the tarpeian method).
+\end{itemize}
+
+All evolutionary algorithms have a requirement for diversity and
+variability in their population in order to evolve. When all
+individuals in a population are similar, cross-over won't effect much
+change and mutation is unlikely to move individuals far in the
+`solution space'. Unfortunately, due to selection, populations tend to
+evolve to be relatively uniform.
+
+There are attempts to make evolutionary algorithms more similar to
+nature in the sense that there can be multiple populations of the same
+species in different areas with little mixing between them. Algorithms
+mimicking this effect are called \textit{Distributed EA's}, and evolve
+multiple populations in near-isolation (some mixing will occur) in
+order to try and get heterogeneous sets of effective genes. Some swarm
+algorithms are an example of this (multiple swarms can be present in
+the solution space).
+
+% Part Three
+
+\section{Complex Networks}
+
+Eva's notes and lectures are really very good, use her notes, not mine :)
