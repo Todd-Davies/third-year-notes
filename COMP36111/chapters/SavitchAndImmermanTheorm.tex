@@ -1,0 +1,59 @@
+\section{Savitch’s Theorem and the Immerman-Szelepcs ́enyi Theorem}
+
+In earlier chapters we looked at the problem of reachability in a graph.
+We noted that there is an algorithm that runs in \texttt{Time($O({n})$)} with a help of DFS, 
+therefore also space of \texttt{Space($O({n})$)}.
+
+
+But can we do better in term of space? 
+\subsection{Savitch’s Theorem}
+Savitch’s Theorem says that if a nondeterministic Turing machine can solve a problem using f(n) space,
+a deterministic TM can solve the same problem in the square of that space bound. 
+
+What does that mean for our reachability example?
+There is a non-deterministic algorithm that uses \texttt{Space($(log(n))^2)$}
+
+\begin{verbatim}
+  begin isReachableNum(u, v, G, h)
+    if h = 0
+      if u = v or (u, v) ∈ E return Yes
+      else return No 
+    for w ∈ V
+      if (isReachableNum(u, w, G, h − 1) and isReachableNum(w, v, G, h − 1)) 
+        return Yes
+    return No
+
+Then we can check reachability from u to v in G = (V, E)
+isReachableNum(u, v, G, |log V|)*
+\end{verbatim}
+* The reason for calling with |log V| is that any two vertex that can reach each other should be able to meet somewhere in the middle.
+
+By keeping u, v, and h on a work tape, we only need to \texttt{Space(h log(V))}. 
+What this algorithm does, is the algorithm works both bottom up and top down from the source and target 
+working from top to a midpoint through the graph, and from bottom to a midpoint through the graph. 
+This is possible because two connected source and target should be able to meet in the middle.
+Because we only consider only half the graph it is in logspace, but we do that twice, so logspace squared.
+
+
+Can we bring down the Space requirement even further?
+
+\subsection{Immerman’s Theorem}
+As you should have guessed from the leading question, yes we can. 
+By introducing non-determinisim we can bring down the Space requirement to \texttt{NLOGSPACE}
+\begin{verbatim}
+begin isReachable(u,v,G)
+  let current = u
+  let counter = 0
+  until current = v or counter = |V|
+    guess a node u′ ∈ V
+    if (current, u′)  ̸∈ E return NO 
+    let current = u′
+    increment counter
+  if current = v return YES 
+  else return NO
+\end{verbatim}
+With a bit of non-determinisim we only need to start the counter and current.
+What the algorithm does is, starting from source, it picks a random node from the graph, 
+if it picked a node that isn't connected to current node,
+it terminates with a no, if it picks a node that is connected with an edge to current node then make that the current node and repeat, 
+until either we reach the target node or the algorithm ran for as many nodes as there are in the graph (remember since it shoose randomly, it can choose nodes it has already traversed)
