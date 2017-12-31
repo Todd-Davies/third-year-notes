@@ -1,5 +1,4 @@
-Third year notes
-#################
+# Third year notes
 
 The aim of this project is to create a comprehensive set of notes on the course
 material covered by the whole of the third year of the BSc Computer Science
