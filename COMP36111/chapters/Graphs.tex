@@ -104,7 +104,7 @@ During a \textit{depth first traversal} (Section~\ref{depth-first-search}) of a
 graph, we can classify each edge into one of four types. When doing the
 traversal, we process each edge from left to right (from the viewer's
 perspective), and we define an edge to be an \textit{ancestor} of another edge
-if there is a path from the ancestor edge to the descendent edge and the ancestor
+if there is a path from the ancestor edge to the descendant edge and the ancestor
 is traversed first. The four types of edges are:
 
 \begin{description}
@@ -112,8 +112,8 @@ is traversed first. The four types of edges are:
     These edges lead to a new node during a search. If you remove all the edges 
     from the graph except tree edges, then you get a tree!
   \item \textbf{Forward edges}\\
-    These go from ancestor edges to descendent edges, but are not tree edges
-    (i.e. the descendent node has been visited already).
+    These go from ancestor edges to descendant edges, but are not tree edges
+    (i.e. the descendant node has been visited already).
   \item \textbf{Cross edges}\\
     These go between edges where no node is the ancestor of the other.
   \item \textbf{Back edges}\\
@@ -142,7 +142,7 @@ increasing order of mental strain.
 \href{https://en.wikipedia.org/wiki/Depth-first_search}{Depth first search}
 (DFS) is an algorithm to find a node in a graph starting from another node. It
 works on both directed and undirected graphs, and runs in $O(|V| + |E|)$
-(linear) time. The psudo code looks like this:
+(linear) time. The pseudo code looks like this:
 
 \marginpar{Note how we mark nodes as having been visited (by adding them to
 \texttt{visitedNodes}). This is so if there is a loop in the graph, the 
@@ -187,7 +187,7 @@ time using Tarjan's algorithm, which we'll see later.
 \subsubsection{Dijkstra's algorithm - Deprecated}
 \textbf{Dijkstra has been moved to Year 2 algorithms and no longer part of this course material.}
 Dijkstra's algorithm finds the undirected shortest path between two nodes in a
-graph. Here is the psudo-code:
+graph. Here is the pseudo-code:
 
 \marginpar{My best advice for learning an algorithm like this, is to get a 
 whiteboard, draw out the problem, and then run the solution manually on the 
@@ -243,7 +243,7 @@ A \textit{strongly connected component} is a subset of edges within a graph,
 where the subset is strongly connected. If a graph has only one strongly
 connected component, then it is strongly connected.
 
-The psudo code here is from
+The pseudo code here is from
 \href{https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm}{Wikipedia}.
 If you're reading this after week 8 of the \texttt{COMP36111} course, then you
 probably have your own implementation in C.

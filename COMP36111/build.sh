@@ -74,6 +74,9 @@ if [ $subl -eq 0 ]; then
   for i in `ls *.tex`; do
       aspell -t check $i;
   done;
+  for i in `ls chapters/*.tex`; do
+      aspell -t check $i;
+  done;
 fi
 
 if [ -s $preCompileCommands ]; then
