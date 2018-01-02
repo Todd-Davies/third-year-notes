@@ -412,3 +412,97 @@ then there will be a Hamiltonian path, like in the figure. This means that TSP
 is \texttt{NP-hard}. To show that it is \texttt{NP-Complete}, observe that TSP
 is in \texttt{NP}, which is easy, since we can obviously verify that a given
 path can be taken with a specific cost in polynomial time.
+
+\subsubsection{Union Find}
+
+\marginpar{Note, this has been freshly written in 2018, suggestions
+  and improvements are welcome.}
+
+Union find is one of my favourite algorithms, and sometimes comes in
+handy for programming competitions and interviews since it's good for
+efficiently combining groups of items together.
+
+`Union find' is a very literally named algorithm, since it has two
+main operations (and one initialisation operation):
+
+\begin{description}
+  \item \texttt{makeSet(a)}\\
+    Create a new set containing the element \texttt{a}.
+
+  \item \texttt{union(a,b)}\\
+    Join the set containing \texttt{a} and the set containing \texttt{b} together.
+    
+  \item \texttt{find(a)}\\
+    Find the identifier (or \textit{root}) for the set containing \texttt{a}. For
+    each element in a given set, the same element in the set will
+    always be returned as an identifier, or in maths terms:
+
+    \[
+      \forall b \in X, \exists c \in X, \mathtt{find(b)} = c
+      \].
+\end{description}
+
+Lets go over each of those methods, define how they can work, and give
+an upper bound on their runtime. See page~\pageref{sec:unionfindimpl} for a
+Python implementation.
+
+\texttt{makeSet} is implemented as follows, and obviously runs in
+constant time:
+
+\begin{verbatim}
+  makeSet(v):
+    newSet = [v]
+    v->set = newSet
+    newSet->size = 1
+    return newSet
+\end{verbatim}
+
+Next, \texttt{find} simply returns the list pointed to by the element,
+and also runs in constant time:
+
+\begin{verbatim}
+  find(v):
+    return v->set
+\end{verbatim}
+
+Finally, lets implement \texttt{union(a,b)}. This runs in $O(|b|)$
+where $b$ is the smaller set, assuming that \texttt{append} is
+constant time:
+
+\begin{verbatim}
+  union(a,b):
+    aSet = find(a)
+    bSet = find(b)
+    # Already in the same set
+    if aSet == bSet:
+      return aSet
+    if aSet->size < bSet->size:
+      return union(b,a) # Ensure that the small one is appended to the big one
+    for element in bSet:
+      element->set = aSet
+    aSet = append(aSet, bSet)
+    aSet->size = aSet->size + bSet->size
+    return aSet
+\end{verbatim}
+
+We can use this to implement the connected components algorithm in
+$O(n log(n))$ time, where $n$ is the number of nodes in the graph:
+
+\begin{verbatim}
+  connected_components(N, E):
+    for n in N:
+      makeSet(n)
+    for (a,b) in E:
+      union(a, b)
+\end{verbatim}
+
+This appears to be $O(|N| + |E||N|)$ (iterate over the nodes once,
+then for each edge, possibly iterate over the nodes again), so it is
+effectively $O(n^2)$ in the size of the graph. However, it is the
+case, that for each element, the set it belongs to can only be updated
+at most $log(n)$ times, since it always moves to a set at least twice
+as big as the one it is currently in (and therefore can happen at most
+$log(n)$ times).
+
+Therefore, $union(a,b)$ actually has a runtime of $O(log(n)$ in this
+context, meaning the whole algorithm is $O(n log(n))$.
