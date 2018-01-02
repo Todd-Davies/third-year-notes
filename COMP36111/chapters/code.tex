@@ -2,12 +2,10 @@
 \label{sec:unionfindimpl}
 
 \begin{verbatim}
->>> sizeSet = {}
 >>> mapping = {}
 >>> 
 >>> def makeSet(a):
 ...   mapping[a] = [a]
-...   sizeSet[a] = 1
 ... 
 >>> def find(a):
 ...   return mapping[a]
@@ -18,12 +16,12 @@
 ...   # If the elements are in the same set, return
 ...   if aSet[0] == bSet[0]:
 ...     return aSet
-...   if sizeSet[aSet[0]] < sizeSet[bSet[0]]:
+...   # N.b. len() is O(1) in Python
+...   if len(aSet) < len(bSet):
 ...     (s,l) = (aSet, bSet)
 ...   else:
 ...     (s,l) = (bSet, aSet)
 ...   l.extend(s)
-...   sizeSet[l[0]] = sizeSet[l[0]] + sizeSet[s[0]]
 ...   for element in s:
 ...     mapping[element] = l
 ...   return l
